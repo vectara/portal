@@ -3,22 +3,37 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8080",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@vectara/react-chatbot": "^1.0.0",
+    "@vectara/react-search": "^0.0.15",
+    "argon2": "^0.40.1",
+    "debounce": "^2.0.0",
+    "formidable": "^3.5.1",
+    "markdown-to-jsx": "^7.4.6",
+    "next": "14.1.0",
+    "pg": "^8.11.5",
+    "qs": "^6.12.1",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.1.0"
+    "react-drag-drop-files": "^2.3.10",
+    "recoil": "^0.7.7",
+    "recoil-persist": "^5.1.0",
+    "short-unique-id": "^5.0.3"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@types/formidable": "^3.4.5",
     "@types/node": "^20",
+    "@types/qs": "^6.9.14",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "14.1.0"
+    "eslint-config-next": "14.1.0",
+    "typescript": "^5"
   }
 }

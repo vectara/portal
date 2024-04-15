@@ -1,0 +1,236 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.loader,
+.loader:after {
+  border-radius: 50%;
+  width: 20em;
+  height: 20em;
+}
+.loader {
+  margin: 30px auto;
+  font-size: 10px;
+  position: relative;
+  text-indent: -9999em;
+  border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+  border-left: 1.1em solid #ddd;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: load8 1.1s infinite linear;
+  animation: load8 1.1s infinite linear;
+}
+@-webkit-keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+@keyframes load8 {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url(fonts/Montserrat-VariableFont_wght.ttf) format("woff");
+}
+
+.file-uploader-wrapper > .file-uploader {
+  min-width: initial;
+  max-width: initial;
+  width: 100%;
+  border: 2px dashed #888;
+  color: #ddd;
+  min-height: 360px;
+  width: 100%;
+  display: flex;
+  gap: 0.25rem;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: auto;
+}
+
+.file-uploader-wrapper > .file-uploader.with-files {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.file-types {
+  display: none;
+}
+
+.vectara-medal {
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+
+  animation-name: open-medal;
+  animation-duration: 0.75s;
+  animation-fill-mode: forwards;
+  animation-delay: 0.25s;
+}
+
+.vectara-medal-wrapper {
+  animation-name: set-box-shadow;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+  animation-delay: 0.5s;
+}
+
+@keyframes set-box-shadow {
+  0% {
+    box-shadow: inset 0px 0px 0px 0px rgba(255, 255, 255, 1);
+  }
+
+  45% {
+    box-shadow: inset 0px 0px 0px 0px rgba(255, 255, 255, 1);
+  }
+
+  100% {
+    box-shadow: inset 0px 0px 4px 3px rgba(150, 150, 150, 1);
+  }
+}
+
+.vectara-medal-logo {
+  opacity: 0;
+  animation-name: reveal-logo;
+  animation-duration: 0.4s;
+  animation-fill-mode: forwards;
+  animation-delay: 0.85s;
+}
+
+@keyframes reveal-logo {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes open-medal {
+  0% {
+    width: 10px;
+    height: 10px;
+  }
+
+  100% {
+    width: 164px;
+    height: 164px;
+  }
+}
+
+.dot-flashing {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #ddd;
+  color: #ddd;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+}
+.dot-flashing::before,
+.dot-flashing::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #ddd;
+  color: #ddd;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 15px;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #ddd;
+  color: #ddd;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% {
+    background-color: #ddd;
+  }
+  50%,
+  100% {
+    background-color: rgba(152, 128, 255, 0.2);
+  }
+}
