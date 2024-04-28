@@ -7,7 +7,6 @@ import { usePortals } from "./usePortals";
 import { Fade, Flex, Heading, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { LoadingMessage } from "../portal/[id]/page";
-import { useUser } from "../hooks/useUser";
 import { useCheckPrequisites } from "../hooks/useCheckPrerequsites";
 
 const Portals = () => {
@@ -19,29 +18,9 @@ const Portals = () => {
 };
 
 const Content = () => {
-  const [portalDatas, setPortalDatas] = useState<Array<PortalData> | null>(
-    null
-  );
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { getPortals } = usePortals();
-  const { currentUser } = useUser();
-
   useCheckPrequisites();
+  const { portals, isLoading } = usePortals();
 
-  useEffect(() => {
-    const doAsync = async () => {
-      const portalDatas = await getPortals(
-        currentUser?.vectaraCustomerId as string
-      );
-
-      window.setTimeout(() => {
-        setPortalDatas(portalDatas);
-        setIsLoading(false);
-      }, 2000);
-    };
-
-    doAsync();
-  }, [currentUser?.vectaraCustomerId]);
   return (
     <Flex
       width="75%"
@@ -75,12 +54,12 @@ const Content = () => {
           padding="1rem"
           gap="1rem"
         >
-          {portalDatas?.map((portalData, index) => (
+          {portals?.map((portal, index) => (
             <PortalCard
               key={`portal-data-${index}`}
-              name={portalData.name}
-              type={portalData.type}
-              id={portalData.portalKey}
+              name={portal.name}
+              type={portal.type}
+              id={portal.portalKey}
             />
           ))}
         </Flex>

@@ -16,7 +16,7 @@ import { LogoutIcon } from "../icons/Logout";
 import { useUser } from "../hooks/useUser";
 import { useRouter } from "next/navigation";
 
-type PageId = "login" | "profile" | "portals" | "portal" | "create" | "signup";
+type PageId = "login" | "profile" | "portals" | "portal" | "create";
 
 interface NavigationProps {
   pageId: PageId;
@@ -56,7 +56,7 @@ export const Page = ({ pageId, children }: PageProps) => {
 };
 
 const Header = ({ pageId }: NavigationProps) => {
-  const { currentUser, logoutUser } = useUser();
+  const { currentUser } = useUser();
   const router = useRouter();
   const [displayType, setDisplayType] = useState<"none" | "flex">("none");
 
@@ -85,15 +85,11 @@ const Header = ({ pageId }: NavigationProps) => {
           <Link href="/me">Your Profile</Link>
         </ListItem>
         <ListItem display="flex" flexGrow={1}>
-          <Box
-            style={logoutStyles}
-            onClick={() => {
-              logoutUser(currentUser!.sessionToken);
-              router.push("/");
-            }}
-          >
+          <Box style={logoutStyles}>
             <LogoutIcon />
-            <Box>Log Out</Box>
+            <Box>
+              <a href="/api/auth/logout">Log Out</a>
+            </Box>
           </Box>
         </ListItem>
       </UnorderedList>

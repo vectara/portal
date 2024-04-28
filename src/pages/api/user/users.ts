@@ -29,14 +29,9 @@ export default async function handler(
   if (!loggedInUser) {
     return res.status(200).send({ users: [] });
   }
-  console.log("### GETTING USER IDS");
 
   const usersIds = await getUserIdsForParentUserId(loggedInUser.id);
-
-  console.log("### USERS IDS: ", usersIds);
-
   const users = await getUsersFromIds(usersIds.users_ids);
-  console.log("### USERS: ", users);
 
   return res.status(200).send({ users });
 }

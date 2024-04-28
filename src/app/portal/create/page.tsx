@@ -59,7 +59,7 @@ const CreateForm = () => {
   const toast = useToast();
   const router = useRouter();
 
-  useCheckPrequisites();
+  useCheckPrequisites(true);
 
   const validateForm = (formValues: FormState) => {
     return {
@@ -84,7 +84,7 @@ const CreateForm = () => {
       });
 
       setTimeout(() => {
-        router.push(`/portal/${createdPortal.key}`);
+        window.open(`/portal/${createdPortal.key}`, "_blank");
       }, 3000);
     } else {
       toast({

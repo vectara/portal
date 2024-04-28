@@ -17,16 +17,10 @@ const pool = new pg.Pool({
 
 /* PORTALS */
 
-export const getPortalsForUser = (vectaraCustomerId: string) => {
-  console.log(
-    "### QUERY: ",
-    `select * from portals where owner_vectara_customer_id = '${vectaraCustomerId}'`
-  );
+export const getPortalsForUser = (userId: string) => {
   return pool.connect().then((client: any) => {
     return client
-      .query(
-        `select * from portals where owner_vectara_customer_id = '${vectaraCustomerId}'`
-      )
+      .query(`select * from portals where owner_id = ${userId}`)
       .then((resolved: any) => {
         client.release();
         return resolved.rows;
@@ -43,12 +37,11 @@ export const createPortalForUser = (
   corpusId: string,
   type: string,
   key: string,
-  vectaraCustomerId: string,
-  vectaraQueryApiKey: string,
+  ownerId: number,
   isRestricted: boolean
 ) => {
   return sendQuery(
-    `INSERT INTO portals VALUES ('${name}', '${corpusId}', '${type}', '${key}', '${vectaraCustomerId}', '${vectaraQueryApiKey}', ${isRestricted});`
+    `INSERT INTO portals (name, vectara_corpus_id, type, key, is_restricted, owner_id) VALUES ('${name}', '${corpusId}', '${type}', '${key}', ${isRestricted}, ${ownerId});`
   );
 };
 
@@ -73,11 +66,11 @@ export const getPortalByKey = (key: string) => {
 
 export const createUser = (
   email: string,
-  hashedPassword: string,
+  authServiceId: string,
   role: string = "admin"
 ) => {
   return sendQuery(
-    `INSERT INTO users (email, password, role) VALUES ('${email}', '${hashedPassword}', '${role}') RETURNING *;`,
+    `INSERT INTO users (email, auth_service_id, role) VALUES ('${email}', '${authServiceId}', '${role}') ON CONFLICT (auth_service_id) DO NOTHING RETURNING id;`,
     (resolved) => resolved.rows?.[0] ?? null
   );
 };
@@ -95,7 +88,6 @@ export const updateUser = (
   }', users_ids = '{${updatedUsersIdsToAdd?.join(
     ","
   )}}'  WHERE email='${email}'`;
-  console.log("### QUERY: ", q);
   return sendQuery(q);
 };
 
@@ -113,6 +105,13 @@ export const getUserById = (id: number) => {
   );
 };
 
+export const getUserByAuthServiceId = (authServiceId: string) => {
+  return sendQuery(
+    `SELECT * FROM users where auth_service_id = '${authServiceId}';`,
+    (resolved) => resolved.rows?.[0] ?? null
+  );
+};
+
 export const getUserIdsForParentUserId = (id: number) => {
   return sendQuery(
     `SELECT users_ids FROM users where id = '${id}';`,
@@ -124,7 +123,6 @@ export const getUsersFromIds = (ids: Array<number>) => {
   const q = `SELECT *
   FROM users
   WHERE id in (${ids.join(",")})`;
-  console.log("### Q: ", q);
   return sendQuery(q, (resolved) => resolved.rows ?? null);
 };
 

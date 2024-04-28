@@ -17,15 +17,6 @@ export default function handler(
     return res.status(500).send({ error: "There was an error" });
   }
 
-  // if (req.method === "GET") {
-  //   const urlParts = req.url.split("/");
-
-  //   const portalKey = urlParts[urlParts.length - 1];
-  //   return getPortalByKey(portalKey).then((portal: any) => {
-  //     return res.status(200).send({ portal });
-  //   });
-  // }
-
   if (req.method === "GET") {
     const urlParts = req.url.split("/");
 

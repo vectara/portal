@@ -1,63 +1,44 @@
 import axios from "axios";
-import { currentUserState } from "../state/user";
-import { useRecoilState } from "recoil";
+import { useEffect, useState } from "react";
+
+type CurrentUser = {
+  id: number | null;
+  email: string | null;
+  vectaraCustomerId: string | null;
+  vectaraPersonalApiKey: string | null;
+  role: string;
+};
 
 export const useUser = () => {
-  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
+  const [currentUser, setCurrentUser] = useState<
+    CurrentUser | null | undefined
+  >();
 
-  const loginUser = async (email: string, password: string) => {
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "/api/user/login",
-      data: {
-        email,
-        password,
-      },
-    };
-
-    const response = await axios(config);
-    const loggedInUser = response.data.user
-      ? {
-          id: response.data.user.id,
-          email: response.data.user.email,
-          role: response.data.user.role,
-          vectaraCustomerId: response.data.user.vectara_customer_id,
-          vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
-          sessionToken: response.data.user.sessionToken,
-          users_ids: response.data.user.users_ids,
+  useEffect(() => {
+    const doAsync = async () => {
+      try {
+        const { user } = await getCurrentUser();
+        if (user) {
+          setCurrentUser({
+            id: user.id,
+            email: user.email,
+            vectaraCustomerId: user.vectara_customer_id,
+            vectaraPersonalApiKey: user.vectara_personal_api_key,
+            role: user.role,
+          });
         }
-      : null;
-
-    if (loggedInUser) {
-      setCurrentUser(loggedInUser);
-    }
-
-    return loggedInUser;
-  };
-
-  const logoutUser = async (sessionToken: string) => {
-    setCurrentUser(null);
-
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "/api/user/logout",
-      headers: {
-        Authorization: sessionToken,
-      },
+      } catch {
+        setCurrentUser(null);
+      }
     };
 
-    await axios(config);
+    doAsync();
+  }, []);
 
-    return true;
-  };
-
-  const getUser = async (id: number) => {
+  const getCurrentUser = async () => {
     const config = {
       method: "get",
-      maxBodyLength: Infinity,
-      url: `/api/user/${id}`,
+      url: `/api/me`,
     };
 
     const response = await axios(config);
@@ -97,9 +78,6 @@ export const useUser = () => {
     const config = {
       maxBodyLength: Infinity,
       url: "/api/user/users",
-      headers: {
-        Authorization: currentUser?.sessionToken,
-      },
     };
 
     const response = await axios(config);
@@ -113,24 +91,17 @@ export const useUser = () => {
     vectaraPersonalApiKey?: string,
     addEmails?: Array<string>
   ) => {
-    const config = {
-      maxBodyLength: Infinity,
-      headers: {
-        Authorization: currentUser?.sessionToken,
-      },
-    };
-
-    const response = await axios.patch(
-      "/api/user",
-      { email, vectaraCustomerId, vectaraPersonalApiKey, addEmails },
-      config
-    );
+    const response = await axios.patch("/api/user", {
+      email,
+      vectaraCustomerId,
+      vectaraPersonalApiKey,
+      addEmails,
+    });
 
     if (response.data.success && currentUser) {
-      const updatedUser = await getUser(currentUser.id ?? 0);
+      const updatedUser = await getCurrentUser();
       setCurrentUser({
         ...updatedUser.user,
-        sessionToken: currentUser.sessionToken,
         vectaraCustomerId: updatedUser.vectara_customer_id,
         vectaraPersonalApiKey: updatedUser.vectara_personal_api_key,
       });
@@ -140,11 +111,9 @@ export const useUser = () => {
   };
 
   return {
-    getUser,
+    getCurrentUser,
     createUser,
     updateUser,
-    loginUser,
-    logoutUser,
     currentUser,
     getChildUsersIds,
   };

@@ -2,20 +2,26 @@ import { useEffect, useState } from "react";
 import { useUser } from "./useUser";
 import { useRouter } from "next/navigation";
 
-export const useCheckPrequisites = () => {
+export const useCheckPrequisites = (verifyVectaraCredentials = true) => {
   const router = useRouter();
   const { currentUser } = useUser();
 
   useEffect(() => {
-    if (!currentUser) {
+    if (currentUser === undefined) {
+      return;
+    }
+
+    if (currentUser === null) {
       router.push("/");
     }
 
-    if (
-      !currentUser?.vectaraCustomerId ||
-      !currentUser?.vectaraPersonalApiKey
-    ) {
-      router.push("/me");
+    if (verifyVectaraCredentials) {
+      if (
+        !currentUser?.vectaraCustomerId ||
+        !currentUser?.vectaraPersonalApiKey
+      ) {
+        router.push("/me");
+      }
     }
   }, [
     currentUser,

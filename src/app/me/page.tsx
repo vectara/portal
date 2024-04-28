@@ -16,6 +16,7 @@ import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
 import { useRouter } from "next/navigation";
+import { useCheckPrequisites } from "../hooks/useCheckPrerequsites";
 
 const Profile = () => {
   return (
@@ -77,8 +78,9 @@ const Content = () => {
     Array<string>
   >([]);
   const { currentUser, updateUser, getChildUsersIds } = useUser();
-  const router = useRouter();
   const isSubmitDisabled = false;
+
+  useCheckPrequisites(false);
 
   useEffect(() => {
     const doAsync = async () => {
@@ -90,7 +92,6 @@ const Content = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      router.push("/vectara-portal");
       return;
     }
 

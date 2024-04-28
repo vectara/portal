@@ -22,9 +22,9 @@ export default function handler(
     return res.status(400).send({ error: "Error!" });
   }
 
-  const { vectaraCustomerId } = req.body;
+  const { ownerId } = req.body;
 
-  return getPortalsForUser(vectaraCustomerId).then((portals: any) => {
+  return getPortalsForUser(ownerId).then((portals: any) => {
     return res.status(200).send({ portals });
   });
 

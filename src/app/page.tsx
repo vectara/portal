@@ -3,7 +3,6 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import { Page } from "./components/Page";
 import { VectaraLogoLarge } from "./icons/Logo";
 import { LoginForm } from "./LoginForm";
-import Link from "next/link";
 
 const App = () => {
   return (
@@ -33,14 +32,6 @@ const App = () => {
           </Box>
         </Flex>
         <LoginForm />
-        <Flex direction="column" color="#ddd" alignItems="center" gap=".2rem">
-          <Text fontSize=".85rem">or</Text>
-          <Link href="/signup">
-            <Text fontWeight={500} fontSize=".9">
-              Sign Up
-            </Text>
-          </Link>
-        </Flex>
       </Flex>
     </Page>
   );

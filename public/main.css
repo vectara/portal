@@ -126,21 +126,21 @@ code {
 }
 
 .vectara-medal {
-  width: 10px;
-  height: 10px;
+  width: 0;
+  height: 0;
   background-color: #fff;
 
   animation-name: open-medal;
   animation-duration: 0.75s;
   animation-fill-mode: forwards;
-  animation-delay: 0.25s;
+  animation-delay: 0.5s;
 }
 
 .vectara-medal-wrapper {
   animation-name: set-box-shadow;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
-  animation-delay: 0.5s;
+  animation-delay: 0.75s;
 }
 
 @keyframes set-box-shadow {
@@ -162,7 +162,7 @@ code {
   animation-name: reveal-logo;
   animation-duration: 0.4s;
   animation-fill-mode: forwards;
-  animation-delay: 0.85s;
+  animation-delay: 1.1s;
 }
 
 @keyframes reveal-logo {
@@ -177,8 +177,8 @@ code {
 
 @keyframes open-medal {
   0% {
-    width: 10px;
-    height: 10px;
+    width: 0px;
+    height: 0px;
   }
 
   100% {

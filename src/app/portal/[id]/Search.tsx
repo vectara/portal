@@ -96,8 +96,6 @@ export const Search = (props: PortalData) => {
     onSearch(e.target.value);
   };
 
-  console.log("### CURRENT", currentUser);
-
   return (
     <Flex style={getWrapperStyles(didInitiateSearch)} gap={4}>
       <Flex direction="column" gap="2rem" align="center">

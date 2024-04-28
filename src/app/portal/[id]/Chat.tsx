@@ -120,9 +120,6 @@ export const Chat = (props: PortalData) => {
     );
   });
 
-  console.log("### ISLOADING: ", isLoading);
-  console.log("### ISSTR: ", isStreamingResponse);
-
   useEffect(updateScrollPosition, [messageHistory, activeMessage]);
 
   return (
