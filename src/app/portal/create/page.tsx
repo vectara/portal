@@ -18,7 +18,7 @@ import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
 import { useCreatePortal } from "./useCreatePortal";
 import { PortalType } from "../../types";
 import { useRouter } from "next/navigation";
-import { useCheckPrequisites } from "../../hooks/useCheckPrerequsites";
+import { useCheckPrequisites } from "../../hooks/useCheckPrerequisites";
 import { Centered } from "@/app/components/Centered";
 
 interface FormState {

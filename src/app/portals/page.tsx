@@ -1,24 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Page } from "../components/Page";
-import { PortalData, PortalType } from "../types";
+import { PortalType } from "../types";
 import { usePortals } from "./usePortals";
 import { Fade, Flex, Heading, Text } from "@chakra-ui/react";
 import Link from "next/link";
 import { LoadingMessage } from "../portal/[id]/page";
-import { useCheckPrequisites } from "../hooks/useCheckPrerequsites";
 
 const Portals = () => {
   return (
-    <Page pageId="portals">
+    <Page
+      pageId="portals"
+      accessPrerequisites={{ loggedInUser: true, vectaraCredentials: true }}
+    >
       <Content />
     </Page>
   );
 };
 
 const Content = () => {
-  useCheckPrequisites();
   const { portals, isLoading } = usePortals();
 
   return (

@@ -125,7 +125,7 @@ code {
   display: none;
 }
 
-.vectara-medal {
+.vectara-logo {
   width: 0;
   height: 0;
   background-color: #fff;
@@ -136,7 +136,7 @@ code {
   animation-delay: 0.5s;
 }
 
-.vectara-medal-wrapper {
+.vectara-logo-wrapper {
   animation-name: set-box-shadow;
   animation-duration: 0.5s;
   animation-fill-mode: forwards;
@@ -157,7 +157,7 @@ code {
   }
 }
 
-.vectara-medal-logo {
+.vectara-logo-content {
   opacity: 0;
   animation-name: reveal-logo;
   animation-duration: 0.4s;

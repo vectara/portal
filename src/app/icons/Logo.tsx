@@ -28,8 +28,8 @@ const logoStyles = {
 
 export const VectaraLogoLarge = () => {
   return (
-    <Flex style={wrapperStylesLg} className="vectara-medal-wrapper">
-      <Box style={logoStylesLg} className="vectara-medal-logo" />
+    <Flex style={wrapperStylesLg} className="vectara-logo-wrapper">
+      <Box style={logoStylesLg} className="vectara-logo-content" />
     </Flex>
   );
 };

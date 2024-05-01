@@ -1,48 +1,32 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-
-type CurrentUser = {
-  id: number | null;
-  email: string | null;
-  vectaraCustomerId: string | null;
-  vectaraPersonalApiKey: string | null;
-  role: string;
-};
+import { useRecoilState } from "recoil";
+import { currentUserState } from "../state/currentUser";
 
 export const useUser = () => {
-  const [currentUser, setCurrentUser] = useState<
-    CurrentUser | null | undefined
-  >();
+  const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
 
-  useEffect(() => {
-    const doAsync = async () => {
-      try {
-        const { user } = await getCurrentUser();
-        if (user) {
-          setCurrentUser({
-            id: user.id,
-            email: user.email,
-            vectaraCustomerId: user.vectara_customer_id,
-            vectaraPersonalApiKey: user.vectara_personal_api_key,
-            role: user.role,
-          });
-        }
-      } catch {
-        setCurrentUser(null);
-      }
-    };
-
-    doAsync();
-  }, []);
-
-  const getCurrentUser = async () => {
+  const loadCurrentUser = async () => {
     const config = {
       method: "get",
       url: `/api/me`,
     };
 
-    const response = await axios(config);
-    return response.data;
+    try {
+      const response = await axios(config);
+      const user = response.data.user;
+
+      if (user) {
+        setCurrentUser({
+          id: user.id,
+          email: user.email,
+          vectaraCustomerId: user.vectara_customer_id,
+          vectaraPersonalApiKey: user.vectara_personal_api_key,
+          role: user.role,
+        });
+      }
+    } catch {
+      setCurrentUser(null);
+    }
   };
 
   const createUser = async (email: string, password: string) => {
@@ -91,19 +75,17 @@ export const useUser = () => {
     vectaraPersonalApiKey?: string,
     addEmails?: Array<string>
   ) => {
-    const response = await axios.patch("/api/user", {
-      email,
+    const response = await axios.patch("/api/me", {
       vectaraCustomerId,
       vectaraPersonalApiKey,
       addEmails,
     });
 
-    if (response.data.success && currentUser) {
-      const updatedUser = await getCurrentUser();
+    if (response.data.user && currentUser) {
       setCurrentUser({
-        ...updatedUser.user,
-        vectaraCustomerId: updatedUser.vectara_customer_id,
-        vectaraPersonalApiKey: updatedUser.vectara_personal_api_key,
+        ...currentUser,
+        vectaraCustomerId: response.data.user.vectara_customer_id,
+        vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
       });
     }
 
@@ -111,7 +93,7 @@ export const useUser = () => {
   };
 
   return {
-    getCurrentUser,
+    loadCurrentUser,
     createUser,
     updateUser,
     currentUser,

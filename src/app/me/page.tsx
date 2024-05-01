@@ -15,12 +15,10 @@ import {
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
-import { useRouter } from "next/navigation";
-import { useCheckPrequisites } from "../hooks/useCheckPrerequsites";
 
 const Profile = () => {
   return (
-    <Page pageId="profile">
+    <Page pageId="profile" accessPrerequisites={{ loggedInUser: true }}>
       <Flex padding="2rem" w="100%">
         <Flex direction="column" gap="1.25rem" style={searchPanelStyles}>
           <Heading size="lg">Your Profile</Heading>
@@ -79,8 +77,6 @@ const Content = () => {
   >([]);
   const { currentUser, updateUser, getChildUsersIds } = useUser();
   const isSubmitDisabled = false;
-
-  useCheckPrequisites(false);
 
   useEffect(() => {
     const doAsync = async () => {

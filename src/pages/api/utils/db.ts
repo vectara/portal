@@ -76,19 +76,17 @@ export const createUser = (
 };
 
 export const updateUser = (
-  email: string,
+  userId: number,
   vectaraCustomerId?: string,
-  vectaraPersonalApiKey?: string,
-  updatedUsersIdsToAdd: Array<number> = []
+  vectaraPersonalApiKey?: string
 ) => {
-  const q = `UPDATE users SET vectara_customer_id = '${
-    vectaraCustomerId ?? "NULL"
-  }', vectara_personal_api_key='${
-    vectaraPersonalApiKey ?? "NULL"
-  }', users_ids = '{${updatedUsersIdsToAdd?.join(
-    ","
-  )}}'  WHERE email='${email}'`;
-  return sendQuery(q);
+  return sendQuery(
+    `UPDATE users SET vectara_customer_id = ${
+      vectaraCustomerId ? `"${vectaraCustomerId}"` : "NULL"
+    }, vectara_personal_api_key='${
+      vectaraPersonalApiKey ?? "NULL"
+    }' WHERE id='${userId}' RETURNING *;`
+  );
 };
 
 export const getUserByEmail = (email: string) => {

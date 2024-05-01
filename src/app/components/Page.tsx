@@ -15,6 +15,10 @@ import { RecoilRoot } from "recoil";
 import { LogoutIcon } from "../icons/Logout";
 import { useUser } from "../hooks/useUser";
 import { useRouter } from "next/navigation";
+import {
+  PagePrerequisites,
+  useCheckPrequisites,
+} from "../hooks/useCheckPrerequisites";
 
 type PageId = "login" | "profile" | "portals" | "portal" | "create";
 
@@ -24,14 +28,15 @@ interface NavigationProps {
 
 interface PageProps extends NavigationProps {
   pageId: PageId;
-  children: ReactNode;
+  accessPrerequisites?: PagePrerequisites;
+  children?: ReactNode;
 }
 
 const HEADERLESS_PAGE_IDS = ["login", "portal", "signup"];
 
-export const Page = ({ pageId, children }: PageProps) => {
+export const Page = ({ pageId, children, accessPrerequisites }: PageProps) => {
   const [didEnter, setDidEnter] = useState<boolean>(false);
-  const toast = useToast();
+  const { canAccess } = useCheckPrequisites(accessPrerequisites);
 
   useEffect(() => {
     window.setTimeout(() => setDidEnter(true), 300);
@@ -39,18 +44,24 @@ export const Page = ({ pageId, children }: PageProps) => {
 
   return (
     <Flex style={pageStyles} direction="column">
-      {HEADERLESS_PAGE_IDS.indexOf(pageId) === -1 && <Header pageId={pageId} />}
-      <Flex alignItems="center" justifyContent="center" h="100%">
-        <Fade
-          in={didEnter}
-          className="test"
-          style={{ width: "100%", height: "100%" }}
-        >
-          <Flex w="100%" h="100%" justifyContent="center">
-            {children}
+      {canAccess && (
+        <>
+          {HEADERLESS_PAGE_IDS.indexOf(pageId) === -1 && (
+            <Header pageId={pageId} />
+          )}
+          <Flex alignItems="center" justifyContent="center" h="100%">
+            <Fade
+              in={didEnter}
+              className="test"
+              style={{ width: "100%", height: "100%" }}
+            >
+              <Flex w="100%" h="100%" justifyContent="center">
+                {children}
+              </Flex>
+            </Fade>
           </Flex>
-        </Fade>
-      </Flex>
+        </>
+      )}
     </Flex>
   );
 };
