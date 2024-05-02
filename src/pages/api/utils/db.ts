@@ -82,7 +82,7 @@ export const updateUser = (
 ) => {
   return sendQuery(
     `UPDATE users SET vectara_customer_id = ${
-      vectaraCustomerId ? `"${vectaraCustomerId}"` : "NULL"
+      vectaraCustomerId ? `'${vectaraCustomerId}'` : "NULL"
     }, vectara_personal_api_key='${
       vectaraPersonalApiKey ?? "NULL"
     }' WHERE id='${userId}' RETURNING *;`

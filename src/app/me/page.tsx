@@ -11,6 +11,7 @@ import {
   Heading,
   Input,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
@@ -20,7 +21,7 @@ const Profile = () => {
   return (
     <Page pageId="profile" accessPrerequisites={{ loggedInUser: true }}>
       <Flex padding="2rem" w="100%">
-        <Flex direction="column" gap="1.25rem" style={searchPanelStyles}>
+        <Flex direction="column" gap="1.25rem" style={panelStyles}>
           <Heading size="lg">Your Profile</Heading>
           <Content />
         </Flex>
@@ -29,7 +30,7 @@ const Profile = () => {
   );
 };
 
-const searchPanelStyles = {
+const panelStyles = {
   backgroundColor: "#242424",
   borderRadius: "1rem",
   padding: "3rem 3.5rem",
@@ -37,10 +38,6 @@ const searchPanelStyles = {
   color: "#ddd",
   overflow: "auto",
   width: "100%",
-};
-
-const inputStyles = {
-  border: "1px solid #aaa",
 };
 
 interface FormState {
@@ -71,12 +68,13 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 
 const Content = () => {
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
-  const [formErrors, setFormErrors] = useState<FormErrors>(INITIAL_FORM_ERRORS);
+  const [, setFormErrors] = useState<FormErrors>(INITIAL_FORM_ERRORS);
   const [currentChildUserEmails, setCurrentChildUserEmails] = useState<
     Array<string>
   >([]);
   const { currentUser, updateUser, getChildUsersIds } = useUser();
-  const isSubmitDisabled = false;
+  const [isSubmitDisabled, setIsSubmitedDisabled] = useState<boolean>(true);
+  const toast = useToast();
 
   useEffect(() => {
     const doAsync = async () => {
@@ -98,14 +96,23 @@ const Content = () => {
     });
   }, [currentUser]);
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!currentUser) return;
-    updateUser(
-      currentUser?.email ?? "",
+
+    setIsSubmitedDisabled(true);
+
+    await updateUser(
       formState.vectaraCustomerId,
       formState.vectaraPersonalApiKey,
       formState.pendingUserEmailsToAdd
     );
+
+    toast({
+      status: "success",
+      title: "Profile Updated!",
+      duration: 3000,
+      position: "top",
+    });
   };
 
   const isUserListEmpty =
@@ -149,12 +156,14 @@ const Content = () => {
             <Input
               type="text"
               value={formState.vectaraCustomerId}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,
                   vectaraCustomerId: e.target.value ?? undefined,
-                })
-              }
+                });
+
+                setIsSubmitedDisabled(false);
+              }}
               border="1px solid #888"
               minWidth="320px"
             />
@@ -168,12 +177,14 @@ const Content = () => {
             <Input
               type="password"
               value={formState.vectaraPersonalApiKey}
-              onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,
                   vectaraPersonalApiKey: e.target.value ?? undefined,
-                })
-              }
+                });
+
+                setIsSubmitedDisabled(false);
+              }}
               border="1px solid #888"
               minWidth="320px"
             />

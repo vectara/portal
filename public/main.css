@@ -126,65 +126,17 @@ code {
 }
 
 .vectara-logo {
-  width: 0;
-  height: 0;
   background-color: #fff;
-
-  animation-name: open-medal;
-  animation-duration: 0.75s;
-  animation-fill-mode: forwards;
-  animation-delay: 0.5s;
+  height: 164px;
+  width: 164px;
 }
 
 .vectara-logo-wrapper {
-  animation-name: set-box-shadow;
-  animation-duration: 0.5s;
-  animation-fill-mode: forwards;
-  animation-delay: 0.75s;
-}
-
-@keyframes set-box-shadow {
-  0% {
-    box-shadow: inset 0px 0px 0px 0px rgba(255, 255, 255, 1);
-  }
-
-  45% {
-    box-shadow: inset 0px 0px 0px 0px rgba(255, 255, 255, 1);
-  }
-
-  100% {
-    box-shadow: inset 0px 0px 4px 3px rgba(150, 150, 150, 1);
-  }
+  box-shadow: inset 0px 0px 4px 3px rgba(150, 150, 150, 1);
 }
 
 .vectara-logo-content {
-  opacity: 0;
-  animation-name: reveal-logo;
-  animation-duration: 0.4s;
-  animation-fill-mode: forwards;
-  animation-delay: 1.1s;
-}
-
-@keyframes reveal-logo {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-@keyframes open-medal {
-  0% {
-    width: 0px;
-    height: 0px;
-  }
-
-  100% {
-    width: 164px;
-    height: 164px;
-  }
+  opacity: 1;
 }
 
 .dot-flashing {

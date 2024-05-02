@@ -55,7 +55,6 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
         });
       }
     }
-
     setCanAccess(accessCheck);
   }, [currentUser?.id]);
 

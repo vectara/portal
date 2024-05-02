@@ -1,17 +1,14 @@
 import {
   Box,
-  ChakraProvider,
   Fade,
   Flex,
   ListItem,
   Text,
   UnorderedList,
-  useToast,
 } from "@chakra-ui/react";
 import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { VectaraLogo } from "../icons/Logo";
 import Link from "next/link";
-import { RecoilRoot } from "recoil";
 import { LogoutIcon } from "../icons/Logout";
 import { useUser } from "../hooks/useUser";
 import { useRouter } from "next/navigation";
@@ -22,11 +19,7 @@ import {
 
 type PageId = "login" | "profile" | "portals" | "portal" | "create";
 
-interface NavigationProps {
-  pageId: PageId;
-}
-
-interface PageProps extends NavigationProps {
+interface PageProps {
   pageId: PageId;
   accessPrerequisites?: PagePrerequisites;
   children?: ReactNode;
@@ -43,12 +36,9 @@ export const Page = ({ pageId, children, accessPrerequisites }: PageProps) => {
   }, []);
 
   return (
-    <Flex style={pageStyles} direction="column">
+    <>
       {canAccess && (
         <>
-          {HEADERLESS_PAGE_IDS.indexOf(pageId) === -1 && (
-            <Header pageId={pageId} />
-          )}
           <Flex alignItems="center" justifyContent="center" h="100%">
             <Fade
               in={didEnter}
@@ -62,49 +52,7 @@ export const Page = ({ pageId, children, accessPrerequisites }: PageProps) => {
           </Flex>
         </>
       )}
-    </Flex>
-  );
-};
-
-const Header = ({ pageId }: NavigationProps) => {
-  const { currentUser } = useUser();
-  const router = useRouter();
-  const [displayType, setDisplayType] = useState<"none" | "flex">("none");
-
-  useEffect(() => {
-    setDisplayType(currentUser === null ? "none" : "flex");
-  }, [currentUser]);
-
-  return (
-    <Flex style={{ ...headerStyles, display: displayType }} gap="1rem">
-      <Flex gap=".5rem" alignItems="center" fontWeight={500}>
-        <VectaraLogo />
-        <Text>PORTAL</Text>
-      </Flex>
-      <UnorderedList style={navigationStyles}>
-        <ListItem
-          style={getNavItemStyles({ isSelected: pageId === "portals" })}
-        >
-          <Link href="/portals">Your Portals</Link>
-        </ListItem>
-        <ListItem style={getNavItemStyles({ isSelected: pageId === "create" })}>
-          <Link href="/portal/create">Create a Portal</Link>
-        </ListItem>
-        <ListItem
-          style={getNavItemStyles({ isSelected: pageId === "profile" })}
-        >
-          <Link href="/me">Your Profile</Link>
-        </ListItem>
-        <ListItem display="flex" flexGrow={1}>
-          <Box style={logoutStyles}>
-            <LogoutIcon />
-            <Box>
-              <a href="/api/auth/logout">Log Out</a>
-            </Box>
-          </Box>
-        </ListItem>
-      </UnorderedList>
-    </Flex>
+    </>
   );
 };
 
@@ -120,33 +68,3 @@ const pageStyles = {
   top: 0,
   width: "100%",
 } as CSSProperties;
-
-const navigationStyles = {
-  display: "flex",
-  gap: "1rem",
-  listStyleType: "none",
-  width: "100%",
-};
-
-const logoutStyles = {
-  display: "flex",
-  alignItems: "center",
-  flexGrow: 1,
-  fontSize: ".95rem",
-  cursor: "pointer",
-  gap: ".5rem",
-  justifyContent: "flex-end",
-};
-
-const getNavItemStyles = ({ isSelected }: { isSelected: boolean }) => ({
-  textDecoration: isSelected ? "underline" : undefined,
-  fontSize: ".95rem",
-  cursor: "pointer",
-});
-
-const headerStyles = {
-  backgroundColor: "#eee",
-  borderBottom: "1px solid #bbb",
-  padding: ".5rem 1rem",
-  alignItems: "center",
-};

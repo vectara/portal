@@ -24,7 +24,7 @@ export const LoginForm = () => {
               color="#ddd"
               fontWeight={300}
               _hover={{
-                backgroundColor: "#777",
+                backgroundColor: "#555",
               }}
             >
               Log in

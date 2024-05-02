@@ -41,28 +41,51 @@ const Content = () => {
           zIndex: "100",
         }}
       >
-        <Heading size="lg" color="#ddd" fontWeight={200}>
-          Select a Portal:
-        </Heading>
-        <Flex
-          background="#242424"
-          borderRadius=".5rem"
-          direction="column"
-          border="1px solid #888"
-          overflow="auto"
-          maxHeight="500px"
-          padding="1rem"
-          gap="1rem"
-        >
-          {portals?.map((portal, index) => (
-            <PortalCard
-              key={`portal-data-${index}`}
-              name={portal.name}
-              type={portal.type}
-              id={portal.portalKey}
-            />
-          ))}
-        </Flex>
+        {portals.length ? (
+          <>
+            <Heading size="lg" color="#ddd" fontWeight={200}>
+              Select a Portal:
+            </Heading>
+            <Flex
+              background="#242424"
+              borderRadius=".5rem"
+              direction="column"
+              border="1px solid #888"
+              overflow="auto"
+              maxHeight="500px"
+              padding="1rem"
+              gap="1rem"
+            >
+              {portals?.map((portal, index) => (
+                <PortalCard
+                  key={`portal-data-${index}`}
+                  name={portal.name}
+                  type={portal.type}
+                  id={portal.portalKey}
+                />
+              ))}
+            </Flex>
+          </>
+        ) : (
+          <>
+            <Flex
+              alignItems="center"
+              borderRadius=".5rem"
+              direction="column"
+              overflow="auto"
+              maxHeight="500px"
+              padding="1rem"
+              gap="1rem"
+            >
+              <Text color="#ddd">You don't have any portals yet.</Text>
+              <Link href="/portal/create">
+                <Text color="blue.500" fontWeight={500}>
+                  Create your first one
+                </Text>
+              </Link>
+            </Flex>
+          </>
+        )}
       </Fade>
     </Flex>
   );

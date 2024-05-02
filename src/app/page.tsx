@@ -8,12 +8,7 @@ import { useUser } from "./hooks/useUser";
 import { useEffect } from "react";
 
 const App = () => {
-  const { currentUser, loadCurrentUser } = useUser();
-
-  useEffect(() => {
-    const doAsync = async () => await loadCurrentUser();
-    doAsync();
-  }, []);
+  const { currentUser } = useUser();
 
   useEffect(() => {
     if (currentUser) {

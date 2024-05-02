@@ -14,11 +14,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { Page } from "../../components/Page";
-import { CSSProperties, ReactNode, useEffect, useRef, useState } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useCreatePortal } from "./useCreatePortal";
 import { PortalType } from "../../types";
 import { useRouter } from "next/navigation";
-import { useCheckPrequisites } from "../../hooks/useCheckPrerequisites";
 import { Centered } from "@/app/components/Centered";
 
 interface FormState {
@@ -43,7 +42,10 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 
 const Create = () => {
   return (
-    <Page pageId="create">
+    <Page
+      pageId="create"
+      accessPrerequisites={{ loggedInUser: true, vectaraCredentials: true }}
+    >
       <Centered>
         <CreateForm />
       </Centered>
@@ -58,8 +60,6 @@ const CreateForm = () => {
   const didStartFillingForm = useRef<boolean>(false);
   const toast = useToast();
   const router = useRouter();
-
-  useCheckPrequisites(true);
 
   const validateForm = (formValues: FormState) => {
     return {

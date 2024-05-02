@@ -70,7 +70,6 @@ export const useUser = () => {
   };
 
   const updateUser = async (
-    email: string,
     vectaraCustomerId?: string,
     vectaraPersonalApiKey?: string,
     addEmails?: Array<string>
