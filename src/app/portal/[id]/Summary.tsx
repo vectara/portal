@@ -13,7 +13,15 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { PortalData } from "../../types";
-import { CSSProperties, ChangeEvent, useEffect, useRef, useState } from "react";
+import {
+  CSSProperties,
+  ChangeEvent,
+  MutableRefObject,
+  createRef,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 
@@ -30,6 +38,7 @@ import {
 import Markdown from "markdown-to-jsx";
 import { useUser } from "../../hooks/useUser";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import Link from "next/link";
 
 export const Summary = (props: PortalData) => {
   const [didInitiateSearch, setDidInitiateSearch] = useState<boolean>(false);
@@ -42,6 +51,9 @@ export const Summary = (props: PortalData) => {
     useState<Array<DeserializedSearchResult> | null>(null);
   const toast = useToast();
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
+  const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
+    number | undefined
+  >();
 
   const { currentUser } = useUser();
 
@@ -92,46 +104,12 @@ export const Summary = (props: PortalData) => {
     setQuery(e.target.value);
   };
 
-  const openReferenceToast = (referenceIndex: number) => {
-    if (!references || !(references ?? [])[referenceIndex]) return;
-
-    const reference = references[referenceIndex - 1];
-
-    toast({
-      title: "Reference",
-      description: (
-        <Flex direction="column" gap="1rem">
-          <Box flexGrow={1}>
-            <Text as="span" fontSize=".9rem">
-              {reference.snippet.pre}
-            </Text>
-            <Text as="span" fontWeight={700} fontSize=".9rem">
-              {reference.snippet.text}
-            </Text>
-            <Text as="span" fontSize=".9rem">
-              {reference.snippet.post}
-            </Text>
-          </Box>
-          <Box>
-            <Text fontSize="0.85rem">
-              <strong>source:</strong> {reference.id}
-            </Text>
-          </Box>
-        </Flex>
-      ),
-      isClosable: true,
-      duration: null,
-      status: "info",
-      position: "top-right",
-    });
-  };
-
   const SummaryCitation = ({ reference }: { reference: string }) => {
     const referenceIndex = parseInt(reference);
     return (
       <>
         {" "}
-        <button onClick={() => openReferenceToast(referenceIndex)}>
+        <button onClick={() => setViewedReferenceIndex(referenceIndex)}>
           <Text as="span" fontWeight={700} color="blue.500">
             [{reference}]
           </Text>
@@ -145,7 +123,7 @@ export const Summary = (props: PortalData) => {
       <Flex direction="column" gap="1.25rem" align="center" style={panelStyles}>
         <Heading
           size="md"
-          fontFamily={'"Source Code Pro", monospace;'}
+          fontFamily="Montserrat"
           width="100%"
           paddingBottom=".5rem"
           borderBottom="1px solid #888"
@@ -164,7 +142,14 @@ export const Summary = (props: PortalData) => {
           direction="column"
           gap=".75rem"
         >
-          <Box flexGrow={1} padding="1rem" paddingBottom="0">
+          <Box
+            flexGrow={1}
+            padding="1rem"
+            paddingBottom="0"
+            minHeight="50%"
+            overflow="scroll"
+            fontWeight={300}
+          >
             <Markdown
               children={summary ?? ""}
               options={{
@@ -176,56 +161,11 @@ export const Summary = (props: PortalData) => {
                 },
               }}
             />
-            <Cursor isIdle={!isStreaming} />
           </Box>
-          <Accordion
-            allowToggle={true}
-            width="100%"
-            borderBottomLeftRadius=".5rem"
-            borderBottomRightRadius=".5rem"
-            reduceMotion={true}
-            borderTop="1px solid"
-            borderTopColor="blue.300"
-          >
-            <AccordionItem
-              border="none"
-              backgroundColor="blue.500"
-              color="#fff"
-              padding="0"
-            >
-              {({ isExpanded }) => (
-                <>
-                  <h2>
-                    <AccordionButton>
-                      <Box
-                        as="span"
-                        flex="1"
-                        textAlign="left"
-                        fontSize=".75rem"
-                      >
-                        References
-                      </Box>
-                      {isExpanded ? (
-                        <ChevronDownIcon fontSize="12px" />
-                      ) : (
-                        <ChevronUpIcon fontSize="12px" />
-                      )}
-                    </AccordionButton>
-                  </h2>
-                  <AccordionPanel
-                    pb={4}
-                    fontSize=".8rem"
-                    backgroundColor="#242424"
-                  >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
-                  </AccordionPanel>
-                </>
-              )}
-            </AccordionItem>
-          </Accordion>
+          <References
+            references={references ?? []}
+            showIndex={viewedReferenceIndex}
+          />
         </Flex>
 
         <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
@@ -237,16 +177,21 @@ export const Summary = (props: PortalData) => {
               value={query}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  onSummarize();
+                  if (!isStreaming) {
+                    onSummarize();
+                  }
+
                   e.preventDefault();
                 }
               }}
+              autoFocus
             />
             <ChakraButton
               colorScheme="blue"
               onClick={() => onSummarize()}
               padding="1rem"
               fontSize=".8rem"
+              isDisabled={isStreaming}
             >
               Summarize
             </ChakraButton>
@@ -372,24 +317,178 @@ const panelStyles = {
   width: "100%",
 };
 
-const Cursor = ({ isIdle }: { isIdle: boolean }) => {
-  const [className, setClassName] = useState<string | undefined>("blink");
+const References = ({
+  references,
+  showIndex,
+}: {
+  references: Array<DeserializedSearchResult>;
+  showIndex?: number;
+}) => {
+  const elRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    setClassName(isIdle ? "blink" : undefined);
-  }, [isIdle]);
+    if (showIndex !== undefined) {
+      // TODO: Fix this
+      // @ts-ignore
+      elRefs.current[showIndex - 1].scrollIntoView({
+        behavior: "smooth",
+      });
+    }
+  }, [showIndex]);
 
   return (
-    <Box
-      className={className}
-      as="span"
-      width="8px"
-      height="12px"
-      backgroundColor="#ddd"
-      display="inline"
-      userSelect="none"
+    <Accordion
+      allowToggle={true}
+      width="100%"
+      borderBottomLeftRadius=".5rem"
+      borderBottomRightRadius=".5rem"
+      reduceMotion={true}
+      index={showIndex !== undefined ? 0 : undefined}
+      maxHeight="50%"
+      overflow="hidden"
     >
-      {"."}
-    </Box>
+      <AccordionItem
+        border="none"
+        borderTop="1px solid"
+        borderTopColor={
+          references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.300"
+        }
+        backgroundColor={
+          references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.500"
+        }
+        color="#fff"
+        padding="0"
+        height="100%"
+        display="flex"
+        flexDirection="column"
+        isDisabled={references.length === 0}
+      >
+        {({ isExpanded }) => (
+          <>
+            <h2>
+              <AccordionButton>
+                <Box
+                  as="span"
+                  flex="1"
+                  textAlign="left"
+                  fontSize=".75rem"
+                  fontWeight={700}
+                >
+                  References
+                </Box>
+                {isExpanded ? (
+                  <ChevronDownIcon fontSize="12px" />
+                ) : (
+                  <ChevronUpIcon fontSize="12px" />
+                )}
+              </AccordionButton>
+            </h2>
+            <Box overflow="scroll">
+              <AccordionPanel pb={4} fontSize=".8rem" backgroundColor="#242424">
+                {references.map((reference, index) => (
+                  <Box
+                    ref={(ref) => {
+                      elRefs.current[index] = ref;
+                    }}
+                  >
+                    <Reference
+                      title={reference.title}
+                      snippet={reference.snippet}
+                      url={reference.url}
+                      index={index}
+                    />
+                  </Box>
+                ))}
+              </AccordionPanel>
+            </Box>
+          </>
+        )}
+      </AccordionItem>
+    </Accordion>
   );
 };
+
+const Reference = ({
+  title,
+  snippet,
+  url,
+  index,
+}: {
+  title?: string;
+  snippet: {
+    pre: string;
+    text: string;
+    post: string;
+  };
+  url?: string;
+  index: number;
+}) => {
+  return (
+    <Flex
+      padding=".5rem 0"
+      borderBottom="1px solid #888"
+      gap=".5rem"
+      direction="column"
+    >
+      <Box>
+        <Text as="span" fontWeight={700} fontSize=".75rem">
+          [{index + 1}]
+        </Text>{" "}
+        <Text
+          as="span"
+          fontWeight={700}
+          fontSize=".75rem"
+          textDecoration="underline"
+        >
+          {title}
+        </Text>
+      </Box>
+      <Box>
+        <Box as="span" fontWeight={300}>
+          {snippet.pre}
+        </Box>
+        <Box as="span" fontWeight={700}>
+          {snippet.text}
+        </Box>
+        <Box as="span" fontWeight={300}>
+          {snippet.post}
+        </Box>
+      </Box>
+      {url && (
+        <Box
+          as="span"
+          color="blue.500"
+          fontWeight={700}
+          _hover={{ color: "blue.300" }}
+          fontSize=".75rem"
+        >
+          <Link href={url} target="_blank">
+            {url}
+          </Link>
+        </Box>
+      )}
+    </Flex>
+  );
+};
+
+// const ResponseWindowCursor = ({ isIdle }: { isIdle: boolean }) => {
+//   const [className, setClassName] = useState<string | undefined>("blink");
+
+//   useEffect(() => {
+//     setClassName(isIdle ? "blink" : undefined);
+//   }, [isIdle]);
+
+//   return (
+//     <Box
+//       className={className}
+//       as="span"
+//       width="8px"
+//       height="12px"
+//       backgroundColor="#ddd"
+//       display="inline"
+//       userSelect="none"
+//     >
+//       {"."}
+//     </Box>
+//   );
+// };
