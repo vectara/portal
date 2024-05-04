@@ -31,7 +31,7 @@ export const ConfigDrawer = ({
       <DrawerContent
         backgroundColor={"#333"}
         borderLeft="1px solid #555"
-        fontFamily="Montserrat"
+        fontFamily='"Source Code Pro", monospace;'
       >
         <DrawerCloseButton color="#fff" />
         {children}

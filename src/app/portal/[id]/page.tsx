@@ -41,7 +41,14 @@ const Portal = ({ params }: any) => {
     <Page pageId="portal">
       <LoadingMessage show={isLoading} />
 
-      <Fade in={!!portalData} style={{ height: "100%", zIndex: "100" }}>
+      <Fade
+        in={!!portalData}
+        style={{
+          height: "100%",
+          width: "100%",
+          zIndex: "100",
+        }}
+      >
         {PortalComponent && portalData && <PortalComponent {...portalData} />}
       </Fade>
     </Page>

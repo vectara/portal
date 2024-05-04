@@ -17,8 +17,8 @@ export const usePortal = () => {
       vectaraCorpusId: portalData.vectara_corpus_id,
       type: portalData.type,
       portalKey: portalData.key,
-      ownerVectaraCustomerId: portalData.owner_vectara_customer_id,
-      vectaraQueryApiKey: portalData.vectara_query_api_key,
+      vectaraCustomerId: portalData.vectara_customer_id,
+      vectaraApiKey: portalData.vectara_api_key,
       isRestricted: portalData.is_restricted,
     };
   };

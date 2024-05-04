@@ -53,7 +53,7 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
     <Flex
       background="linear-gradient(180deg, hsla(0, 0%, 30%, 1) 0%, hsla(0, 0%, 20%, 1) 55%, hsla(0, 0%, 10%, 1) 100%)"
-      fontFamily='"Montserrat", sans-serif'
+      fontFamily='"Source Code Pro", monospace;'
       direction="column"
       height="100%"
       left={0}

@@ -5,7 +5,7 @@ export type PortalData = {
   vectaraCorpusId: string;
   type: PortalType;
   portalKey: string;
-  ownerVectaraCustomerId: string;
-  vectaraQueryApiKey: string;
+  vectaraCustomerId: string;
+  vectaraApiKey: string;
   isRestricted: boolean;
 };

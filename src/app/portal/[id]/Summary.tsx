@@ -3,14 +3,17 @@ import {
   Flex,
   Heading,
   Input,
-  ListItem,
   Text,
-  UnorderedList,
   Button as ChakraButton,
   useToast,
+  Accordion,
+  AccordionPanel,
+  AccordionItem,
+  AccordionButton,
+  AccordionIcon,
 } from "@chakra-ui/react";
 import { PortalData } from "../../types";
-import { CSSProperties, ChangeEvent, useCallback, useState } from "react";
+import { CSSProperties, ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 
@@ -26,11 +29,7 @@ import {
 } from "@vectara/stream-query-client";
 import Markdown from "markdown-to-jsx";
 import { useUser } from "../../hooks/useUser";
-
-interface ParsedSearchResult extends Pick<DeserializedSearchResult, "snippet"> {
-  title: string;
-  url?: string;
-}
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 
 export const Summary = (props: PortalData) => {
   const [didInitiateSearch, setDidInitiateSearch] = useState<boolean>(false);
@@ -42,10 +41,13 @@ export const Summary = (props: PortalData) => {
   const [references, setReferences] =
     useState<Array<DeserializedSearchResult> | null>(null);
   const toast = useToast();
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
   const { currentUser } = useUser();
 
   const onReceiveSummary = (update: StreamUpdate) => {
+    setIsStreaming(true);
+
     if (update.references) {
       setReferences(update.references);
     }
@@ -53,6 +55,10 @@ export const Summary = (props: PortalData) => {
     if (update.updatedText) {
       const sanitized = markDownCitations(update.updatedText);
       setSummary(sanitized);
+    }
+
+    if (update.isDone) {
+      setIsStreaming(false);
     }
   };
 
@@ -66,10 +72,10 @@ export const Summary = (props: PortalData) => {
       rerankNumResults: 10,
       rerankerId: 272725718,
       rerankDiversityBias: 0.3,
-      customerId: props.ownerVectaraCustomerId,
+      customerId: props.vectaraCustomerId,
       corpusIds: [props.vectaraCorpusId],
       endpoint: "api.vectara.io",
-      apiKey: props.vectaraQueryApiKey,
+      apiKey: props.vectaraApiKey,
       summaryNumResults: 3,
       summaryNumSentences: 3,
       language: "eng" as SummaryLanguage,
@@ -136,26 +142,29 @@ export const Summary = (props: PortalData) => {
 
   return (
     <Flex style={wrapperStyles} gap={4}>
-      <Flex direction="column" gap="2rem" align="center">
-        <Flex
-          direction="column"
-          gap="1.25rem"
-          align="center"
-          style={searchPanelStyles}
+      <Flex direction="column" gap="1.25rem" align="center" style={panelStyles}>
+        <Heading
+          size="md"
+          fontFamily={'"Source Code Pro", monospace;'}
+          width="100%"
+          paddingBottom=".5rem"
+          borderBottom="1px solid #888"
+          fontWeight={400}
         >
-          <Heading size="md">{portalName}</Heading>
-          <Box
-            width="75%"
-            maxWidth="600px"
-            minWidth="460px"
-            height="400px"
-            border="1px solid #888"
-            backgroundColor="#242424"
-            borderRadius="1rem"
-            overflow="auto"
-            color="#ddd"
-            padding="1rem"
-          >
+          {portalName}
+        </Heading>
+        <Flex
+          width="100%"
+          border="1px solid #888"
+          backgroundColor="#242424"
+          borderRadius=".5rem"
+          overflow="auto"
+          color="#ddd"
+          flexGrow={1}
+          direction="column"
+          gap=".75rem"
+        >
+          <Box flexGrow={1} padding="1rem" paddingBottom="0">
             <Markdown
               children={summary ?? ""}
               options={{
@@ -167,44 +176,89 @@ export const Summary = (props: PortalData) => {
                 },
               }}
             />
+            <Cursor isIdle={!isStreaming} />
           </Box>
-          <Flex
-            as="form"
-            style={searchFormStyles}
-            direction="column"
-            gap=".5rem"
+          <Accordion
+            allowToggle={true}
+            width="100%"
+            borderBottomLeftRadius=".5rem"
+            borderBottomRightRadius=".5rem"
+            reduceMotion={true}
+            borderTop="1px solid"
+            borderTopColor="blue.300"
           >
-            <Flex gap=".5rem">
-              <Input
-                style={inputStyles}
-                placeholder="Enter a topic"
-                onChange={onChange}
-                value={query}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    onSummarize();
-                    e.preventDefault();
-                  }
-                }}
-              />
-              <ChakraButton
-                colorScheme="blue"
-                onClick={() => onSummarize()}
-                padding="1rem"
-                fontSize=".8rem"
-              >
-                Summarize
-              </ChakraButton>
-            </Flex>
-            <Flex gap=".5rem">
-              {currentUser && (
-                <Button
-                  icon={<GearIcon />}
-                  label="Manage"
-                  onClick={() => setIsManagementOpen(true)}
-                />
+            <AccordionItem
+              border="none"
+              backgroundColor="blue.500"
+              color="#fff"
+              padding="0"
+            >
+              {({ isExpanded }) => (
+                <>
+                  <h2>
+                    <AccordionButton>
+                      <Box
+                        as="span"
+                        flex="1"
+                        textAlign="left"
+                        fontSize=".75rem"
+                      >
+                        References
+                      </Box>
+                      {isExpanded ? (
+                        <ChevronDownIcon fontSize="12px" />
+                      ) : (
+                        <ChevronUpIcon fontSize="12px" />
+                      )}
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel
+                    pb={4}
+                    fontSize=".8rem"
+                    backgroundColor="#242424"
+                  >
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+                    do eiusmod tempor incididunt ut labore et dolore magna
+                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+                    ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                  </AccordionPanel>
+                </>
               )}
-            </Flex>
+            </AccordionItem>
+          </Accordion>
+        </Flex>
+
+        <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
+          <Flex gap=".5rem">
+            <Input
+              style={inputStyles}
+              placeholder="Ask a question"
+              onChange={onChange}
+              value={query}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSummarize();
+                  e.preventDefault();
+                }
+              }}
+            />
+            <ChakraButton
+              colorScheme="blue"
+              onClick={() => onSummarize()}
+              padding="1rem"
+              fontSize=".8rem"
+            >
+              Summarize
+            </ChakraButton>
+          </Flex>
+          <Flex gap=".5rem">
+            {currentUser && (
+              <Button
+                icon={<GearIcon />}
+                label="Manage"
+                onClick={() => setIsManagementOpen(true)}
+              />
+            )}
           </Flex>
         </Flex>
       </Flex>
@@ -215,7 +269,7 @@ export const Summary = (props: PortalData) => {
         onClose={() => setIsManagementOpen(false)}
       >
         <ManagementPanel
-          customerId={props.ownerVectaraCustomerId}
+          customerId={props.vectaraCustomerId}
           corpusId={props.vectaraCorpusId}
           portalKey={props.portalKey}
           portalName={portalName}
@@ -302,27 +356,40 @@ const wrapperStyles = {
 } as CSSProperties;
 
 const searchFormStyles = {
-  maxWidth: "800px",
-  minWidth: "460px",
-  width: "75%",
+  width: "100%",
 };
 
 const inputStyles = {
   border: "1px solid #aaa",
 };
 
-const searchResultStyles = {
-  display: "flex",
-  flexDirection: "column",
-  gap: ".75rem",
-  padding: "1.5rem",
-  borderBottom: "1px solid #555",
-} as CSSProperties;
-
-const searchPanelStyles = {
+const panelStyles = {
   backgroundColor: "#242424",
-  borderRadius: "1rem",
+  height: "100%",
   padding: "1.5rem 1rem",
-  width: "800px",
   border: "1px solid #555",
+  borderRadius: ".5rem",
+  width: "100%",
+};
+
+const Cursor = ({ isIdle }: { isIdle: boolean }) => {
+  const [className, setClassName] = useState<string | undefined>("blink");
+
+  useEffect(() => {
+    setClassName(isIdle ? "blink" : undefined);
+  }, [isIdle]);
+
+  return (
+    <Box
+      className={className}
+      as="span"
+      width="8px"
+      height="12px"
+      backgroundColor="#ddd"
+      display="inline"
+      userSelect="none"
+    >
+      {"."}
+    </Box>
+  );
 };

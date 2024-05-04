@@ -43,7 +43,10 @@ export const Page = ({ pageId, children, accessPrerequisites }: PageProps) => {
             <Fade
               in={didEnter}
               className="test"
-              style={{ width: "100%", height: "100%" }}
+              style={{
+                width: "100%",
+                height: "100%",
+              }}
             >
               <Flex w="100%" h="100%" justifyContent="center">
                 {children}
