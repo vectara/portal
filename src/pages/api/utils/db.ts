@@ -1,6 +1,3 @@
-import { randomUUID } from "crypto";
-
-const fs = require("fs");
 const pg = require("pg");
 
 const pool = new pg.Pool({
@@ -51,7 +48,7 @@ export const updatePortal = (
   isRestricted: boolean
 ) => {
   return sendQuery(
-    `UPDATE portals SET name = '${name}', is_restricted=${isRestricted} WHERE key='${key}'`
+    `UPDATE portals SET name = '${name}', is_restricted=${isRestricted} WHERE key='${key}' returning *`
   );
 };
 
@@ -122,39 +119,6 @@ export const getUsersFromIds = (ids: Array<number>) => {
   FROM users
   WHERE id in (${ids.join(",")})`;
   return sendQuery(q, (resolved) => resolved.rows ?? null);
-};
-
-/* SESSIONS */
-
-export const initSession = async (userId: number) => {
-  const sessionId = randomUUID();
-
-  await sendQuery(
-    `INSERT INTO sessions VALUES ('${userId}', '${sessionId}');`,
-    (resolved) => resolved.rows?.[0] ?? null
-  );
-
-  return sessionId;
-};
-
-export const endSession = (token: string) => {
-  const sessionId = randomUUID();
-
-  return sendQuery(
-    `DELETE from sessions where token = '${token}';`,
-    (resolved) => resolved.rows?.[0] ?? null
-  );
-};
-
-export const getLoggedInUserForToken = async (token: string) => {
-  const session = await sendQuery(
-    `SELECT * from sessions where token = '${token}';`,
-    (resolved) => resolved.rows?.[0] ?? null
-  );
-
-  const user = await getUserById(session.user_id);
-
-  return user;
 };
 
 const sendQuery = async (

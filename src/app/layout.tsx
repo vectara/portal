@@ -18,7 +18,6 @@ import { LogoutIcon } from "./icons/Logout";
 import Link from "next/link";
 import { VectaraLogo } from "./icons/Logo";
 
-const HEADERLESS_PAGE_IDS = ["login", "portal", "signup"];
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({
@@ -63,24 +62,25 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       top={0}
       width="100%"
     >
-      <Header pagePath={"pageId"} />
+      <Header />
       {children}
     </Flex>
   );
 };
 
-interface NavigationProps {
-  pagePath: string;
-}
-
-const Header = ({ pagePath }: NavigationProps) => {
+const Header = () => {
   const pathName = usePathname();
   const { currentUser } = useUser();
   const [displayType, setDisplayType] = useState<"none" | "flex">("none");
+  const isPortalPath = pathName?.match(/^\/portal\/(?!.*create)/);
 
   useEffect(() => {
     setDisplayType(currentUser === null ? "none" : "flex");
   }, [currentUser]);
+
+  if (isPortalPath) {
+    return null;
+  }
 
   return (
     <Flex style={{ ...headerStyles, display: displayType }} gap="1rem">

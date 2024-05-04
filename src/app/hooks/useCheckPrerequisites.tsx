@@ -23,6 +23,11 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
   );
 
   useEffect(() => {
+    // If we've preemptively allowed access, no need to perform any checks
+    if (canAccess) {
+      return;
+    }
+
     let accessCheck = true;
 
     if (currentUser === undefined) {
