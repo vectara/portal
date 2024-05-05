@@ -45,13 +45,13 @@ export const ManagementPanel = ({
   const {
     uploadFilesToCorpus,
     addedFiles,
-    queueFileForUpload,
+    queueFilesForUpload,
     removeQueuedFile,
   } = useFileUpload();
 
   const saveUpdates = () => {
     updatePortal(portalKey, updatedPortalName, false);
-    uploadFilesToCorpus(customerId, corpusId);
+    uploadFilesToCorpus(corpusId);
 
     onSave(updatedPortalName);
   };
@@ -79,10 +79,10 @@ export const ManagementPanel = ({
             <FormLabel style={formLabelStyles}>Add/Remove Data</FormLabel>
             <Box className="file-uploader-wrapper">
               <FileUploader
-                handleChange={(file: FileList) => {
-                  queueFileForUpload(file);
+                handleChange={(files: FileList) => {
+                  queueFilesForUpload(files);
                 }}
-                name="file"
+                name="files"
                 types={FILE_TYPES}
                 classes={`file-uploader ${
                   addedFiles.length > 0 ? "with-files" : ""
@@ -96,7 +96,7 @@ export const ManagementPanel = ({
                       border="1px solid #888"
                       width="100%"
                       p=".25rem .5rem"
-                      borderRadius=".5rem"
+                      borderRadius=".25rem"
                       fontSize=".8rem"
                       backgroundColor="#555"
                       fontWeight={600}

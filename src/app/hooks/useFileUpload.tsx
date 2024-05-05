@@ -1,23 +1,28 @@
 import axios from "axios";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { atom, useRecoilState } from "recoil";
 
+// TODO: Re-factor. A bit of unclear code here around the file upload queue. :)
 export const useFileUpload = () => {
   const [queuedFileObjects, setQueuedFileObjects] = useState<Array<File>>([]);
   const [fileUploads, setFileUploads] = useRecoilState(fileUploadState);
 
-  const queueFileForUpload = (filelist: FileList) => {
-    setQueuedFileObjects((prev) => [...prev, filelist[0]]);
+  const queueFilesForUpload = (files: FileList) => {
+    const filesArray = Array.from(files);
+    setQueuedFileObjects((prev) => [...prev, ...filesArray]);
 
     setFileUploads((prev) => {
       return {
         ...prev,
-        addedFiles: [...prev.addedFiles, filelist[0].name],
+        addedFiles: [
+          ...prev.addedFiles,
+          ...filesArray.map((file) => file.name),
+        ],
       };
     });
   };
 
-  const uploadFilesToCorpus = (customerId: string, corpusId: string) => {
+  const uploadFilesToCorpus = (corpusId: string) => {
     const pendingFiles = [...fileUploads.addedFiles];
 
     setFileUploads({
@@ -29,7 +34,7 @@ export const useFileUpload = () => {
     });
 
     queuedFileObjects.forEach(async (file) => {
-      const resp = await uploadFileToCorpus(customerId, corpusId, file);
+      const resp = await uploadFileToCorpus(corpusId, file);
 
       if (resp.data.success) {
         removeUploadedFileFromQueue(file.name);
@@ -66,13 +71,8 @@ export const useFileUpload = () => {
     });
   };
 
-  const uploadFileToCorpus = async (
-    customerId: string,
-    corpusId: string,
-    file: File
-  ) => {
+  const uploadFileToCorpus = async (corpusId: string, file: File) => {
     const data = {
-      customerId,
       corpusId,
       file,
     };
@@ -92,7 +92,7 @@ export const useFileUpload = () => {
   };
 
   return {
-    queueFileForUpload,
+    queueFilesForUpload,
     uploadFilesToCorpus,
     removeQueuedFile,
     pendingFiles: fileUploads.pendingFiles,

@@ -30,7 +30,7 @@ export const useFileUploadNotification = () => {
         duration: 5000,
         isClosable: true,
       });
-      setDidShowInitialToast(true);
+      setDidShowInitialToast(false);
       return;
     }
   }, [fileUploads.pendingFiles.length]);

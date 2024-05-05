@@ -327,7 +327,7 @@ const References = ({
   const elRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    if (showIndex !== undefined) {
+    if (showIndex !== undefined && elRefs.current[showIndex - 1]) {
       // TODO: Fix this
       // @ts-ignore
       elRefs.current[showIndex - 1].scrollIntoView({

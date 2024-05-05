@@ -30,9 +30,10 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { vectara_personal_api_key: apiKey } = internalUserData;
+  const { vectara_customer_id: customerId, vectara_personal_api_key: apiKey } =
+    internalUserData;
 
-  if (!apiKey) {
+  if (!apiKey || !customerId) {
     return NextResponse.json(
       {
         error: "Insufficient credentials to upload file",
@@ -41,7 +42,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const success = await uploadFile(req, apiKey);
+  const success = await uploadFile(req, customerId, apiKey);
 
   return NextResponse.json(
     {
@@ -51,11 +52,14 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
   );
 });
 
-const uploadFile = async (req: NextRequest, apiKey: string) => {
+const uploadFile = async (
+  req: NextRequest,
+  customerId: string,
+  apiKey: string
+) => {
   const form = formidable({});
   try {
     const inboundFormData = await req.formData();
-    const customerId = inboundFormData.get("customerId");
     const corpusId = inboundFormData.get("corpusId");
     const file = inboundFormData.get("file");
 
