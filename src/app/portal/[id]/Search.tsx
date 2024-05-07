@@ -39,6 +39,7 @@ import { useFileUploadNotification } from "../../hooks/useFileUploadNotification
 import { CloseIcon } from "@vectara/react-search";
 import { ManagementPanel } from "../../components/ManagementPanel";
 import { useUser } from "../../hooks/useUser";
+import { PortalHeader, PortalPanel, PortalWrapper } from "./ChatSummaryBase";
 
 interface ParsedSearchResult extends Pick<DeserializedSearchResult, "snippet"> {
   title: string;
@@ -67,9 +68,9 @@ export const Search = (props: PortalData) => {
   useFileUploadNotification();
   const [isManagementOpen, setIsManagementOpen] = useState<boolean>(false);
   const { fetchSearchResults, isLoading } = useSearch(
-    props.ownerVectaraCustomerId,
+    props.vectaraCustomerId,
     props.vectaraCorpusId,
-    props.vectaraQueryApiKey
+    props.vectaraApiKey
   );
 
   const { currentUser } = useUser();
@@ -97,45 +98,33 @@ export const Search = (props: PortalData) => {
   };
 
   return (
-    <Flex style={getWrapperStyles(didInitiateSearch)} gap={4}>
-      <Flex direction="column" gap="2rem" align="center">
-        <Flex
-          direction="column"
-          gap="1.25rem"
-          align="center"
-          style={searchPanelStyles}
-        >
-          <Heading size="md">{portalName}</Heading>
-          <Flex
-            as="form"
-            style={searchFormStyles}
-            direction="column"
-            gap=".5rem"
-          >
-            <Input
-              style={inputStyles}
-              placeholder="Search..."
-              onChange={onChange}
-            />
-            <Flex gap=".5rem">
-              {currentUser && (
-                <Button
-                  icon={<GearIcon />}
-                  label="Manage"
-                  onClick={() => setIsManagementOpen(true)}
-                />
-              )}
-            </Flex>
+    <PortalWrapper>
+      <PortalPanel>
+        <PortalHeader name={portalName} />
+        <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
+          <Input
+            style={inputStyles}
+            placeholder="Search..."
+            onChange={onChange}
+          />
+          <Flex gap=".5rem">
+            {currentUser && (
+              <Button
+                icon={<GearIcon />}
+                label="Manage"
+                onClick={() => setIsManagementOpen(true)}
+              />
+            )}
           </Flex>
         </Flex>
-        {searchResults && didInitiateSearch && (
-          <UnorderedList style={searchResultsStyles}>
-            {searchResults?.map((searchResult, index) => (
-              <SearchResult key={`search-results-${index}`} {...searchResult} />
-            ))}
-          </UnorderedList>
-        )}
-      </Flex>
+      </PortalPanel>
+      {searchResults && didInitiateSearch && (
+        <UnorderedList style={searchResultsStyles}>
+          {searchResults?.map((searchResult, index) => (
+            <SearchResult key={`search-results-${index}`} {...searchResult} />
+          ))}
+        </UnorderedList>
+      )}
 
       <ConfigDrawer
         header="Portal Management"
@@ -143,7 +132,7 @@ export const Search = (props: PortalData) => {
         onClose={() => setIsManagementOpen(false)}
       >
         <ManagementPanel
-          customerId={props.ownerVectaraCustomerId}
+          customerId={props.vectaraCustomerId}
           corpusId={props.vectaraCorpusId}
           portalKey={props.portalKey}
           portalName={portalName}
@@ -154,7 +143,7 @@ export const Search = (props: PortalData) => {
           }
         />
       </ConfigDrawer>
-    </Flex>
+    </PortalWrapper>
   );
 };
 
@@ -188,17 +177,6 @@ const SearchResult = (props: ParsedSearchResult) => {
   );
 };
 
-const getWrapperStyles = (didInitiateSearch: boolean) =>
-  ({
-    alignItems: didInitiateSearch ? "initial" : "center",
-    flexDirection: "column",
-    height: "100%",
-    justifyContent: didInitiateSearch ? "initial" : "center",
-    width: "100%",
-    color: "#ddd",
-    padding: "1rem",
-  } as CSSProperties);
-
 const searchFormStyles = {
   maxWidth: "500px",
   minWidth: "360px",
@@ -227,11 +205,3 @@ const searchResultStyles = {
   padding: "1.5rem",
   borderBottom: "1px solid #555",
 } as CSSProperties;
-
-const searchPanelStyles = {
-  backgroundColor: "#242424",
-  borderRadius: "1rem",
-  padding: "1.5rem 1rem",
-  width: "600px",
-  border: "1px solid #555",
-};
