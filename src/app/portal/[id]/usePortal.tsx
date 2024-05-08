@@ -1,5 +1,5 @@
 import axios from "axios";
-import { PortalType, PortalData } from "../../types";
+import { PortalData, PortalType } from "../../types";
 
 export const usePortal = () => {
   const getPortal = async (key: string): Promise<PortalData> => {
@@ -20,19 +20,26 @@ export const usePortal = () => {
       vectaraCustomerId: portalData.vectara_customer_id,
       vectaraApiKey: portalData.vectara_api_key,
       isRestricted: portalData.is_restricted,
+      description: portalData.description,
     };
   };
 
   const updatePortal = async (
     key: string,
     name: string,
-    isRestricted: boolean
+    isRestricted: boolean,
+    type: PortalType,
+    description: string
   ) => {
     const config = {
       maxBodyLength: Infinity,
     };
 
-    axios.patch(`/api/portal/${key}`, { key, name, isRestricted }, config);
+    axios.patch(
+      `/api/portal/${key}`,
+      { key, name, isRestricted, type, description },
+      config
+    );
   };
 
   return { getPortal, updatePortal };

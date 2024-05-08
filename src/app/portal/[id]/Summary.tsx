@@ -90,9 +90,9 @@ export const Summary = (props: PortalData) => {
 
   return (
     <ChatSummaryBase
-      portalData={props}
       onQuery={(query) => onSummarize(query)}
-      references={processedReferences}
+      // TODO: Figure out why references are occasionally undefined
+      references={processedReferences.filter((ref) => ref !== undefined)}
       viewedReferenceIndex={viewedReferenceIndex}
     >
       <Markdown

@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Fade, Flex, Text } from "@chakra-ui/react";
+import { Fade, Flex, Text } from "@chakra-ui/react";
 import { Page } from "../../components/Page";
 import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { usePortal } from "./usePortal";
@@ -9,11 +9,19 @@ import { Search } from "./Search";
 import { Spinner } from "../../components/Spinner";
 import { Summary } from "./Summary";
 import { Chat } from "./Chat";
+import { PortalPanel } from "./PortalPanel";
+import { PortalWrapper } from "./PortalWrapper";
+import { PortalHeader } from "./PortalHeader";
+import { ConfigDrawer } from "@/app/components/ConfigDrawer";
+import { ManagementPanel } from "@/app/components/ManagementPanel";
+import { GearIcon } from "@/app/icons/Gear";
+import { Button } from "@/app/components/Button";
 
 const Portal = ({ params }: any) => {
   const { getPortal } = usePortal();
   const [portalData, setPortalData] = useState<PortalData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isManagementOpen, setIsManagementOpen] = useState<boolean>(false);
 
   const { id: portalId } = params;
 
@@ -37,6 +45,15 @@ const Portal = ({ params }: any) => {
     ? PORTAL_TYPE_TO_COMPONENT[portalData.type as PortalType]
     : null;
 
+  const headerButtons = [
+    <Button
+      hasBorder={false}
+      icon={<GearIcon />}
+      onClick={() => setIsManagementOpen(true)}
+      size="s"
+    />,
+  ];
+
   return (
     <Page pageId="portal">
       <LoadingMessage show={isLoading} />
@@ -49,7 +66,34 @@ const Portal = ({ params }: any) => {
           zIndex: "100",
         }}
       >
-        {PortalComponent && portalData && <PortalComponent {...portalData} />}
+        {portalData && (
+          <>
+            <PortalWrapper>
+              <PortalPanel>
+                <PortalHeader
+                  portalData={portalData}
+                  headerButtons={headerButtons}
+                />
+                {PortalComponent && portalData && (
+                  <PortalComponent {...portalData} />
+                )}
+              </PortalPanel>
+            </PortalWrapper>
+            <ConfigDrawer
+              header="Portal Management"
+              isOpen={isManagementOpen}
+              onClose={() => setIsManagementOpen(false)}
+            >
+              <ManagementPanel
+                portalData={portalData}
+                onClose={() => setIsManagementOpen(false)}
+                onSave={(updatedPortalData: PortalData) =>
+                  setPortalData(updatedPortalData)
+                }
+              />
+            </ConfigDrawer>
+          </>
+        )}
       </Fade>
     </Page>
   );

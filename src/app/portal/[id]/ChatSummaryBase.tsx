@@ -1,7 +1,6 @@
 import {
   Box,
   Flex,
-  Heading,
   Input,
   Text,
   Button as ChakraButton,
@@ -9,27 +8,16 @@ import {
   AccordionPanel,
   AccordionItem,
   AccordionButton,
-  Tooltip,
 } from "@chakra-ui/react";
 import { PortalData } from "../../types";
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
-
-import { ConfigDrawer } from "../../components/ConfigDrawer";
-import { Button } from "../../components/Button";
-import { GearIcon } from "../../icons/Gear";
 import { useFileUploadNotification } from "../../hooks/useFileUploadNotification";
-import { ManagementPanel } from "../../components/ManagementPanel";
-import { useUser } from "../../hooks/useUser";
-import { ChevronDownIcon, ChevronUpIcon, InfoIcon } from "@chakra-ui/icons";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import Link from "next/link";
-import { PortalPanel } from "./PortalPanel";
-import { PortalWrapper } from "./PortalWrapper";
-import { PortalHeader } from "./PortalHeader";
 
 interface Props {
-  portalData: PortalData;
   onQuery: (query: string) => void;
   placeholder?: string;
   buttonLabel?: string;
@@ -39,7 +27,6 @@ interface Props {
 }
 
 export const ChatSummaryBase = ({
-  portalData,
   onQuery,
   children,
   references,
@@ -49,12 +36,7 @@ export const ChatSummaryBase = ({
 }: Props) => {
   const [query, setQuery] = useState<string>("");
   useFileUploadNotification();
-  const [isManagementOpen, setIsManagementOpen] = useState<boolean>(false);
-  const [portalName, setPortalName] = useState<string>(portalData.name);
-  const [portalType, setPortalType] = useState<string>(portalData.type);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
-
-  const { currentUser } = useUser();
 
   const onQueryInternal = () => {
     onQuery(query);
@@ -66,91 +48,60 @@ export const ChatSummaryBase = ({
   };
 
   return (
-    <PortalWrapper>
-      <PortalPanel>
-        <PortalHeader name={portalName} type={portalType} />
-        <Flex
-          width="100%"
-          border="1px solid #888"
-          backgroundColor="#242424"
-          borderRadius=".5rem"
-          overflow="auto"
-          color="#ddd"
-          flexGrow={1}
-          direction="column"
-        >
-          <Box
-            flexGrow={1}
-            padding="1rem"
-            paddingBottom="0"
-            minHeight="50%"
-            overflow="scroll"
-            fontWeight={300}
-          >
-            {children}
-          </Box>
-          <References
-            references={references ?? []}
-            showIndex={viewedReferenceIndex}
-          />
-        </Flex>
-
-        <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
-          <Flex gap=".5rem">
-            <Input
-              style={inputStyles}
-              placeholder={placeholder}
-              onChange={onChange}
-              value={query}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  onQueryInternal();
-
-                  e.preventDefault();
-                }
-              }}
-              autoFocus
-            />
-            <ChakraButton
-              colorScheme="blue"
-              onClick={() => onQueryInternal()}
-              padding="1rem"
-              fontSize=".8rem"
-              isDisabled={isStreaming}
-            >
-              {buttonLabel}
-            </ChakraButton>
-          </Flex>
-          <Flex gap=".5rem">
-            {currentUser && (
-              <Button
-                icon={<GearIcon />}
-                label="Manage"
-                onClick={() => setIsManagementOpen(true)}
-              />
-            )}
-          </Flex>
-        </Flex>
-      </PortalPanel>
-
-      <ConfigDrawer
-        header="Portal Management"
-        isOpen={isManagementOpen}
-        onClose={() => setIsManagementOpen(false)}
+    <>
+      <Flex
+        width="100%"
+        border="1px solid #888"
+        backgroundColor="#242424"
+        borderRadius=".5rem"
+        overflow="auto"
+        color="#ddd"
+        flexGrow={1}
+        direction="column"
       >
-        <ManagementPanel
-          customerId={portalData.vectaraCustomerId}
-          corpusId={portalData.vectaraCorpusId}
-          portalKey={portalData.portalKey}
-          portalName={portalName}
-          isRestricted={portalData.isRestricted}
-          onClose={() => setIsManagementOpen(false)}
-          onSave={(updatedPortalName: string) =>
-            setPortalName(updatedPortalName)
-          }
+        <Box
+          flexGrow={1}
+          padding="1rem"
+          paddingBottom="0"
+          minHeight="50%"
+          overflow="scroll"
+          fontWeight={300}
+        >
+          {children}
+        </Box>
+        <References
+          references={references ?? []}
+          showIndex={viewedReferenceIndex}
         />
-      </ConfigDrawer>
-    </PortalWrapper>
+      </Flex>
+
+      <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
+        <Flex gap=".5rem">
+          <Input
+            style={inputStyles}
+            placeholder={placeholder}
+            onChange={onChange}
+            value={query}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onQueryInternal();
+                e.preventDefault();
+              }
+            }}
+            autoFocus
+          />
+          <ChakraButton
+            colorScheme="blue"
+            onClick={() => onQueryInternal()}
+            padding="1rem"
+            fontSize=".8rem"
+            isDisabled={isStreaming}
+          >
+            {buttonLabel}
+          </ChakraButton>
+        </Flex>
+      </Flex>
+    </>
   );
 };
 

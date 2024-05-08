@@ -1,3 +1,5 @@
+import { PortalType } from "@/app/types";
+
 const pg = require("pg");
 
 const pool = new pg.Pool({
@@ -46,11 +48,28 @@ export const createPortalForUser = (
 
 export const updatePortal = (
   key: string,
-  name: string,
-  isRestricted: boolean
+  name?: string,
+  isRestricted?: boolean,
+  type?: PortalType,
+  description?: string
 ) => {
+  const params: Record<string, string | boolean | PortalType | undefined> = {
+    name,
+    isRestricted,
+    type,
+    description,
+  };
+
+  const setParts: Array<string> = [];
+
+  Object.keys(params).forEach((key) => {
+    if (params[key]) {
+      setParts.push(`${key} = '${params[key]}'`);
+    }
+  });
+
   return sendQuery(
-    `UPDATE portals SET name = '${name}', is_restricted=${isRestricted} WHERE key='${key}' returning *`
+    `UPDATE portals SET ${setParts.join(",")} WHERE key='${key}' returning *`
   );
 };
 

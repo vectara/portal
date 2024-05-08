@@ -8,4 +8,5 @@ export type PortalData = {
   vectaraCustomerId: string;
   vectaraApiKey: string;
   isRestricted: boolean;
+  description: string | null;
 };

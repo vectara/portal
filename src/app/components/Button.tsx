@@ -1,19 +1,28 @@
-import { Button as ChakraButton } from "@chakra-ui/react";
+import { Button as ChakraButton, ResponsiveValue } from "@chakra-ui/react";
 import { ReactNode } from "react";
 
 interface ButtonProps {
-  label: string;
+  label?: string;
+  size?: ResponsiveValue<string>;
+  hasBorder?: boolean;
   icon: ReactNode;
   onClick: () => void;
 }
 
-export const Button = ({ label, icon, onClick }: ButtonProps) => {
+export const Button = ({
+  label,
+  icon,
+  onClick,
+  hasBorder = true,
+  size = "xs",
+}: ButtonProps) => {
   return (
     <ChakraButton
-      size="xs"
+      size={size}
       display="flex"
-      border="1px solid #888"
+      border={hasBorder ? "1px solid #888" : undefined}
       backgroundColor="#242424"
+      padding=".25rem"
       fontWeight={500}
       color="#ddd"
       gap=".25rem"

@@ -77,7 +77,6 @@ export const Chat = (props: PortalData) => {
 
   return (
     <ChatSummaryBase
-      portalData={props}
       onQuery={(query) => sendMessage({ query })}
       references={latestReferences}
       viewedReferenceIndex={viewedReferenceIndex}

@@ -1,45 +1,82 @@
+import { Button } from "@/app/components/Button";
+import { GearIcon } from "@/app/icons/Gear";
+import { PortalData } from "@/app/types";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
+import { Fragment, ReactNode, useState } from "react";
 
 export const PortalHeader = ({
-  name,
-  type,
+  portalData,
+  headerButtons,
 }: {
-  name: string;
-  type: string;
+  portalData: PortalData;
+  headerButtons?: ReactNode[];
 }) => {
   return (
-    <Heading
-      size="md"
-      fontFamily="Montserrat"
-      width="100%"
-      paddingBottom=".5rem"
-      borderBottom="1px solid #888"
-      fontWeight={400}
-    >
-      <Flex gap=".5rem" alignItems="center">
-        <Text>{name}</Text>
-        <Tooltip
-          label={<PortalInfoToolip type={type} />}
-          hasArrow
-          backgroundColor="#444"
-          borderRadius=".25rem"
-          padding=".5rem"
-          placement="auto-start"
-        >
-          <InfoOutlineIcon boxSize=".8rem" />
-        </Tooltip>
-      </Flex>
-    </Heading>
+    <>
+      <Heading
+        size="md"
+        fontFamily="Montserrat"
+        width="100%"
+        paddingBottom=".5rem"
+        borderBottom="1px solid #888"
+        fontWeight={400}
+        display="flex"
+        gap="1rem"
+        alignItems="center"
+      >
+        <Flex gap=".5rem" alignItems="center">
+          <Text>{portalData.name}</Text>
+          <Tooltip
+            label={
+              <PortalInfoToolip
+                type={portalData.type}
+                description={portalData.description ?? undefined}
+              />
+            }
+            hasArrow
+            backgroundColor="#444"
+            borderRadius=".25rem"
+            padding=".5rem"
+            placement="auto-start"
+          >
+            <InfoOutlineIcon boxSize=".8rem" />
+          </Tooltip>
+        </Flex>
+        <Flex justifyContent="flex-end" grow={1}>
+          {headerButtons?.map((button, index) => (
+            <Fragment key={`header-button-${index}`}>{button}</Fragment>
+          ))}
+        </Flex>
+      </Heading>
+    </>
   );
 };
 
-export const PortalInfoToolip = ({ type }: { type: string }) => {
+export const PortalInfoToolip = ({
+  type,
+  description,
+}: {
+  type: string;
+  description?: string;
+}) => {
   return (
     <Box>
-      <Box border="1px solid #888" borderRadius=".25rem" padding=".5rem">
-        Type: {type}
-      </Box>
+      <Flex
+        border="1px solid #888"
+        borderRadius=".25rem"
+        padding=".5rem"
+        direction="column"
+        gap=".5rem"
+        fontSize=".8rem"
+      >
+        <Box>
+          <Text>{description}</Text>
+        </Box>
+        <Box>
+          <Text>Type: {type}</Text>
+        </Box>
+      </Flex>
     </Box>
   );
 };

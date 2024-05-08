@@ -43,20 +43,19 @@ export const PATCH = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { key, name, isRestricted } = await req.json();
+  const { key, name, isRestricted, type, description } = await req.json();
 
-  if (!name && !key && !isRestricted) {
+  if (!name && !key && !isRestricted && !type && !description) {
     return NextResponse.json(
       {
-        error: "One of (key, name, isRestricted) is required",
+        error:
+          "One of (key, name, isRestricted, type, description) is required",
       },
       { status: 400 }
     );
   }
 
-  const portal = await updatePortal(key, name, isRestricted);
-
-  console.log("### UPDATED PORTAL: ", portal);
+  const portal = await updatePortal(key, name, isRestricted, type, description);
 
   return NextResponse.json(
     {

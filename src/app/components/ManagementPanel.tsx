@@ -11,36 +11,40 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
   Switch,
 } from "@chakra-ui/react";
 import { FileUploader } from "react-drag-drop-files";
+import { PortalData, PortalType } from "../types";
 
 interface ManagementPanelProps {
-  customerId: string;
-  corpusId: string;
-  portalKey: string;
-  portalName: string;
-  isRestricted: boolean;
+  portalData: PortalData;
   onClose: () => void;
-  onSave: (updatedName: string) => void;
+  onSave: (updatedPortalData: PortalData) => void;
 }
 
 const FILE_TYPES = ["PDF"];
 
 export const ManagementPanel = ({
-  customerId,
-  corpusId,
-  portalKey,
-  portalName,
-  isRestricted,
+  portalData,
   onClose,
   onSave,
 }: ManagementPanelProps) => {
-  const [updatedPortalName, setUpdatedPortalName] =
-    useState<string>(portalName);
+  const [updatedPortalName, setUpdatedPortalName] = useState<string>(
+    portalData.name
+  );
 
-  const [updatedIsRestricted, setUpdatedIsRestricted] =
-    useState<boolean>(isRestricted);
+  const [updatedPortalDescription, setUpdatedPortalDescription] =
+    useState<string>(portalData.description ?? "");
+
+  const [updatedPortalType, setUpdatedPortalType] = useState<PortalType>(
+    portalData.type
+  );
+
+  const [updatedIsRestricted, setUpdatedIsRestricted] = useState<boolean>(
+    portalData.isRestricted
+  );
+
   const { updatePortal } = usePortal();
   const {
     uploadFilesToCorpus,
@@ -50,10 +54,23 @@ export const ManagementPanel = ({
   } = useFileUpload();
 
   const saveUpdates = () => {
-    updatePortal(portalKey, updatedPortalName, false);
-    uploadFilesToCorpus(corpusId);
+    updatePortal(
+      portalData.portalKey,
+      updatedPortalName,
+      false,
+      updatedPortalType,
+      updatedPortalDescription
+    );
+    uploadFilesToCorpus(portalData.vectaraCorpusId);
 
-    onSave(updatedPortalName);
+    onSave({
+      ...portalData,
+      portalKey: portalData.portalKey,
+      name: updatedPortalName,
+      isRestricted: false,
+      type: updatedPortalType,
+      description: updatedPortalDescription,
+    });
   };
 
   return (
@@ -62,9 +79,9 @@ export const ManagementPanel = ({
         Manage your Portal
       </DrawerHeader>
 
-      <DrawerBody>
+      <DrawerBody display="flex" flexDirection="column" gap="1rem">
         <FormControl>
-          <FormLabel style={formLabelStyles}>Portal Name</FormLabel>
+          <FormLabel style={formLabelStyles}>Name</FormLabel>
           <Input
             type="text"
             value={updatedPortalName}
@@ -73,6 +90,32 @@ export const ManagementPanel = ({
             }
             border="1px solid #888"
           />
+        </FormControl>
+        <FormControl>
+          <FormLabel style={formLabelStyles}>Description</FormLabel>
+          <Input
+            type="text"
+            value={updatedPortalDescription}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setUpdatedPortalDescription(e.target.value)
+            }
+            border="1px solid #888"
+          />
+        </FormControl>
+        <FormControl>
+          <FormLabel style={formLabelStyles}>Type</FormLabel>
+          <Select
+            placeholder="Select option"
+            border="1px solid #888"
+            onChange={(e: ChangeEvent<HTMLSelectElement>) => {
+              setUpdatedPortalType(e.target.value as PortalType);
+            }}
+            value={updatedPortalType}
+          >
+            <option value="search">Search</option>
+            <option value="summary">Summary</option>
+            <option value="chat">Chat</option>
+          </Select>
         </FormControl>
         <FormControl mt="1rem">
           <Flex direction="column">
