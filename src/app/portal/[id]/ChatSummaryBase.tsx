@@ -24,6 +24,9 @@ import { ManagementPanel } from "../../components/ManagementPanel";
 import { useUser } from "../../hooks/useUser";
 import { ChevronDownIcon, ChevronUpIcon, InfoIcon } from "@chakra-ui/icons";
 import Link from "next/link";
+import { PortalPanel } from "./PortalPanel";
+import { PortalWrapper } from "./PortalWrapper";
+import { PortalHeader } from "./PortalHeader";
 
 interface Props {
   portalData: PortalData;
@@ -210,75 +213,6 @@ const extractCitations = (summary: string) => {
   }
 
   return citations;
-};
-
-export const PortalWrapper = ({ children }: { children: ReactNode }) => {
-  return (
-    <Flex
-      alignItems="center"
-      color="#ddd"
-      direction="column"
-      height="100%"
-      justifyContent="center"
-      padding="1rem"
-      width="100%"
-      gap={4}
-    >
-      {children}
-    </Flex>
-  );
-};
-
-export const PortalPanel = ({ children }: { children: ReactNode }) => {
-  return (
-    <Flex
-      alignItems="center"
-      backgroundColor="#242424"
-      border="1px solid #555"
-      borderRadius=".5rem"
-      direction="column"
-      gap="1.25rem"
-      height="100%"
-      padding="1.5rem 1rem"
-      width="100%"
-    >
-      {children}
-    </Flex>
-  );
-};
-
-export const PortalHeader = ({
-  name,
-  type,
-}: {
-  name: string;
-  type: string;
-}) => {
-  return (
-    <Heading
-      size="md"
-      fontFamily="Montserrat"
-      width="100%"
-      paddingBottom=".5rem"
-      borderBottom="1px solid #888"
-      fontWeight={400}
-    >
-      <Flex gap=".5rem" alignItems="center">
-        <Text>{name}</Text>
-        <Tooltip
-          label={<PortalInfoToolip type={type} />}
-          hasArrow
-          placement="auto-start"
-        >
-          <InfoIcon boxSize=".8rem" />
-        </Tooltip>
-      </Flex>
-    </Heading>
-  );
-};
-
-export const PortalInfoToolip = ({ type }: { type: string }) => {
-  return <Box>Type: {type}</Box>;
 };
 
 const searchFormStyles = {

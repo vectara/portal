@@ -1,27 +1,15 @@
 import {
   Box,
-  DrawerBody,
-  DrawerFooter,
-  DrawerHeader,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
   Input,
   ListItem,
+  Spinner,
   Text,
   UnorderedList,
-  Button as ChakraButton,
 } from "@chakra-ui/react";
 import { PortalData } from "../../types";
-import {
-  CSSProperties,
-  ChangeEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { CSSProperties, ChangeEvent, useCallback, useState } from "react";
 import { useSearch } from "@vectara/react-search/lib/useSearch";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
@@ -31,15 +19,12 @@ import Link from "next/link";
 import { ConfigDrawer } from "../../components/ConfigDrawer";
 import { Button } from "../../components/Button";
 import { GearIcon } from "../../icons/Gear";
-
-import { FileUploader } from "react-drag-drop-files";
-import { usePortal } from "./usePortal";
-import { useFileUpload } from "../../hooks/useFileUpload";
 import { useFileUploadNotification } from "../../hooks/useFileUploadNotification";
-import { CloseIcon } from "@vectara/react-search";
 import { ManagementPanel } from "../../components/ManagementPanel";
 import { useUser } from "../../hooks/useUser";
-import { PortalHeader, PortalPanel, PortalWrapper } from "./ChatSummaryBase";
+import { PortalPanel } from "./PortalPanel";
+import { PortalWrapper } from "./PortalWrapper";
+import { PortalHeader } from "./PortalHeader";
 
 interface ParsedSearchResult extends Pick<DeserializedSearchResult, "snippet"> {
   title: string;
@@ -61,7 +46,6 @@ const parseSearchResults = (
 };
 
 export const Search = (props: PortalData) => {
-  const [didInitiateSearch, setDidInitiateSearch] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<
     ParsedSearchResult[] | null
   >();
@@ -88,11 +72,10 @@ export const Search = (props: PortalData) => {
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length < 3) {
-      setDidInitiateSearch(false);
+      setSearchResults(null);
       return;
     }
 
-    setDidInitiateSearch(true);
     setSearchResults(null);
     onSearch(e.target.value);
   };
@@ -100,13 +83,17 @@ export const Search = (props: PortalData) => {
   return (
     <PortalWrapper>
       <PortalPanel>
-        <PortalHeader name={portalName} />
-        <Flex as="form" style={searchFormStyles} direction="column" gap=".5rem">
-          <Input
-            style={inputStyles}
-            placeholder="Search..."
-            onChange={onChange}
-          />
+        <PortalHeader name={portalName} type="search" />
+        <Flex as="form" direction="column" gap=".5rem" width="100%">
+          <Flex alignItems="center" gap=".5rem">
+            <Input
+              border="1px solid #aaa"
+              maxWidth="500px"
+              placeholder="Search..."
+              onChange={onChange}
+            />
+            {isLoading && <Spinner color="#888" size="sm" />}
+          </Flex>
           <Flex gap=".5rem">
             {currentUser && (
               <Button
@@ -117,14 +104,30 @@ export const Search = (props: PortalData) => {
             )}
           </Flex>
         </Flex>
+        <Box
+          overflow="scroll"
+          width="100%"
+          borderTop={searchResults ? "1px solid #888" : undefined}
+        >
+          {searchResults && (
+            <UnorderedList
+              display="flex"
+              flexDirection="column"
+              gap=".75rem"
+              listStyleType="none"
+              margin={0}
+              padding="1rem 0"
+            >
+              {searchResults?.map((searchResult, index) => (
+                <SearchResult
+                  key={`search-results-${index}`}
+                  {...searchResult}
+                />
+              ))}
+            </UnorderedList>
+          )}
+        </Box>
       </PortalPanel>
-      {searchResults && didInitiateSearch && (
-        <UnorderedList style={searchResultsStyles}>
-          {searchResults?.map((searchResult, index) => (
-            <SearchResult key={`search-results-${index}`} {...searchResult} />
-          ))}
-        </UnorderedList>
-      )}
 
       <ConfigDrawer
         header="Portal Management"
@@ -149,7 +152,15 @@ export const Search = (props: PortalData) => {
 
 const SearchResult = (props: ParsedSearchResult) => {
   const content = (
-    <ListItem as="li" style={searchResultStyles}>
+    <ListItem
+      as="li"
+      display="flex"
+      flexDirection="column"
+      gap=".25rem"
+      padding="1rem"
+      border="1px solid #555"
+      borderRadius=".5rem"
+    >
       <Heading size="xs">{props.title}</Heading>
       <Text size="sm">
         {props.snippet.pre}
@@ -176,32 +187,3 @@ const SearchResult = (props: ParsedSearchResult) => {
     </Link>
   );
 };
-
-const searchFormStyles = {
-  maxWidth: "500px",
-  minWidth: "360px",
-  width: "75%",
-};
-
-const inputStyles = {
-  border: "1px solid #aaa",
-};
-
-const searchResultsStyles = {
-  display: "flex",
-  flexDirection: "column",
-  gap: ".75rem",
-  listStyleType: "none",
-  margin: 0,
-  width: "75%",
-  maxWidth: "800px",
-  paddingBottom: "4rem",
-} as CSSProperties;
-
-const searchResultStyles = {
-  display: "flex",
-  flexDirection: "column",
-  gap: ".75rem",
-  padding: "1.5rem",
-  borderBottom: "1px solid #555",
-} as CSSProperties;
