@@ -1,11 +1,21 @@
 "use client";
 
 import { Page } from "../components/Page";
-import { PortalType } from "../types";
+import { PortalData, PortalType } from "../types";
 import { usePortals } from "./usePortals";
-import { Fade, Flex, Heading, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Fade,
+  Flex,
+  Heading,
+  Input,
+  Select,
+  SimpleGrid,
+  Text,
+} from "@chakra-ui/react";
 import Link from "next/link";
 import { LoadingMessage } from "../portal/[id]/page";
+import { ChangeEvent, useEffect, useState } from "react";
 
 const Portals = () => {
   return (
@@ -20,12 +30,33 @@ const Portals = () => {
 
 const Content = () => {
   const { portals, isLoading } = usePortals();
+  const [filters, setFilters] = useState<FilterData | null>(null);
+  const onFilter = (filterData: FilterData) => {
+    setFilters(filterData);
+  };
+
+  let filteredPortalDatas = portals;
+
+  if (filters) {
+    filteredPortalDatas = portals.filter((portalData) => {
+      const isTextMatch =
+        portalData.name.toLowerCase().match(filters.text) ||
+        portalData.description?.toLowerCase().match(filters.text);
+      const isTypeMatch = filters.type
+        ? portalData.type === filters.type
+        : true;
+      const isIsRestrictedMatch = filters.isRestricted
+        ? portalData.isRestricted === filters.isRestricted
+        : true;
+
+      return isTextMatch && isTypeMatch && isIsRestrictedMatch;
+    });
+  }
 
   return (
     <Flex
-      width="75%"
-      justifyContent="center"
       alignItems="center"
+      width="100%"
       direction="column"
       position="relative"
     >
@@ -33,39 +64,42 @@ const Content = () => {
       <Fade
         in={!isLoading}
         style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "1.5rem",
           position: "absolute",
           zIndex: "100",
+          width: "100%",
+          padding: "2rem",
+          height: "100%",
         }}
       >
         {portals.length ? (
-          <>
+          <Flex direction="column" width="100%" gap="1rem" height="100%">
             <Heading size="lg" color="#ddd" fontWeight={200}>
-              Select a Portal:
+              Your Portals
             </Heading>
-            <Flex
+            <Filters onFilter={onFilter} />
+            <Box
               background="#242424"
-              borderRadius=".5rem"
-              direction="column"
               border="1px solid #888"
-              overflow="auto"
-              maxHeight="500px"
+              borderRadius=".5rem"
+              flexGrow={1}
+              overflow="scroll"
               padding="1rem"
-              gap="1rem"
             >
-              {portals?.map((portal, index) => (
-                <PortalCard
-                  key={`portal-data-${index}`}
-                  name={portal.name}
-                  type={portal.type}
-                  id={portal.portalKey}
-                />
-              ))}
-            </Flex>
-          </>
+              <SimpleGrid
+                minChildWidth="320px"
+                borderRadius=".5rem"
+                gap="1rem"
+                width="100%"
+              >
+                {filteredPortalDatas.map((portalData, index) => (
+                  <PortalCard
+                    key={`portal-data-${index}`}
+                    portalData={portalData}
+                  />
+                ))}
+              </SimpleGrid>
+            </Box>
+          </Flex>
         ) : (
           <>
             <Flex
@@ -91,35 +125,164 @@ const Content = () => {
   );
 };
 
-interface PortalCardProps {
-  name: string;
-  type: PortalType;
-  id: string;
+type FilterData = {
+  text: string;
+  type: PortalType | null;
+  isRestricted: boolean | null;
+};
+
+interface FiltersProps {
+  onFilter: (filterData: FilterData) => void;
 }
 
-const PortalCard = ({ name, type, id }: PortalCardProps) => {
+const Filters = ({ onFilter }: FiltersProps) => {
+  const [filters, setFilters] = useState<FilterData>({
+    text: "",
+    type: null,
+    isRestricted: null,
+  });
+
+  useEffect(() => onFilter(filters), [filters]);
+
   return (
-    <Link href={`portal/${id}`} target="_blank">
+    <Flex gap=".5rem" color="#fff" alignItems="center">
+      <Text fontWeight={500}>Filter: </Text>
+      <Input
+        background="#242424"
+        fontSize=".8rem"
+        size="sm"
+        maxWidth="200px"
+        border="1px solid #888"
+        borderRadius=".25rem"
+        padding=".25rem .5rem"
+        value={filters.text}
+        onChange={(e: ChangeEvent<HTMLInputElement>) =>
+          setFilters((prev) => ({
+            ...prev,
+            text: e.target.value.toLowerCase(),
+          }))
+        }
+      />
+      <Select
+        fontSize=".8rem"
+        border="1px solid #888"
+        borderRadius=".25rem"
+        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+          setFilters((prev) => ({
+            ...prev,
+            type:
+              e.target.value === "all" ? null : (e.target.value as PortalType),
+          }))
+        }
+        defaultValue="all"
+        value={filters.type ?? "all"}
+        size="sm"
+        maxWidth="150px"
+      >
+        <option value="all">All Types</option>
+        <option value="search">Search</option>
+        <option value="summary">Summary</option>
+        <option value="chat">Chat</option>
+      </Select>
+      <Select
+        fontSize=".8rem"
+        border="1px solid #888"
+        borderRadius=".25rem"
+        // TODO: Change this icky ternary
+        value={
+          filters.isRestricted === null
+            ? "all"
+            : filters.isRestricted === true
+            ? "private"
+            : "public"
+        }
+        onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+          setFilters((prev) => ({
+            ...prev,
+            isRestricted:
+              e.target.value === "all" ? null : e.target.value === "private",
+          }))
+        }
+        size="sm"
+        maxWidth="150px"
+      >
+        <option value="all">All Permissions</option>
+        <option value="public">Public</option>
+        <option value="private">Private</option>
+      </Select>
+    </Flex>
+  );
+};
+
+interface PortalCardProps {
+  portalData: PortalData;
+}
+
+const PortalCard = ({ portalData }: PortalCardProps) => {
+  return (
+    <Link href={`portal/${portalData.portalKey}`} target="_blank">
       <Flex
+        background="#333"
+        border="1px solid #888"
         borderRadius=".5rem"
         color="#ddd"
         direction="column"
         gap=".5rem"
-        padding="1.25rem 1rem"
-        _hover={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }}
+        padding="1rem"
+        _hover={{ backgroundColor: "rgba(255, 255, 255, 0.1)" }}
       >
-        <Flex alignItems="center" justifyContent="center">
-          <Heading fontFamily="Montserrat" size="md" fontWeight={300}>
-            {name}
-          </Heading>
-        </Flex>
-        <Flex alignItems="center" justifyContent="center">
-          <Text fontSize=".8rem" fontWeight={600}>
-            {type}
-          </Text>
+        <Text fontWeight={500} borderBottom="1px solid #888">
+          {portalData.name}
+        </Text>
+        <Text fontSize=".8rem" fontWeight={400}>
+          {portalData.description}
+        </Text>
+        <Flex
+          alignItems="center"
+          justifyContent="flex-end"
+          gap=".5rem"
+          width="100%"
+        >
+          <DetailBadge label={portalData.type} />
+          <DetailBadge
+            label={portalData.isRestricted ? "private" : "public"}
+            color={portalData.isRestricted ? "red" : "green"}
+          />
         </Flex>
       </Flex>
     </Link>
+  );
+};
+
+const DetailBadge = ({
+  label,
+  color = "neutral",
+}: {
+  label: string;
+  color?: "red" | "green" | "neutral";
+}) => {
+  const bgColors = {
+    red: "rgb(100, 0, 0)",
+    green: "rgb(0, 100, 0)",
+    neutral: "#444",
+  };
+
+  const borderColors = {
+    red: "rgb(140, 0, 0)",
+    green: "rgb(0, 140, 0)",
+    neutral: "#888",
+  };
+  return (
+    <Box
+      background={bgColors[color]}
+      border={`1px solid ${borderColors[color]}`}
+      borderRadius=".25rem"
+      padding=".125rem .25rem"
+    >
+      <Text fontSize=".7rem" fontWeight={600}>
+        {label}
+      </Text>
+    </Box>
   );
 };
 
