@@ -33,7 +33,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { name, type, isRestricted } = await req.json();
+  const { name, type, description, isRestricted } = await req.json();
 
   if (!name) {
     return NextResponse.json(
@@ -47,6 +47,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
   const portal = await createPortal(
     name,
     type,
+    description,
     internalUserData.id,
     internalUserData.vectara_customer_id,
     internalUserData.vectara_personal_api_key,
@@ -74,7 +75,8 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
 
 const createPortal = async (
   name: string,
-  type: string = "search",
+  type: string,
+  description: string,
   ownerId: number,
   vectaraCustomerId: string,
   vectaraPersonalApiKey: string,
@@ -116,6 +118,7 @@ const createPortal = async (
     name,
     corpusId,
     type,
+    description,
     portalKey,
     ownerId,
     isRestricted,

@@ -45,14 +45,16 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
     if (shouldVerifyVectaraCredentials) {
       accessCheck =
         !!currentUser?.vectaraCustomerId &&
-        !!currentUser?.vectaraPersonalApiKey;
+        !!currentUser?.vectaraPersonalApiKey &&
+        !!currentUser?.vectaraOAuth2ClientId &&
+        !!currentUser?.vectaraOAuth2ClientSecret;
 
       if (!accessCheck) {
         router.push("/me");
         toast({
           title: "We need a few more things to get you started.",
           description:
-            "To take full advantage of Portal, please add your Vectara Customer ID and Personal API key. You can find this info in your Vectara account.",
+            "To take full advantage of Portal, please add the required Vectara credentials. You can find these in your Vectara account.",
           status: "info",
           duration: 10000,
           isClosable: true,

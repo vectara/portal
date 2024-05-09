@@ -5,12 +5,12 @@ import {
   Flex,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Heading,
   Input,
   Select,
   Switch,
+  Textarea,
   useToast,
 } from "@chakra-ui/react";
 import { Page } from "../../components/Page";
@@ -22,22 +22,26 @@ import { Centered } from "@/app/components/Centered";
 
 interface FormState {
   name?: string;
+  description?: string;
   type: PortalType;
   isRestricted: boolean;
 }
 
 interface FormErrors {
   name: boolean;
+  description: boolean;
 }
 
 const INITIAL_FORM_STATE: FormState = {
-  name: undefined,
+  name: "",
+  description: "",
   type: "search",
   isRestricted: false,
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
   name: false,
+  description: false,
 };
 
 const Create = () => {
@@ -46,9 +50,9 @@ const Create = () => {
       pageId="create"
       accessPrerequisites={{ loggedInUser: true, vectaraCredentials: true }}
     >
-      <Centered>
+      <Flex padding="2rem" w="100%" justifyContent="center">
         <CreateForm />
-      </Centered>
+      </Flex>
     </Page>
   );
 };
@@ -57,20 +61,25 @@ const CreateForm = () => {
   const { createPortal } = useCreatePortal();
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
   const [formErrors, setFormErrors] = useState<FormErrors>(INITIAL_FORM_ERRORS);
-  const didStartFillingForm = useRef<boolean>(false);
+  const didStartFillingForm = useRef<{ name: boolean; description: boolean }>({
+    name: false,
+    description: false,
+  });
   const toast = useToast();
-  const router = useRouter();
 
-  const validateForm = (formValues: FormState) => {
+  const validateForm = () => {
     return {
-      name: formState.name === "",
+      name: didStartFillingForm.current.name && formState.name === "",
+      description:
+        didStartFillingForm.current.description && formState.description === "",
     };
   };
 
   const onSubmit = async () => {
-    if (!formState.name || !formState.type) return;
+    if (!formState.name || !formState.type || !formState.description) return;
     const createdPortal = await createPortal(
       formState.name,
+      formState.description,
       formState.type,
       formState.isRestricted
     );
@@ -97,12 +106,22 @@ const CreateForm = () => {
   };
 
   const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    didStartFillingForm.current = true;
+    didStartFillingForm.current.name = true;
     const updatedName = e.target.value;
 
     setFormState((prevState) => ({
       ...prevState,
       name: updatedName,
+    }));
+  };
+
+  const onChangeDescription = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    didStartFillingForm.current.description = true;
+    const updatedDescription = e.target.value;
+
+    setFormState((prevState) => ({
+      ...prevState,
+      description: updatedDescription,
     }));
   };
 
@@ -125,9 +144,13 @@ const CreateForm = () => {
   };
 
   useEffect(() => {
-    if (!didStartFillingForm.current) return;
+    if (
+      !didStartFillingForm.current.name &&
+      !didStartFillingForm.current.description
+    )
+      return;
 
-    const updatedFormErrors = validateForm(formState);
+    const updatedFormErrors = validateForm();
     setFormErrors(updatedFormErrors);
   }, [formState]);
 
@@ -136,90 +159,119 @@ const CreateForm = () => {
     (didStartFillingForm.current && formErrors.name);
 
   return (
-    <Flex style={formStyles} direction="column" align="center" gap="2rem">
-      <Heading size="md" style={{ fontFamily: "Montserrat" }} color="#ddd">
-        Create a Portal
-      </Heading>
-      <Flex as="form" direction="column" gap={8}>
-        <Box>
-          <FormControl
-            style={formControlStyles}
-            isInvalid={formErrors.name}
-            onSubmit={onSubmit}
-          >
-            <FormLabel style={formLabelStyles}>
-              What would you like to name your portal?
-            </FormLabel>
-            <Input
-              type="text"
-              value={formState.name ?? ""}
-              onChange={onChangeName}
-              border="1px solid #888"
-              color="#ddd"
-            />
-            {!formErrors.name ? (
-              <FormHelperText color="#aaa" fontSize="0.75rem">
-                This will appear as the title on your portal page.
-              </FormHelperText>
-            ) : (
-              <FormErrorMessage fontSize="0.75rem" color="red.500">
-                Please enter a name.
-              </FormErrorMessage>
-            )}
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>
-              What kind of portal do you want to create?
-            </FormLabel>
-            <Select
-              color="#ddd"
-              defaultValue="search"
-              value={formState.type}
-              onChange={onChangeType}
-              border="1px solid #888"
+    <Box>
+      <Flex
+        background="#242424"
+        borderRadius=".5rem"
+        border="1px solid #888"
+        fontWeight="400"
+        padding="2rem 2.5rem"
+        direction="column"
+        gap="1.25rem"
+        minWidth="500px"
+      >
+        <Heading size="lg" style={{ fontFamily: "Montserrat" }} color="#ddd">
+          Create a Portal
+        </Heading>
+        <Flex as="form" direction="column" gap="1.2rem">
+          <Box>
+            <FormControl
+              style={formControlStyles}
+              isInvalid={formErrors.name}
+              onSubmit={onSubmit}
             >
-              <option value="search">Search</option>
-              <option value="summary">Summary</option>
-              <option value="chat">Chat</option>
-            </Select>
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl
-            style={{
-              ...formControlStyles,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <FormLabel
-              style={{ ...formLabelStyles, marginBottom: "0" }}
-              flexGrow={1}
+              <FormLabel style={formLabelStyles}>Portal Name</FormLabel>
+              <Input
+                type="text"
+                value={formState.name ?? ""}
+                onChange={onChangeName}
+                border="1px solid #888"
+                color="#ddd"
+              />
+              {formErrors.name && (
+                <FormErrorMessage fontSize="0.75rem" color="red.500">
+                  Please enter a name.
+                </FormErrorMessage>
+              )}
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl
+              style={formControlStyles}
+              isInvalid={formErrors.description}
+              onSubmit={onSubmit}
             >
-              Restrict to authorized users?
-            </FormLabel>
-            <Switch
-              isChecked={formState.isRestricted}
-              onChange={(e) =>
-                setFormState((prev) => ({
-                  ...prev,
-                  isRestricted: !prev.isRestricted,
-                }))
-              }
-            />
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl style={formControlStyles}>
-            <Button isDisabled={isSubmitDisabled} onClick={onSubmit}>
-              Create it
-            </Button>
-          </FormControl>
-        </Box>
+              <FormLabel style={formLabelStyles}>Portal Description</FormLabel>
+              <Textarea
+                value={formState.description ?? ""}
+                onChange={onChangeDescription}
+                border="1px solid #888"
+                color="#ddd"
+              />
+              {formErrors.description && (
+                <FormErrorMessage fontSize="0.75rem" color="red.500">
+                  Please enter a description.
+                </FormErrorMessage>
+              )}
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl style={formControlStyles}>
+              <FormLabel style={formLabelStyles}>Portal Type</FormLabel>
+              <Select
+                color="#ddd"
+                defaultValue="search"
+                value={formState.type}
+                onChange={onChangeType}
+                border="1px solid #888"
+              >
+                <option value="search">Search</option>
+                <option value="summary">Summary</option>
+                <option value="chat">Chat</option>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl
+              style={{
+                ...formControlStyles,
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <FormLabel
+                style={{ ...formLabelStyles, marginBottom: "0" }}
+                flexGrow={1}
+              >
+                Restrict to authorized users?
+              </FormLabel>
+              <Switch
+                isChecked={formState.isRestricted}
+                onChange={(e) =>
+                  setFormState((prev) => ({
+                    ...prev,
+                    isRestricted: !prev.isRestricted,
+                  }))
+                }
+              />
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl style={formControlStyles}>
+              <Flex>
+                <Button
+                  isDisabled={isSubmitDisabled}
+                  onClick={onSubmit}
+                  colorScheme="blue"
+                >
+                  Create it
+                </Button>
+              </Flex>
+            </FormControl>
+          </Box>
+        </Flex>
       </Flex>
-    </Flex>
+    </Box>
   );
 };
 
@@ -233,18 +285,7 @@ const formLabelStyles = {
   marginBottom: "0.75rem",
 };
 
-const formStyles = {
-  background: "#242424",
-  borderRadius: ".5rem",
-  border: "1px solid #888",
-
-  fontWeight: "400",
-  maxWidth: "640px",
-  padding: "2.5rem",
-};
-
 const formControlStyles = {
   display: "flex",
   flexDirection: "column",
-  alignItems: "center",
 } as CSSProperties;

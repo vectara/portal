@@ -4,6 +4,7 @@ import { PortalType } from "../../types";
 export const useCreatePortal = () => {
   const createPortal = async (
     name: string,
+    description: string,
     type: PortalType,
     isRestricted: boolean
   ) => {
@@ -13,6 +14,7 @@ export const useCreatePortal = () => {
       url: "/api/portal/create",
       data: {
         name,
+        description,
         type,
         isRestricted,
       },

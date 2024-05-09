@@ -31,7 +31,7 @@ const Profile = () => {
 const panelStyles = {
   backgroundColor: "#242424",
   borderRadius: "1rem",
-  padding: "3rem 3.5rem",
+  padding: "2rem 2.5rem",
   border: "1px solid #555",
   color: "#ddd",
   overflow: "auto",

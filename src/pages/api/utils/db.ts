@@ -35,6 +35,7 @@ export const createPortalForUser = (
   name: string,
   corpusId: string,
   type: string,
+  description: string,
   key: string,
   ownerId: number,
   isRestricted: boolean,
@@ -42,7 +43,7 @@ export const createPortalForUser = (
   vectaraApiKey: string
 ) => {
   return sendQuery(
-    `INSERT INTO portals (name, vectara_corpus_id, type, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${name}', '${corpusId}', '${type}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
+    `INSERT INTO portals (name, vectara_corpus_id, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${name}', '${corpusId}', '${type}', '${description}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
   );
 };
 

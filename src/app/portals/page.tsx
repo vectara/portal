@@ -235,7 +235,7 @@ const PortalCard = ({ portalData }: PortalCardProps) => {
           {portalData.name}
         </Text>
         <Text fontSize=".8rem" fontWeight={400}>
-          {portalData.description}
+          {portalData.description ?? <em>No description provided</em>}
         </Text>
         <Flex
           alignItems="center"
