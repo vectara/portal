@@ -10,12 +10,12 @@ import {
   Heading,
   Input,
   Select,
-  SimpleGrid,
   Text,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { LoadingMessage } from "../portal/[id]/page";
 import { ChangeEvent, useEffect, useState } from "react";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 const Portals = () => {
   return (
@@ -90,19 +90,18 @@ const Content = () => {
               overflow="scroll"
               padding="1rem"
             >
-              <SimpleGrid
-                minChildWidth="320px"
-                borderRadius=".5rem"
-                gap="1rem"
-                width="100%"
+              <ResponsiveMasonry
+                columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}
               >
-                {filteredPortalDatas.map((portalData, index) => (
-                  <PortalCard
-                    key={`portal-data-${index}`}
-                    portalData={portalData}
-                  />
-                ))}
-              </SimpleGrid>
+                <Masonry gutter=".75rem">
+                  {filteredPortalDatas.map((portalData, index) => (
+                    <PortalCard
+                      key={`portal-data-${index}`}
+                      portalData={portalData}
+                    />
+                  ))}
+                </Masonry>
+              </ResponsiveMasonry>
             </Box>
           </Flex>
         ) : (
@@ -179,7 +178,6 @@ const Filters = ({ onFilter }: FiltersProps) => {
               e.target.value === "all" ? null : (e.target.value as PortalType),
           }))
         }
-        defaultValue="all"
         value={filters.type ?? "all"}
         size="sm"
         maxWidth="150px"

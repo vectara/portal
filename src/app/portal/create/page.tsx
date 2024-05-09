@@ -233,7 +233,6 @@ const CreateForm = () => {
               <FormLabel style={formLabelStyles}>Portal Type</FormLabel>
               <Select
                 color="#ddd"
-                defaultValue="search"
                 value={formState.type}
                 onChange={onChangeType}
                 border="1px solid #888"
