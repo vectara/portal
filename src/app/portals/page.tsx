@@ -73,7 +73,12 @@ const Content = () => {
       >
         {portals.length ? (
           <Flex direction="column" width="100%" gap="1rem" height="100%">
-            <Heading size="lg" color="#ddd" fontWeight={200}>
+            <Heading
+              style={{ fontFamily: "Montserrat" }}
+              size="lg"
+              color="#ddd"
+              fontWeight={400}
+            >
               Your Portals
             </Heading>
             <Filters onFilter={onFilter} />

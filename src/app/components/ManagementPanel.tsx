@@ -13,6 +13,7 @@ import {
   Input,
   Select,
   Switch,
+  Textarea,
 } from "@chakra-ui/react";
 import { FileUploader } from "react-drag-drop-files";
 import { PortalData, PortalType } from "../types";
@@ -93,10 +94,9 @@ export const ManagementPanel = ({
         </FormControl>
         <FormControl>
           <FormLabel style={formLabelStyles}>Description</FormLabel>
-          <Input
-            type="text"
+          <Textarea
             value={updatedPortalDescription}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
               setUpdatedPortalDescription(e.target.value)
             }
             border="1px solid #888"

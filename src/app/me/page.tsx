@@ -20,7 +20,14 @@ const Profile = () => {
     <Page pageId="profile" accessPrerequisites={{ loggedInUser: true }}>
       <Flex padding="2rem" w="100%">
         <Flex direction="column" gap="1.25rem" style={panelStyles}>
-          <Heading size="lg">Your Profile</Heading>
+          <Heading
+            size="lg"
+            fontWeight={400}
+            color="#ddd"
+            style={{ fontFamily: "Montserrat" }}
+          >
+            Your Profile
+          </Heading>
           <Content />
         </Flex>
       </Flex>
@@ -131,7 +138,7 @@ const Content = () => {
     (formState.pendingUserEmailsToAdd ?? []).length === 0;
 
   return (
-    <Flex as="form" direction="column" gap="1.2rem">
+    <Flex as="form" direction="column" gap="1.5rem">
       <Flex gap="1rem">
         <Box>
           <FormControl style={formControlStyles}>
@@ -337,7 +344,7 @@ const Content = () => {
 
 // TODO: Create common components with prop-based styles
 const formLabelStyles = {
-  fontWeight: "500",
+  fontWeight: "400",
   margin: 0,
   marginBottom: "0.75rem",
 };

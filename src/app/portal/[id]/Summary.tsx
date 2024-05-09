@@ -1,7 +1,6 @@
 import { PortalData } from "../../types";
 import { useState } from "react";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
-import { useFileUploadNotification } from "../../hooks/useFileUploadNotification";
 import {
   StreamUpdate,
   SummaryLanguage,
@@ -18,7 +17,6 @@ import { Text } from "@chakra-ui/react";
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
-  useFileUploadNotification();
   const [references, setReferences] =
     useState<Array<DeserializedSearchResult>>();
   const [isStreaming, setIsStreaming] = useState<boolean>(false);

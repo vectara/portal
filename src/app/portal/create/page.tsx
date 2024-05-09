@@ -9,6 +9,7 @@ import {
   Heading,
   Input,
   Select,
+  Spinner,
   Switch,
   Textarea,
   useToast,
@@ -17,8 +18,7 @@ import { Page } from "../../components/Page";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useCreatePortal } from "./useCreatePortal";
 import { PortalType } from "../../types";
-import { useRouter } from "next/navigation";
-import { Centered } from "@/app/components/Centered";
+import { redirect, useRouter } from "next/navigation";
 
 interface FormState {
   name?: string;
@@ -66,6 +66,8 @@ const CreateForm = () => {
     description: false,
   });
   const toast = useToast();
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const router = useRouter();
 
   const validateForm = () => {
     return {
@@ -77,6 +79,9 @@ const CreateForm = () => {
 
   const onSubmit = async () => {
     if (!formState.name || !formState.type || !formState.description) return;
+
+    setIsCreating(true);
+
     const createdPortal = await createPortal(
       formState.name,
       formState.description,
@@ -94,8 +99,10 @@ const CreateForm = () => {
 
       setTimeout(() => {
         window.open(`/portal/${createdPortal.key}`, "_blank");
+        router.push("/portals");
       }, 3000);
     } else {
+      setIsCreating(false);
       toast({
         status: "error",
         title: "Could not create portal",
@@ -155,6 +162,7 @@ const CreateForm = () => {
   }, [formState]);
 
   const isSubmitDisabled =
+    isCreating ||
     !didStartFillingForm.current ||
     (didStartFillingForm.current && formErrors.name);
 
@@ -170,10 +178,15 @@ const CreateForm = () => {
         gap="1.25rem"
         minWidth="500px"
       >
-        <Heading size="lg" style={{ fontFamily: "Montserrat" }} color="#ddd">
+        <Heading
+          size="lg"
+          style={{ fontFamily: "Montserrat" }}
+          fontWeight={400}
+          color="#ddd"
+        >
           Create a Portal
         </Heading>
-        <Flex as="form" direction="column" gap="1.2rem">
+        <Flex as="form" direction="column" gap="1.5rem">
           <Box>
             <FormControl
               style={formControlStyles}
@@ -258,7 +271,7 @@ const CreateForm = () => {
           </Box>
           <Box>
             <FormControl style={formControlStyles}>
-              <Flex>
+              <Flex alignItems="center" gap=".5rem">
                 <Button
                   isDisabled={isSubmitDisabled}
                   onClick={onSubmit}
@@ -266,6 +279,7 @@ const CreateForm = () => {
                 >
                   Create it
                 </Button>
+                {isCreating && <Spinner color="#888" size="sm" />}
               </Flex>
             </FormControl>
           </Box>
@@ -280,7 +294,7 @@ export default Create;
 // TODO: Create common form components with prop styles
 const formLabelStyles = {
   color: "#ddd",
-  fontWeight: "500",
+  fontWeight: "400",
   margin: 0,
   marginBottom: "0.75rem",
 };

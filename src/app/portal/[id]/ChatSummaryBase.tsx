@@ -199,11 +199,13 @@ const References = ({
     if (showIndex !== undefined && elRefs.current[showIndex - 1]) {
       setToggleState("auto_open");
 
-      // TODO: Fix this
-      // @ts-ignore
-      elRefs.current[showIndex - 1].scrollIntoView({
-        behavior: "smooth",
-      });
+      setTimeout(() => {
+        // TODO: Fix this
+        // @ts-ignore
+        elRefs.current[showIndex - 1].scrollIntoView({
+          behavior: "smooth",
+        });
+      }, 100);
     }
   }, [showIndex]);
 

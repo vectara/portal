@@ -81,17 +81,19 @@ export const Chat = (props: PortalData) => {
       references={latestReferences}
       viewedReferenceIndex={viewedReferenceIndex}
     >
-      {messages}
-      {activeMessage && (
-        <Turn
-          question={activeMessage.question}
-          answer={sanitizedAnswer}
-          isActive={true}
-          isLoading={isLoading}
-          isStreaming={isStreamingResponse}
-          onClickReference={(index: number) => setViewedReferenceIndex(index)}
-        />
-      )}
+      <Flex direction="column" gap="1rem">
+        {messages}
+        {activeMessage && (
+          <Turn
+            question={activeMessage.question}
+            answer={sanitizedAnswer}
+            isActive={true}
+            isLoading={isLoading}
+            isStreaming={isStreamingResponse}
+            onClickReference={(index: number) => setViewedReferenceIndex(index)}
+          />
+        )}
+      </Flex>
     </ChatSummaryBase>
   );
 };
