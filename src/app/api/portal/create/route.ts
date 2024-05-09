@@ -50,6 +50,8 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     internalUserData.id,
     internalUserData.vectara_customer_id,
     internalUserData.vectara_personal_api_key,
+    internalUserData.oauth2_client_id,
+    internalUserData.oauth2_client_secret,
     isRestricted
   );
 
@@ -76,6 +78,8 @@ const createPortal = async (
   ownerId: number,
   vectaraCustomerId: string,
   vectaraPersonalApiKey: string,
+  vectaraOAuth2ClientId: string,
+  vectaraOAuth2ClientSecret: string,
   isRestricted: boolean = false
 ) => {
   // Step 1. Create the corpus in Vectara.
@@ -96,7 +100,8 @@ const createPortal = async (
     name,
     corpusId,
     vectaraCustomerId,
-    vectaraPersonalApiKey
+    vectaraOAuth2ClientId,
+    vectaraOAuth2ClientSecret
   );
 
   if (!apiKey) {
@@ -161,9 +166,10 @@ const createApiKey = async (
   name: string,
   corpusId: string,
   customerId: string,
-  apiKey: string
+  oAuth2ClientId: string,
+  oAuth2ClientSecret: string
 ) => {
-  const jwt = await getJwt();
+  const jwt = await getJwt(customerId, oAuth2ClientId, oAuth2ClientSecret);
 
   const data = JSON.stringify({
     apiKeyData: [
@@ -193,22 +199,20 @@ const createApiKey = async (
   return response.data.response[0].keyId;
 };
 
-const OAUTH2_URL =
-  "https://vectara-prod-3614030405.auth.us-west-2.amazoncognito.com/oauth2/token";
-const OAUTH2_CLIENT_ID = "10bimhllnk3h8pg1094ihc9fv6";
-const OAUTH2_CLIENT_SECRET =
-  "13uu6ktdemrj6a0uges477kasa99v0n7bec2l3t5o2s1jb9ob074";
-
-const getJwt = async () => {
+const getJwt = async (
+  customerId: string,
+  oAuth2ClientId: string,
+  oAuth2ClientSecret: string
+) => {
   const config = {
     method: "post",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     data: qs.stringify({
       grant_type: "client_credentials",
-      client_id: OAUTH2_CLIENT_ID,
-      client_secret: OAUTH2_CLIENT_SECRET,
+      client_id: oAuth2ClientId,
+      client_secret: oAuth2ClientSecret,
     }),
-    url: OAUTH2_URL,
+    url: `https://vectara-prod-${customerId}.auth.us-west-2.amazoncognito.com/oauth2/token`,
   };
 
   const {

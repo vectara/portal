@@ -3,10 +3,8 @@
 import {
   Box,
   Button,
-  Center,
   Flex,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Heading,
   Input,
@@ -43,6 +41,8 @@ const panelStyles = {
 interface FormState {
   vectaraCustomerId?: string;
   vectaraPersonalApiKey?: string;
+  vectaraOAuth2ClientId?: string;
+  vectaraOAuth2ClientSecret?: string;
   pendingUserEmailsToAdd?: Array<string>;
   userEmailToAdd?: string;
 }
@@ -50,6 +50,8 @@ interface FormState {
 interface FormErrors {
   vectaraCustomerId: boolean;
   vectaraPersonalApiKey: boolean;
+  vectaraOAuth2ClientId: boolean;
+  vectaraOAuth2ClientSecret: boolean;
   userEmailToAdd: boolean;
 }
 
@@ -57,12 +59,16 @@ const INITIAL_FORM_STATE: FormState = {
   vectaraCustomerId: undefined,
   vectaraPersonalApiKey: undefined,
   pendingUserEmailsToAdd: undefined,
+  vectaraOAuth2ClientId: undefined,
+  vectaraOAuth2ClientSecret: undefined,
   userEmailToAdd: undefined,
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
   vectaraCustomerId: false,
   vectaraPersonalApiKey: false,
+  vectaraOAuth2ClientId: false,
+  vectaraOAuth2ClientSecret: false,
   userEmailToAdd: false,
 };
 
@@ -93,6 +99,9 @@ const Content = () => {
       ...INITIAL_FORM_STATE,
       vectaraCustomerId: currentUser.vectaraCustomerId ?? undefined,
       vectaraPersonalApiKey: currentUser.vectaraPersonalApiKey ?? undefined,
+      vectaraOAuth2ClientId: currentUser.vectaraOAuth2ClientId ?? undefined,
+      vectaraOAuth2ClientSecret:
+        currentUser.vectaraOAuth2ClientSecret ?? undefined,
     });
   }, [currentUser]);
 
@@ -104,6 +113,8 @@ const Content = () => {
     await updateUser(
       formState.vectaraCustomerId,
       formState.vectaraPersonalApiKey,
+      formState.vectaraOAuth2ClientId,
+      formState.vectaraOAuth2ClientSecret,
       formState.pendingUserEmailsToAdd
     );
 
@@ -133,19 +144,6 @@ const Content = () => {
               minWidth="320px"
               isDisabled={true}
             />
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>Role</FormLabel>
-            <Select
-              border="1px solid #888"
-              isDisabled={true}
-              value={currentUser?.role}
-            >
-              <option value="admin">admin</option>
-              <option value="user">user</option>
-            </Select>
           </FormControl>
         </Box>
       </Flex>
@@ -191,7 +189,49 @@ const Content = () => {
           </FormControl>
         </Box>
       </Flex>
-      <Flex gap="1rem" direction="column" mt="1rem">
+      <Flex gap="1rem">
+        <Box>
+          <FormControl style={formControlStyles}>
+            <FormLabel style={formLabelStyles}>OAuth 2.0 Client ID</FormLabel>
+            <Input
+              type="text"
+              value={formState.vectaraOAuth2ClientId}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setFormState({
+                  ...formState,
+                  vectaraOAuth2ClientId: e.target.value ?? undefined,
+                });
+
+                setIsSubmitedDisabled(false);
+              }}
+              border="1px solid #888"
+              minWidth="320px"
+            />
+          </FormControl>
+        </Box>
+        <Box>
+          <FormControl style={formControlStyles}>
+            <FormLabel style={formLabelStyles}>
+              OAuth 2.0 Client Secret
+            </FormLabel>
+            <Input
+              type="password"
+              value={formState.vectaraOAuth2ClientSecret}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setFormState({
+                  ...formState,
+                  vectaraOAuth2ClientSecret: e.target.value ?? undefined,
+                });
+
+                setIsSubmitedDisabled(false);
+              }}
+              border="1px solid #888"
+              minWidth="320px"
+            />
+          </FormControl>
+        </Box>
+      </Flex>
+      {/*<Flex gap="1rem" direction="column" mt="1rem">
         <Heading size="md">Your Users</Heading>
         <Flex
           width="50%"
@@ -279,7 +319,7 @@ const Content = () => {
             />
           </FormControl>
         </Box>
-      </Flex>
+      </Flex>*/}
       <Flex>
         <FormControl style={formControlStyles} w="initial">
           <Button

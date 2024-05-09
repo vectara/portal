@@ -6,6 +6,8 @@ type CurrentUserState =
       email: string | null;
       vectaraCustomerId: string | null;
       vectaraPersonalApiKey: string | null;
+      vectaraOAuth2ClientId: string | null;
+      vectaraOAuth2ClientSecret: string | null;
       role: string;
     }
   | null

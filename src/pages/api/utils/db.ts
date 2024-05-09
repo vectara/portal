@@ -96,13 +96,19 @@ export const createUser = (
 export const updateUser = (
   userId: number,
   vectaraCustomerId?: string,
-  vectaraPersonalApiKey?: string
+  vectaraPersonalApiKey?: string,
+  vectaraOAuth2ClientId?: string,
+  vectaraOAuth2ClientSecret?: string
 ) => {
   return sendQuery(
     `UPDATE users SET vectara_customer_id = ${
       vectaraCustomerId ? `'${vectaraCustomerId}'` : "NULL"
     }, vectara_personal_api_key='${
       vectaraPersonalApiKey ?? "NULL"
+    }', oauth2_client_id='${
+      vectaraOAuth2ClientId ?? "NULL"
+    }', oauth2_client_secret='${
+      vectaraOAuth2ClientSecret ?? "NULL"
     }' WHERE id='${userId}' RETURNING *;`
   );
 };
