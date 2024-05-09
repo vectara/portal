@@ -1,73 +1,41 @@
+import { useToast } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { atom, useRecoilState } from "recoil";
 
-// TODO: Re-factor. A bit of unclear code here around the file upload queue. :)
-export const useFileUpload = () => {
-  const [queuedFileObjects, setQueuedFileObjects] = useState<Array<File>>([]);
-  const [fileUploads, setFileUploads] = useRecoilState(fileUploadState);
-
+export const useFileUpload = (corpusId: string) => {
+  const toast = useToast();
+  const [isUploading, setIsUploading] = useState<boolean>(false);
   const queueFilesForUpload = (files: FileList) => {
     const filesArray = Array.from(files);
-    setQueuedFileObjects((prev) => [...prev, ...filesArray]);
-
-    setFileUploads((prev) => {
-      return {
-        ...prev,
-        addedFiles: [
-          ...prev.addedFiles,
-          ...filesArray.map((file) => file.name),
-        ],
-      };
-    });
+    uploadFilesToCorpus(filesArray);
   };
 
-  const uploadFilesToCorpus = async (corpusId: string) => {
-    const pendingFiles = [...fileUploads.addedFiles];
-
-    setFileUploads({
-      ...fileUploads,
-      pendingFiles,
-      progress:
-        (fileUploads.addedFiles.length - pendingFiles.length) /
-        fileUploads.addedFiles.length,
+  const uploadFilesToCorpus = async (files: Array<File>) => {
+    toast({
+      title: `Uploading ${files.length} files`,
+      description: "We'll notify you when it's done.",
+      status: "info",
+      duration: 5000,
+      isClosable: true,
     });
-
-    queuedFileObjects.forEach(async (file) => {
+    setIsUploading(true);
+    files.forEach(async (file, index) => {
       const resp = await uploadFileToCorpus(corpusId, file);
 
       if (resp.data.success) {
-        removeUploadedFileFromQueue(file.name);
+        if (index === files.length - 1) {
+          toast({
+            title: "File upload complete!",
+            description: "Updated data will be available shortly",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+          });
+
+          setIsUploading(false);
+        }
       }
-    });
-  };
-
-  const removeUploadedFileFromQueue = (fileName: string) => {
-    setFileUploads((prev) => {
-      const updatedPendingFiles = prev.pendingFiles.filter(
-        (fname) => fname !== fileName
-      );
-      return {
-        ...prev,
-        addedFiles: updatedPendingFiles.length === 0 ? [] : prev.addedFiles,
-        pendingFiles: updatedPendingFiles,
-      };
-    });
-  };
-
-  const removeQueuedFile = (indexToRemove: number) => {
-    setQueuedFileObjects((prev) => {
-      return prev.splice(indexToRemove, 0);
-    });
-
-    setFileUploads((prev) => {
-      const updatedAddedFiles = prev.addedFiles.filter(
-        (file, index) => index !== indexToRemove
-      );
-      return {
-        ...prev,
-        addedFiles: updatedAddedFiles,
-      };
     });
   };
 
@@ -93,23 +61,6 @@ export const useFileUpload = () => {
 
   return {
     queueFilesForUpload,
-    uploadFilesToCorpus,
-    removeQueuedFile,
-    pendingFiles: fileUploads.pendingFiles,
-    addedFiles: fileUploads.addedFiles,
-    progress: fileUploads.progress,
+    isUploading,
   };
 };
-
-export const fileUploadState = atom<{
-  addedFiles: Array<string>;
-  pendingFiles: Array<string>;
-  progress: number;
-}>({
-  key: "fileUploadState", // unique ID (with respect to other atoms/selectors)
-  default: {
-    addedFiles: [],
-    pendingFiles: [],
-    progress: 0,
-  }, // default value (aka initial value)
-});

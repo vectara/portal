@@ -13,7 +13,6 @@ import { PortalData } from "../../types";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
-import { useFileUploadNotification } from "../../hooks/useFileUploadNotification";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 
@@ -35,7 +34,6 @@ export const ChatSummaryBase = ({
   viewedReferenceIndex,
 }: Props) => {
   const [query, setQuery] = useState<string>("");
-  useFileUploadNotification();
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
   const onQueryInternal = () => {

@@ -14,7 +14,6 @@ import { useSearch } from "@vectara/react-search/lib/useSearch";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import debounce from "debounce";
 import Link from "next/link";
-import { useFileUploadNotification } from "../../hooks/useFileUploadNotification";
 
 interface ParsedSearchResult extends Pick<DeserializedSearchResult, "snippet"> {
   title: string;
@@ -39,7 +38,6 @@ export const Search = (props: PortalData) => {
   const [searchResults, setSearchResults] = useState<
     ParsedSearchResult[] | null
   >();
-  useFileUploadNotification();
   const { fetchSearchResults, isLoading } = useSearch(
     props.vectaraCustomerId,
     props.vectaraCorpusId,

@@ -90,16 +90,9 @@ export const ManagementPanel = ({
 
   const deleteConfirmationRef = useRef<HTMLDivElement>(null);
 
-  const { uploadFilesToCorpus, queueFilesForUpload, addedFiles } =
-    useFileUpload();
-
-  useEffect(() => {
-    const doAsync = async () => {
-      await uploadFilesToCorpus(portalData.vectaraCorpusId);
-    };
-
-    doAsync();
-  }, [addedFiles]);
+  const { queueFilesForUpload, isUploading } = useFileUpload(
+    portalData.vectaraCorpusId
+  );
 
   const saveUpdates = () => {
     updatePortal(
@@ -210,21 +203,25 @@ export const ManagementPanel = ({
                 Documents
               </FormLabel>
               <Flex flexGrow={1} justifyContent="flex-end" alignItems="center">
-                <FileUploader
-                  handleChange={(files: FileList) => {
-                    queueFilesForUpload(files);
-                  }}
-                  name="files"
-                  types={FILE_TYPES}
-                  multiple={true}
-                  display="flex"
-                >
-                  <IconButton
-                    aria-label="Upload file"
-                    icon={<AddIcon boxSize=".5rem" />}
-                    size="xs"
-                  />
-                </FileUploader>
+                {isUploading ? (
+                  <Spinner size="sm" color="#888" />
+                ) : (
+                  <FileUploader
+                    handleChange={(files: FileList) => {
+                      queueFilesForUpload(files);
+                    }}
+                    name="files"
+                    types={FILE_TYPES}
+                    multiple={true}
+                    display="flex"
+                  >
+                    <IconButton
+                      aria-label="Upload file"
+                      icon={<AddIcon boxSize=".5rem" />}
+                      size="xs"
+                    />
+                  </FileUploader>
+                )}
               </Flex>
             </Flex>
 
@@ -240,8 +237,9 @@ export const ManagementPanel = ({
                   <Text fontSize=".75rem">Loading documents</Text>
                 </Flex>
               ) : (
-                documents.map((document, index) => (
+                documents.map((document) => (
                   <Document
+                    key={`document-${portalData.vectaraCorpusId}-${document.id}`}
                     documentId={document.id}
                     onDelete={deleteDocument}
                   />
