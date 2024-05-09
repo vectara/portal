@@ -22,7 +22,7 @@ export const useFileUpload = () => {
     });
   };
 
-  const uploadFilesToCorpus = (corpusId: string) => {
+  const uploadFilesToCorpus = async (corpusId: string) => {
     const pendingFiles = [...fileUploads.addedFiles];
 
     setFileUploads({

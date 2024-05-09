@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from "react";
 import { usePortal } from "../portal/[id]/usePortal";
 import { useFileUpload } from "../hooks/useFileUpload";
 import {
@@ -10,8 +10,10 @@ import {
   Flex,
   FormControl,
   FormLabel,
+  IconButton,
   Input,
   Select,
+  Spinner,
   Switch,
   Text,
   Textarea,
@@ -19,8 +21,16 @@ import {
 } from "@chakra-ui/react";
 import { FileUploader } from "react-drag-drop-files";
 import { PortalData, PortalType } from "../types";
-import { CheckIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  ArrowBackIcon,
+  ArrowForwardIcon,
+  CheckIcon,
+  CloseIcon,
+  SmallCloseIcon,
+} from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
+import { useDocuments } from "../hooks/useDocuments";
 
 interface ManagementPanelProps {
   portalData: PortalData;
@@ -28,7 +38,7 @@ interface ManagementPanelProps {
   onSave: (updatedPortalData: PortalData) => void;
 }
 
-const FILE_TYPES = ["PDF"];
+const FILE_TYPES = ["PDF", "DOC", "TXT", "HTML", "RTF"];
 
 export const ManagementPanel = ({
   portalData,
@@ -37,6 +47,27 @@ export const ManagementPanel = ({
 }: ManagementPanelProps) => {
   const toast = useToast();
   const router = useRouter();
+  const {
+    getDocumentsForCorpus,
+    deleteDocument,
+    getNextPage,
+    getPrevPage,
+    reloadCurrentPage,
+  } = useDocuments(portalData.vectaraCorpusId);
+
+  const [documents, setDocuments] = useState<Array<{ id: string }>>([]);
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState<boolean>(false);
+
+  useEffect(() => {
+    const doAsync = async () => {
+      setIsLoadingDocuments(true);
+      const docs = await getDocumentsForCorpus();
+      setIsLoadingDocuments(false);
+      setDocuments(docs.map((doc: any) => ({ id: doc.id })));
+    };
+
+    doAsync();
+  }, [portalData.vectaraCorpusId]);
 
   const [updatedPortalName, setUpdatedPortalName] = useState<string>(
     portalData.name
@@ -59,12 +90,16 @@ export const ManagementPanel = ({
 
   const deleteConfirmationRef = useRef<HTMLDivElement>(null);
 
-  const {
-    uploadFilesToCorpus,
-    addedFiles,
-    queueFilesForUpload,
-    removeQueuedFile,
-  } = useFileUpload();
+  const { uploadFilesToCorpus, queueFilesForUpload, addedFiles } =
+    useFileUpload();
+
+  useEffect(() => {
+    const doAsync = async () => {
+      await uploadFilesToCorpus(portalData.vectaraCorpusId);
+    };
+
+    doAsync();
+  }, [addedFiles]);
 
   const saveUpdates = () => {
     updatePortal(
@@ -74,7 +109,6 @@ export const ManagementPanel = ({
       updatedPortalType,
       updatedPortalDescription
     );
-    uploadFilesToCorpus(portalData.vectaraCorpusId);
 
     onSave({
       ...portalData,
@@ -170,9 +204,79 @@ export const ManagementPanel = ({
           </Select>
         </FormControl>
         <FormControl mt="1rem">
-          <Flex direction="column">
-            <FormLabel style={formLabelStyles}>Add/Remove Data</FormLabel>
-            <Box className="file-uploader-wrapper">
+          <Flex direction="column" gap=".25rem">
+            <Flex width="100%" alignItems="center">
+              <FormLabel style={{ ...formLabelStyles, marginBottom: 0 }}>
+                Documents
+              </FormLabel>
+              <Flex flexGrow={1} justifyContent="flex-end" alignItems="center">
+                <FileUploader
+                  handleChange={(files: FileList) => {
+                    queueFilesForUpload(files);
+                  }}
+                  name="files"
+                  types={FILE_TYPES}
+                  multiple={true}
+                  display="flex"
+                >
+                  <IconButton
+                    aria-label="Upload file"
+                    icon={<AddIcon boxSize=".5rem" />}
+                    size="xs"
+                  />
+                </FileUploader>
+              </Flex>
+            </Flex>
+
+            <Flex
+              direction="column"
+              color="#ddd"
+              gap="0.25rem"
+              borderRadius="0.5rem"
+            >
+              {isLoadingDocuments ? (
+                <Flex gap=".25rem" alignItems="center">
+                  <Spinner color="#888" size="xs" />
+                  <Text fontSize=".75rem">Loading documents</Text>
+                </Flex>
+              ) : (
+                documents.map((document, index) => (
+                  <Document
+                    documentId={document.id}
+                    onDelete={deleteDocument}
+                  />
+                ))
+              )}
+              <Flex>
+                <Flex justifyContent="flex-start" width="50%">
+                  {getPrevPage && (
+                    <IconButton
+                      size="xs"
+                      aria-label="Previous page of documents"
+                      icon={<ArrowBackIcon />}
+                      onClick={async () => {
+                        const docs = await getPrevPage();
+                        setDocuments(docs);
+                      }}
+                    />
+                  )}
+                </Flex>
+                <Flex justifyContent="flex-end" width="50%">
+                  {getNextPage && (
+                    <IconButton
+                      aria-label="Next page of documents"
+                      size="xs"
+                      icon={<ArrowForwardIcon />}
+                      onClick={async () => {
+                        const docs = await getNextPage();
+                        setDocuments(docs);
+                      }}
+                    />
+                  )}
+                </Flex>
+              </Flex>
+            </Flex>
+            {/*<Box className="file-uploader-wrapper">
               <FileUploader
                 handleChange={(files: FileList) => {
                   queueFilesForUpload(files);
@@ -215,7 +319,7 @@ export const ManagementPanel = ({
                   <div>Click or drag files here</div>
                 )}
               </FileUploader>
-            </Box>
+            </Box>*/}
           </Flex>
         </FormControl>
         <FormControl mt="1rem">
@@ -230,27 +334,6 @@ export const ManagementPanel = ({
                   onChange={() => setUpdatedIsRestricted((prev) => !prev)}
                 />
               </Flex>
-              {updatedIsRestricted && (
-                <>
-                  <Flex
-                    width="100%"
-                    border="1px solid #888"
-                    borderRadius=".375rem"
-                    padding="1rem"
-                    gap=".5rem"
-                    flexWrap="wrap"
-                  >
-                    <div>no users yet</div>
-                  </Flex>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Search for a user"
-                      border="1px solid #888"
-                    />
-                  </FormControl>
-                </>
-              )}
             </Flex>
           </Flex>
         </FormControl>
@@ -330,6 +413,56 @@ export const ManagementPanel = ({
           Save
         </ChakraButton>
       </DrawerFooter>
+    </Flex>
+  );
+};
+
+const Document = ({
+  documentId,
+  onDelete,
+}: {
+  documentId: string;
+  onDelete: (documentId: string) => void;
+}) => {
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
+
+  let interactiveEl: ReactNode | null = <CloseIcon boxSize=".5rem" />;
+
+  if (isDeleted) {
+    interactiveEl = null;
+  } else if (isDeleting) {
+    interactiveEl = <Spinner boxSize=".5rem" />;
+  }
+
+  return (
+    <Flex
+      key={`document-${documentId}`}
+      width="100%"
+      padding=".25rem .5rem"
+      borderRadius=".25rem"
+      background="#555"
+      fontSize=".8rem"
+      fontWeight={600}
+      alignItems="center"
+      opacity={isDeleting || isDeleted ? 0.4 : 1.0}
+    >
+      <Box flexGrow={1}>{documentId}</Box>
+      <Box
+        fontWeight={400}
+        cursor="pointer"
+        onClick={async (e: any) => {
+          // TODO: verify deletion
+          e.preventDefault();
+          setIsDeleting(true);
+          await onDelete(documentId);
+          setIsDeleting(false);
+          setIsDeleted(true);
+        }}
+        onMouseUp={(e: any) => e.preventDefault()}
+      >
+        {interactiveEl}
+      </Box>
     </Flex>
   );
 };

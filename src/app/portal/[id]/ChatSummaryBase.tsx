@@ -220,7 +220,6 @@ const References = ({
       reduceMotion={true}
       index={accordionItemIndex}
       maxHeight="50%"
-      minHeight="34px"
       overflow="hidden"
       onChange={(expandedIndex: number) => {
         if (expandedIndex > -1 && accordionItemIndex) {
@@ -266,7 +265,7 @@ const References = ({
                 )}
               </AccordionButton>
             </h2>
-            <Box overflow="scroll">
+            <Box overflow="scroll" height="100%">
               <AccordionPanel pb={4} fontSize=".8rem" backgroundColor="#242424">
                 {references.map((reference, index) => (
                   <Box
