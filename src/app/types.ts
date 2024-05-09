@@ -9,4 +9,5 @@ export type PortalData = {
   vectaraApiKey: string;
   isRestricted: boolean;
   description: string | null;
+  ownerId: string | null;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { Fade, Flex, Text } from "@chakra-ui/react";
+import { Fade, Flex, Text, useToast } from "@chakra-ui/react";
 import { Page } from "../../components/Page";
 import { CSSProperties, ReactNode, useEffect, useState } from "react";
 import { usePortal } from "./usePortal";
@@ -16,14 +16,19 @@ import { ConfigDrawer } from "@/app/components/ConfigDrawer";
 import { ManagementPanel } from "@/app/components/ManagementPanel";
 import { GearIcon } from "@/app/icons/Gear";
 import { Button } from "@/app/components/Button";
+import { useUser } from "@/app/hooks/useUser";
+import { FaShareSquare } from "react-icons/fa";
+import { CopyToClipboard } from "react-copy-to-clipboard";
 
 const Portal = ({ params }: any) => {
   const { getPortal } = usePortal();
   const [portalData, setPortalData] = useState<PortalData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isManagementOpen, setIsManagementOpen] = useState<boolean>(false);
-
   const { id: portalId } = params;
+  const { currentUser } = useUser();
+  const userIsOwner = currentUser?.id === portalData?.ownerId;
+  const toast = useToast();
 
   useEffect(() => {
     const doAsync = async () => {
@@ -46,13 +51,37 @@ const Portal = ({ params }: any) => {
     : null;
 
   const headerButtons = [
-    <Button
-      hasBorder={false}
-      icon={<GearIcon />}
-      onClick={() => setIsManagementOpen(true)}
-      size="s"
-    />,
+    <CopyToClipboard
+      text={window.location.href}
+      onCopy={() =>
+        toast({
+          title: "Portal URL copied to clipboard!",
+          status: "success",
+          duration: 5000,
+        })
+      }
+    >
+      <Button
+        hasBorder={false}
+        icon={<FaShareSquare />}
+        onClick={() => {
+          /* noop */
+        }}
+        size="s"
+      />
+    </CopyToClipboard>,
   ];
+
+  if (userIsOwner) {
+    headerButtons.push(
+      <Button
+        hasBorder={false}
+        icon={<GearIcon />}
+        onClick={() => setIsManagementOpen(true)}
+        size="s"
+      />
+    );
+  }
 
   return (
     <Page pageId="portal">

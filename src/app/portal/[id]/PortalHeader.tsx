@@ -1,9 +1,7 @@
-import { Button } from "@/app/components/Button";
-import { GearIcon } from "@/app/icons/Gear";
 import { PortalData } from "@/app/types";
 import { InfoOutlineIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text, Tooltip } from "@chakra-ui/react";
-import { Fragment, ReactNode, useState } from "react";
+import { Fragment, ReactNode } from "react";
 
 export const PortalHeader = ({
   portalData,

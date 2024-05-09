@@ -25,6 +25,7 @@ export const usePortal = () => {
       vectaraApiKey: portalData.vectara_api_key,
       isRestricted: portalData.is_restricted,
       description: portalData.description,
+      ownerId: portalData.owner_id,
     };
   };
 
