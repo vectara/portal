@@ -16,10 +16,13 @@ const pool = new pg.Pool({
 
 /* PORTALS */
 
+// TODO: Use sendQuery util
 export const getPortalsForUser = (userId: string) => {
   return pool.connect().then((client: any) => {
     return client
-      .query(`select * from portals where owner_id = ${userId}`)
+      .query(
+        `select * from portals where owner_id = ${userId} and is_deleted != 'true'`
+      )
       .then((resolved: any) => {
         client.release();
         return resolved.rows;
@@ -45,6 +48,10 @@ export const createPortalForUser = (
   return sendQuery(
     `INSERT INTO portals (name, vectara_corpus_id, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${name}', '${corpusId}', '${type}', '${description}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
   );
+};
+
+export const deletePortal = (key: string) => {
+  return sendQuery(`UPDATE portals SET is_deleted='true' WHERE key='${key}'`);
 };
 
 export const updatePortal = (
@@ -76,7 +83,7 @@ export const updatePortal = (
 
 export const getPortalByKey = (key: string) => {
   return sendQuery(
-    `select * from portals where key = '${key}';`,
+    `select * from portals where key = '${key}' and is_deleted != 'true';`,
     (resolved) => resolved.rows?.[0] ?? null
   );
 };

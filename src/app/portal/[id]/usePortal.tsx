@@ -2,7 +2,7 @@ import axios from "axios";
 import { PortalData, PortalType } from "../../types";
 
 export const usePortal = () => {
-  const getPortal = async (key: string): Promise<PortalData> => {
+  const getPortal = async (key: string): Promise<PortalData | null> => {
     const config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -11,6 +11,10 @@ export const usePortal = () => {
 
     const response = await axios(config);
     const { portal: portalData } = response.data;
+
+    if (!portalData) {
+      return null;
+    }
 
     return {
       name: portalData.name,
@@ -35,12 +39,16 @@ export const usePortal = () => {
       maxBodyLength: Infinity,
     };
 
-    axios.patch(
+    return axios.patch(
       `/api/portal/${key}`,
       { key, name, isRestricted, type, description },
       config
     );
   };
 
-  return { getPortal, updatePortal };
+  const deletePortal = async (key: string) => {
+    return axios.delete(`/api/portal/${key}`);
+  };
+
+  return { getPortal, updatePortal, deletePortal };
 };

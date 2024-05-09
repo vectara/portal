@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { usePortal } from "../portal/[id]/usePortal";
 import { useFileUpload } from "../hooks/useFileUpload";
 import {
@@ -13,10 +13,14 @@ import {
   Input,
   Select,
   Switch,
+  Text,
   Textarea,
+  useToast,
 } from "@chakra-ui/react";
 import { FileUploader } from "react-drag-drop-files";
 import { PortalData, PortalType } from "../types";
+import { CheckIcon, SmallCloseIcon } from "@chakra-ui/icons";
+import { useRouter } from "next/navigation";
 
 interface ManagementPanelProps {
   portalData: PortalData;
@@ -31,6 +35,9 @@ export const ManagementPanel = ({
   onClose,
   onSave,
 }: ManagementPanelProps) => {
+  const toast = useToast();
+  const router = useRouter();
+
   const [updatedPortalName, setUpdatedPortalName] = useState<string>(
     portalData.name
   );
@@ -46,7 +53,12 @@ export const ManagementPanel = ({
     portalData.isRestricted
   );
 
-  const { updatePortal } = usePortal();
+  const { updatePortal, deletePortal } = usePortal();
+  const [didInitiateDelete, setDidInitiateDelete] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+
+  const deleteConfirmationRef = useRef<HTMLDivElement>(null);
+
   const {
     uploadFilesToCorpus,
     addedFiles,
@@ -74,13 +86,53 @@ export const ManagementPanel = ({
     });
   };
 
+  const onPreDelete = () => {
+    setDidInitiateDelete(true);
+
+    setTimeout(
+      () =>
+        deleteConfirmationRef.current?.scrollIntoView({ behavior: "smooth" }),
+      125
+    );
+  };
+
+  const onDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deletePortal(portalData.portalKey);
+      toast({
+        title: "Portal deleted!",
+        description: "Taking you to your Portals page...",
+        status: "success",
+        duration: 5000,
+      });
+      onClose();
+
+      setTimeout(() => router.push("/portals"), 3000);
+    } catch {
+      setIsDeleting(false);
+      toast({
+        title: "We couldn't delete your portal",
+        description: "Please try again",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Flex as="form" direction="column" color="#ddd" height="100%">
       <DrawerHeader color="#ddd" fontSize="1rem" background="#444">
         Manage your Portal
       </DrawerHeader>
 
-      <DrawerBody display="flex" flexDirection="column" gap="1rem">
+      <DrawerBody
+        display="flex"
+        flexDirection="column"
+        gap="1rem"
+        paddingBottom="2rem"
+      >
         <FormControl>
           <FormLabel style={formLabelStyles}>Name</FormLabel>
           <Input
@@ -202,6 +254,54 @@ export const ManagementPanel = ({
             </Flex>
           </Flex>
         </FormControl>
+        <FormControl mt="1rem">
+          <Flex>
+            <Flex
+              flexGrow={1}
+              justifyContent="center"
+              direction="column"
+              gap=".5rem"
+            >
+              <ChakraButton
+                size="sm"
+                onClick={onPreDelete}
+                colorScheme="red"
+                width="100%"
+                isDisabled={isDeleting}
+              >
+                {"Delete this portal"}
+              </ChakraButton>
+              {didInitiateDelete && (
+                <Flex
+                  gap=".5rem"
+                  justifyContent="flex-end"
+                  alignItems="center"
+                  ref={deleteConfirmationRef}
+                >
+                  <Text fontSize=".75rem" fontWeight={500}>
+                    Are you sure?
+                  </Text>
+                  <ChakraButton
+                    size="xs"
+                    onClick={onPreDelete}
+                    colorScheme="red"
+                    isDisabled={isDeleting}
+                  >
+                    <SmallCloseIcon boxSize="1.1rem" />
+                  </ChakraButton>
+                  <ChakraButton
+                    size="xs"
+                    onClick={onDelete}
+                    colorScheme="green"
+                    isDisabled={isDeleting}
+                  >
+                    <CheckIcon />
+                  </ChakraButton>
+                </Flex>
+              )}
+            </Flex>
+          </Flex>
+        </FormControl>
       </DrawerBody>
 
       <DrawerFooter background="#444">
@@ -212,6 +312,7 @@ export const ManagementPanel = ({
           onClick={() => {}}
           color="#ddd"
           fontSize=".75rem"
+          isDisabled={isDeleting}
         >
           Cancel
         </ChakraButton>
@@ -224,6 +325,7 @@ export const ManagementPanel = ({
             onClose();
           }}
           fontSize=".75rem"
+          isDisabled={isDeleting}
         >
           Save
         </ChakraButton>
