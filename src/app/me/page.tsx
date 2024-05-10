@@ -160,7 +160,7 @@ const Content = () => {
             <FormLabel style={formLabelStyles}>Vectara Customer ID</FormLabel>
             <Input
               type="text"
-              value={formState.vectaraCustomerId}
+              value={formState.vectaraCustomerId ?? ""}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,
@@ -181,7 +181,7 @@ const Content = () => {
             </FormLabel>
             <Input
               type="password"
-              value={formState.vectaraPersonalApiKey}
+              value={formState.vectaraPersonalApiKey ?? ""}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,
@@ -202,7 +202,7 @@ const Content = () => {
             <FormLabel style={formLabelStyles}>OAuth 2.0 Client ID</FormLabel>
             <Input
               type="text"
-              value={formState.vectaraOAuth2ClientId}
+              value={formState.vectaraOAuth2ClientId ?? ""}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,
@@ -223,7 +223,7 @@ const Content = () => {
             </FormLabel>
             <Input
               type="password"
-              value={formState.vectaraOAuth2ClientSecret}
+              value={formState.vectaraOAuth2ClientSecret ?? ""}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
                   ...formState,

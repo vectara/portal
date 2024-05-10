@@ -41,7 +41,7 @@ export const PortalHeader = ({
             <InfoOutlineIcon boxSize=".8rem" />
           </Tooltip>
         </Flex>
-        <Flex justifyContent="flex-end" grow={1}>
+        <Flex justifyContent="flex-end" grow={1} gap=".25rem">
           {headerButtons?.map((button, index) => (
             <Fragment key={`header-button-${index}`}>{button}</Fragment>
           ))}
