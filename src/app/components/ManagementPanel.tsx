@@ -31,6 +31,7 @@ import {
 } from "@chakra-ui/icons";
 import { useRouter } from "next/navigation";
 import { useDocuments } from "../hooks/useDocuments";
+import { IoMdRefresh } from "react-icons/io";
 
 interface ManagementPanelProps {
   portalData: PortalData;
@@ -58,15 +59,15 @@ export const ManagementPanel = ({
   const [documents, setDocuments] = useState<Array<{ id: string }>>([]);
   const [isLoadingDocuments, setIsLoadingDocuments] = useState<boolean>(false);
 
-  useEffect(() => {
-    const doAsync = async () => {
-      setIsLoadingDocuments(true);
-      const docs = await getDocumentsForCorpus();
-      setIsLoadingDocuments(false);
-      setDocuments(docs.map((doc: any) => ({ id: doc.id })));
-    };
+  const getDocuments = async () => {
+    setIsLoadingDocuments(true);
+    const docs = await getDocumentsForCorpus();
+    setIsLoadingDocuments(false);
+    setDocuments(docs.map((doc: any) => ({ id: doc.id })));
+  };
 
-    doAsync();
+  useEffect(() => {
+    getDocuments();
   }, [portalData.vectaraCorpusId]);
 
   const [updatedPortalName, setUpdatedPortalName] = useState<string>(
@@ -206,21 +207,47 @@ export const ManagementPanel = ({
                 {isUploading ? (
                   <Spinner size="sm" color="#888" />
                 ) : (
-                  <FileUploader
-                    handleChange={(files: FileList) => {
-                      queueFilesForUpload(files);
-                    }}
-                    name="files"
-                    types={FILE_TYPES}
-                    multiple={true}
-                    display="flex"
-                  >
+                  <Flex alignItems="center">
                     <IconButton
                       aria-label="Upload file"
-                      icon={<AddIcon boxSize=".5rem" />}
-                      size="xs"
+                      icon={<IoMdRefresh color="#888" />}
+                      height=".9rem"
+                      width=".9rem"
+                      minWidth="none"
+                      borderRadius=".125rem"
+                      variant="outline"
+                      border="none"
+                      onClick={() => getDocuments()}
                     />
-                  </FileUploader>
+                    <Flex className="file-uploader-wrapper">
+                      <FileUploader
+                        handleChange={(files: FileList) => {
+                          queueFilesForUpload(files);
+                        }}
+                        name="files"
+                        types={FILE_TYPES}
+                        multiple={true}
+                        display="flex"
+                      >
+                        <Flex
+                          padding="0 .25rem"
+                          alignItems="center"
+                          className="foo"
+                        >
+                          <IconButton
+                            aria-label="Upload file"
+                            icon={<AddIcon boxSize=".6rem" color="#888" />}
+                            height=".9rem"
+                            width=".9rem"
+                            minWidth="none"
+                            borderRadius=".125rem"
+                            variant="outline"
+                            border="none"
+                          />
+                        </Flex>
+                      </FileUploader>
+                    </Flex>
+                  </Flex>
                 )}
               </Flex>
             </Flex>
@@ -230,6 +257,7 @@ export const ManagementPanel = ({
               color="#ddd"
               gap="0.25rem"
               borderRadius="0.5rem"
+              minHeight="2rem"
             >
               {isLoadingDocuments ? (
                 <Flex gap=".25rem" alignItems="center">
@@ -274,50 +302,6 @@ export const ManagementPanel = ({
                 </Flex>
               </Flex>
             </Flex>
-            {/*<Box className="file-uploader-wrapper">
-              <FileUploader
-                handleChange={(files: FileList) => {
-                  queueFilesForUpload(files);
-                }}
-                name="files"
-                types={FILE_TYPES}
-                classes={`file-uploader ${
-                  addedFiles.length > 0 ? "with-files" : ""
-                }`}
-                multiple={true}
-              >
-                {addedFiles.length ? (
-                  addedFiles.map((filename, index) => (
-                    <Flex
-                      key={`queued-file-${index}`}
-                      border="1px solid #888"
-                      width="100%"
-                      p=".25rem .5rem"
-                      borderRadius=".25rem"
-                      fontSize=".8rem"
-                      backgroundColor="#555"
-                      fontWeight={600}
-                      alignItems="center"
-                    >
-                      <Box flexGrow={1}>{filename}</Box>
-                      <Box
-                        fontWeight={400}
-                        cursor="pointer"
-                        onClick={(e: any) => {
-                          e.preventDefault();
-                          removeQueuedFile(index);
-                        }}
-                        onMouseUp={(e: any) => e.preventDefault()}
-                      >
-                        x
-                      </Box>
-                    </Flex>
-                  ))
-                ) : (
-                  <div>Click or drag files here</div>
-                )}
-              </FileUploader>
-            </Box>*/}
           </Flex>
         </FormControl>
         <FormControl mt="1rem">

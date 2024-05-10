@@ -97,28 +97,9 @@ code {
   src: url(fonts/Montserrat-VariableFont_wght.ttf) format("woff");
 }
 
-.file-uploader-wrapper > .file-uploader {
-  min-width: initial;
-  max-width: initial;
-  width: 100%;
-  border: 2px dashed #888;
-  color: #ddd;
-  min-height: 360px;
-  width: 100%;
-  display: flex;
-  gap: 0.25rem;
-  flex-direction: column;
-  border-radius: 0.5rem;
-  padding: 0.5rem;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  overflow: auto;
-}
-
-.file-uploader-wrapper > .file-uploader.with-files {
-  align-items: flex-start;
-  justify-content: flex-start;
+.file-uploader-wrapper > label:focus-within {
+  border: none !important;
+  outline: none !important;
 }
 
 .file-types {
