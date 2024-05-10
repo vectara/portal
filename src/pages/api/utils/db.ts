@@ -45,8 +45,11 @@ export const createPortalForUser = (
   vectaraCustomerId: string,
   vectaraApiKey: string
 ) => {
+  const sanitizedName = name.replace(/'/g, "''");
+  const sanitizedDescription = description.replace(/'/g, "''");
+
   return sendQuery(
-    `INSERT INTO portals (name, vectara_corpus_id, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${name}', '${corpusId}', '${type}', '${description}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
+    `INSERT INTO portals (name, vectara_corpus_id, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${sanitizedName}', '${corpusId}', '${type}', '${sanitizedDescription}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
   );
 };
 

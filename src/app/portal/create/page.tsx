@@ -161,10 +161,14 @@ const CreateForm = () => {
     setFormErrors(updatedFormErrors);
   }, [formState]);
 
+  const didFillAllFields =
+    didStartFillingForm.current.name && didStartFillingForm.current.description;
+
   const isSubmitDisabled =
     isCreating ||
-    !didStartFillingForm.current ||
-    (didStartFillingForm.current && formErrors.name);
+    !didFillAllFields ||
+    formErrors.name ||
+    formErrors.description;
 
   return (
     <Box>
