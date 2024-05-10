@@ -57,16 +57,15 @@ export const ChatSummaryBase = ({
         flexGrow={1}
         direction="column"
       >
-        <Box
+        <Flex
           flexGrow={1}
           padding="1rem"
           paddingBottom="0"
-          minHeight="50%"
           overflow="scroll"
           fontWeight={300}
         >
           {children}
-        </Box>
+        </Flex>
         <References
           references={references ?? []}
           showIndex={viewedReferenceIndex}
@@ -186,6 +185,7 @@ const References = ({
   references: Array<DeserializedSearchResult>;
   showIndex?: number;
 }) => {
+  console.log("### REFERENCES: ", references);
   const elRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [toggleState, setToggleState] =
     useState<ReferencesToggleState>(undefined);
@@ -210,82 +210,87 @@ const References = ({
   const accordionItemIndex = shouldOpenToReference ? 0 : undefined;
 
   return (
-    <Accordion
-      allowToggle={true}
-      width="100%"
-      borderBottomLeftRadius=".5rem"
-      borderBottomRightRadius=".5rem"
-      reduceMotion={true}
-      index={accordionItemIndex}
-      maxHeight="50%"
-      overflow="hidden"
-      onChange={(expandedIndex: number) => {
-        if (expandedIndex > -1 && accordionItemIndex) {
-          setToggleState("manual_open");
-        } else {
-          setToggleState("manual_close");
-        }
-      }}
-    >
-      <AccordionItem
-        border="none"
-        borderTop="1px solid"
-        borderTopColor={
-          references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.300"
-        }
-        backgroundColor={
-          references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.500"
-        }
-        color="#fff"
-        padding="0"
-        height="100%"
-        display="flex"
-        flexDirection="column"
-        isDisabled={references.length === 0}
+    <Flex maxHeight="50%">
+      <Accordion
+        allowToggle={true}
+        width="100%"
+        borderBottomLeftRadius=".5rem"
+        borderBottomRightRadius=".5rem"
+        reduceMotion={true}
+        index={accordionItemIndex}
+        overflow="hidden"
+        onChange={(expandedIndex: number) => {
+          if (expandedIndex > -1 && accordionItemIndex) {
+            setToggleState("manual_open");
+          } else {
+            setToggleState("manual_close");
+          }
+        }}
       >
-        {({ isExpanded }) => (
-          <>
-            <h2>
-              <AccordionButton>
-                <Box
-                  as="span"
-                  flex="1"
-                  textAlign="left"
-                  fontSize=".75rem"
-                  fontWeight={700}
-                >
-                  References
-                </Box>
-                {isExpanded ? (
-                  <ChevronDownIcon fontSize="12px" />
-                ) : (
-                  <ChevronUpIcon fontSize="12px" />
-                )}
-              </AccordionButton>
-            </h2>
-            <Box overflow="scroll" height="100%">
-              <AccordionPanel pb={4} fontSize=".8rem" backgroundColor="#242424">
-                {references.map((reference, index) => (
+        <AccordionItem
+          border="none"
+          borderTop="1px solid"
+          borderTopColor={
+            references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.300"
+          }
+          backgroundColor={
+            references.length === 0 ? "rgba(255, 255, 255, .25)" : "blue.500"
+          }
+          color="#fff"
+          padding="0"
+          height="100%"
+          display="flex"
+          flexDirection="column"
+          isDisabled={references.length === 0}
+        >
+          {({ isExpanded }) => (
+            <>
+              <h2>
+                <AccordionButton>
                   <Box
-                    key={`reference-${index}`}
-                    ref={(ref) => {
-                      elRefs.current[index] = ref;
-                    }}
+                    as="span"
+                    flex="1"
+                    textAlign="left"
+                    fontSize=".75rem"
+                    fontWeight={700}
                   >
-                    <Reference
-                      title={reference.title}
-                      snippet={reference.snippet}
-                      url={reference.url}
-                      index={index}
-                    />
+                    References
                   </Box>
-                ))}
-              </AccordionPanel>
-            </Box>
-          </>
-        )}
-      </AccordionItem>
-    </Accordion>
+                  {isExpanded ? (
+                    <ChevronDownIcon fontSize="12px" />
+                  ) : (
+                    <ChevronUpIcon fontSize="12px" />
+                  )}
+                </AccordionButton>
+              </h2>
+              <Box overflow="scroll" height="100%">
+                <AccordionPanel
+                  pb={4}
+                  fontSize=".8rem"
+                  backgroundColor="#242424"
+                >
+                  {references.map((reference, index) => (
+                    <Box
+                      key={`reference-${index}`}
+                      ref={(ref) => {
+                        elRefs.current[index] = ref;
+                      }}
+                    >
+                      <Reference
+                        title={reference.title}
+                        snippet={reference.snippet}
+                        url={reference.url}
+                        index={index}
+                      />
+                    </Box>
+                  ))}
+                </AccordionPanel>
+              </Box>
+            </>
+          )}
+        </AccordionItem>
+      </Accordion>
+    </Flex>
   );
 };
 
