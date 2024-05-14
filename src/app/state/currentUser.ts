@@ -2,8 +2,8 @@ import { atom } from "recoil";
 
 type CurrentUserState =
   | {
-      id: string | null;
-      email: string | null;
+      id: string;
+      email: string;
       vectaraCustomerId: string | null;
       vectaraPersonalApiKey: string | null;
       vectaraOAuth2ClientId: string | null;

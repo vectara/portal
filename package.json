@@ -18,6 +18,7 @@
     "auth0": "^4.3.1",
     "debounce": "^2.0.0",
     "formidable": "^3.5.1",
+    "generate-password": "^1.7.1",
     "markdown-to-jsx": "^7.4.6",
     "next": "14.1.0",
     "pg": "^8.11.5",

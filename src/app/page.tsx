@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { useUser } from "./hooks/useUser";
 import { useEffect } from "react";
 
-const App = () => {
+const Login = () => {
   const { currentUser } = useUser();
 
   useEffect(() => {
@@ -68,4 +68,4 @@ const Logo = () => {
   );
 };
 
-export default App;
+export default Login;

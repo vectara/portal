@@ -11,3 +11,16 @@ export type PortalData = {
   description: string | null;
   ownerId: string | null;
 };
+
+export type UserGroupMembership = {
+  userId: string;
+  groupId: string;
+  email: string;
+  state: UserGroupMembershipState;
+};
+
+export type UserGroupMembershipState =
+  | "pending"
+  | "accepted"
+  | "declined"
+  | "revoked";

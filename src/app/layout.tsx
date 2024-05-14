@@ -3,6 +3,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import {
+  Badge,
   Box,
   ChakraProvider,
   Flex,
@@ -17,6 +18,8 @@ import { usePathname } from "next/navigation";
 import { LogoutIcon } from "./icons/Logout";
 import Link from "next/link";
 import { VectaraLogo } from "./icons/Logo";
+import { EmailIcon } from "@chakra-ui/icons";
+import { useUserGroupInvitations } from "./hooks/useUserGroupInvitations";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,7 +37,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ChakraProvider>
           <RecoilRoot>
-            <AppWrapper>{children}</AppWrapper>
+            <App>{children}</App>
           </RecoilRoot>
         </ChakraProvider>
       </body>
@@ -42,8 +45,8 @@ export default function RootLayout({
   );
 }
 
-const AppWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { loadCurrentUser } = useUser();
+const App = ({ children }: { children: React.ReactNode }) => {
+  const { loadCurrentUser, currentUser } = useUser();
 
   useEffect(() => {
     const doAsync = async () => await loadCurrentUser();
@@ -62,7 +65,8 @@ const AppWrapper = ({ children }: { children: React.ReactNode }) => {
       top={0}
       width="100%"
     >
-      <Header />
+      {currentUser && <Header />}
+
       {children}
     </Flex>
   );
@@ -73,6 +77,17 @@ const Header = () => {
   const { currentUser } = useUser();
   const [displayType, setDisplayType] = useState<"none" | "flex">("none");
   const isPortalPath = pathName?.match(/^\/portal\/(?!.*create)/);
+  const { getInvitations } = useUserGroupInvitations();
+  const [pendingInvitationsCount, setPendingInvitationsCount] =
+    useState<number>(0);
+
+  useEffect(() => {
+    const doAsync = async () => {
+      const invitations = await getInvitations();
+      setPendingInvitationsCount(invitations.length);
+    };
+    doAsync();
+  }, []);
 
   useEffect(() => {
     setDisplayType(currentUser === null ? "none" : "flex");
@@ -104,7 +119,34 @@ const Header = () => {
         <ListItem style={getNavItemStyles({ isSelected: pathName === "/me" })}>
           <Link href="/me">Your Profile</Link>
         </ListItem>
-        <ListItem display="flex" flexGrow={1}>
+        <ListItem
+          display="flex"
+          position="relative"
+          flexGrow={1}
+          justifyContent="flex-end"
+        >
+          <Link href="/invitations">
+            <EmailIcon
+              boxSize="1.2rem"
+              opacity={pendingInvitationsCount > 0 ? 1 : 0.5}
+            />
+            {pendingInvitationsCount > 0 && (
+              <Badge
+                display="flex"
+                justifyContent="center"
+                position="absolute"
+                top="-.125rem"
+                right="-.3rem"
+                backgroundColor="red.500"
+                color="#fff"
+                fontSize=".5rem"
+              >
+                {pendingInvitationsCount}
+              </Badge>
+            )}
+          </Link>
+        </ListItem>
+        <ListItem display="flex">
           <Box style={logoutStyles}>
             <LogoutIcon />
             <Box>

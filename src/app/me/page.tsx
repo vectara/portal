@@ -14,6 +14,7 @@ import {
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
+import { UserGroups } from "./UserGroups";
 
 const Profile = () => {
   return (
@@ -81,7 +82,6 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 
 const Content = () => {
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
-  const [, setFormErrors] = useState<FormErrors>(INITIAL_FORM_ERRORS);
   const [currentChildUserEmails, setCurrentChildUserEmails] = useState<
     Array<string>
   >([]);
@@ -133,9 +133,9 @@ const Content = () => {
     });
   };
 
-  const isUserListEmpty =
-    currentChildUserEmails.length === 0 &&
-    (formState.pendingUserEmailsToAdd ?? []).length === 0;
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <Flex as="form" direction="column" gap="1.5rem">
@@ -238,95 +238,7 @@ const Content = () => {
           </FormControl>
         </Box>
       </Flex>
-      {/*<Flex gap="1rem" direction="column" mt="1rem">
-        <Heading size="md">Your Users</Heading>
-        <Flex
-          width="50%"
-          border="1px solid #888"
-          borderRadius=".375rem"
-          padding="1rem"
-          gap=".5rem"
-          flexWrap="wrap"
-        >
-          {isUserListEmpty && <>no users yet</>}
-          {currentChildUserEmails?.map((email, index) => (
-            <Box
-              backgroundColor="gray.700"
-              padding=".5rem"
-              key={`current-child-user-add-email-${email}`}
-              borderRadius=".375rem"
-              fontWeight={700}
-            >
-              {email}
-            </Box>
-          ))}
-          {formState.pendingUserEmailsToAdd?.map((email, index) => (
-            <Box
-              backgroundColor="blue.600"
-              padding=".5rem"
-              key={`pending-user-add-email-${email}`}
-              borderRadius=".375rem"
-              fontWeight={700}
-            >
-              {email}
-            </Box>
-          ))}
-        </Flex>
-        <Box width="50%">
-          <FormControl style={formControlStyles}>
-            <Input
-              type="text"
-              value={formState.userEmailToAdd}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormErrors((prev) => ({
-                  ...prev,
-                  userEmailToAdd: true,
-                }));
-                setFormState({
-                  ...formState,
-                  userEmailToAdd: e.target.value ?? undefined,
-                });
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  const email = formState.userEmailToAdd;
-
-                  const isEmailValid = String(email)
-                    .toLowerCase()
-                    .match(
-                      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-                    );
-
-                  const userHasAlreadyBeenAdded =
-                    (formState.pendingUserEmailsToAdd ?? []).indexOf(email!) >
-                    -1;
-
-                  if (!isEmailValid || userHasAlreadyBeenAdded) {
-                    setFormErrors((prev) => ({
-                      ...prev,
-                      userEmailToAdd: true,
-                    }));
-                    return;
-                  }
-
-                  setFormState({
-                    ...formState,
-                    userEmailToAdd: undefined,
-                    pendingUserEmailsToAdd: [
-                      ...(formState.pendingUserEmailsToAdd ?? []),
-                      email!,
-                    ],
-                  });
-                }
-              }}
-              placeholder="Add a user with their email address"
-              border="1px solid #888"
-              minWidth="320px"
-            />
-          </FormControl>
-        </Box>
-      </Flex>*/}
+      <UserGroups userId={currentUser.id} />
       <Flex>
         <FormControl style={formControlStyles} w="initial">
           <Button

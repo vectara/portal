@@ -1,3 +1,4 @@
+// TODO: Split these so we don't have one giant bucket of db functions.
 import { PortalType } from "@/app/types";
 
 const pg = require("pg");
@@ -124,6 +125,15 @@ export const updateUser = (
   );
 };
 
+export const updateUserAuthServiceId = (
+  userId: number,
+  authServiceId: string
+) => {
+  return sendQuery(
+    `UPDATE users SET auth_service_id = '${authServiceId}' RETURNING *;`
+  );
+};
+
 export const getUserByEmail = (email: string) => {
   return sendQuery(
     `SELECT * FROM users where email = '${email}';`,
@@ -135,6 +145,13 @@ export const getUserById = (id: number) => {
   return sendQuery(
     `SELECT * FROM users where id = '${id}';`,
     (resolved) => resolved.rows?.[0] ?? null
+  );
+};
+
+export const getUsersById = (ids: Array<number>) => {
+  return sendQuery(
+    `SELECT * FROM users where id = ANY(ARRAY[${ids.join(",")}]);`,
+    (resolved) => resolved.rows ?? null
   );
 };
 
@@ -152,11 +169,94 @@ export const getUserIdsForParentUserId = (id: number) => {
   );
 };
 
-export const getUsersFromIds = (ids: Array<number>) => {
+/* USER GROUPS */
+
+export const getUserGroupsForUser = (ownerId: number) => {
   const q = `SELECT *
-  FROM users
-  WHERE id in (${ids.join(",")})`;
+  FROM user_groups
+  WHERE owner_id = '${ownerId}'`;
   return sendQuery(q, (resolved) => resolved.rows ?? null);
+};
+
+export const addUserToUserGroup = (
+  user_id: number,
+  user_group_id: number,
+  inviter_id: number
+) => {
+  return sendQuery(
+    `INSERT INTO user_group_memberships (user_id, user_group_id, state, inviter_id) VALUES ('${user_id}', '${user_group_id}', 'pending', '${inviter_id}');`
+  );
+};
+
+/* USER GROUP */
+
+export const getUserGroup = (groupId: number) => {
+  const q = `SELECT *
+  FROM user_groups
+  WHERE id = '${groupId}'`;
+  return sendQuery(q, (resolved) => resolved.rows?.[0] ?? null);
+};
+
+/* USER GROUP MEMBERSHIPS */
+
+export const getUserGroupMemberships = (userGroupId: number) => {
+  return sendQuery(
+    `SELECT * from user_group_memberships where user_group_id='${userGroupId}' ORDER BY ID DESC`,
+    (resolved) => resolved.rows ?? null
+  );
+};
+
+export const getPendingUserGroupMembershipsForUser = (userId: number) => {
+  return sendQuery(
+    `SELECT 
+     t1.id as invite_id,
+     t3.email as inviter_email
+     FROM user_group_memberships t1
+     INNER JOIN user_groups t2 ON t1.user_group_id = t2.id
+     INNER JOIN users t3 ON t2.owner_id = t3.id
+     WHERE T1.user_id = '${userId}' AND t1.state = 'pending' ORDER BY invite_id DESC`,
+    (resolved) => resolved.rows ?? null
+  );
+};
+
+export const acceptUserGroupMembership = (
+  userId: number,
+  membershipId: number
+) => {
+  return sendQuery(
+    `UPDATE user_group_memberships SET state='accepted' WHERE id='${membershipId}' and user_id='${userId}' returning id, state;`,
+    (resolved) => resolved.rows ?? null
+  );
+};
+
+export const rejectUserGroupMembership = (
+  userId: number,
+  membershipId: number
+) => {
+  return sendQuery(
+    `UPDATE user_group_memberships SET state='rejected' WHERE id='${membershipId}' and user_id='${userId}' returning id, state;`,
+    (resolved) => resolved.rows ?? null
+  );
+};
+
+export const revokeUserGroupMembership = (
+  inviterId: number,
+  membershipId: number
+) => {
+  return sendQuery(
+    `UPDATE user_group_memberships SET state='revoked' WHERE id='${membershipId}' and inviter_id='${inviterId}' returning id, state;`,
+    (resolved) => resolved.rows ?? null
+  );
+};
+
+export const resendUserGroupMembership = (
+  userId: number,
+  membershipId: number
+) => {
+  return sendQuery(
+    `UPDATE user_group_memberships SET state='pending' WHERE id='${membershipId}' and inviter_id='${userId}' returning id, state;`,
+    (resolved) => resolved.rows ?? null
+  );
 };
 
 const sendQuery = async (
