@@ -82,20 +82,9 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 
 const Content = () => {
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
-  const [currentChildUserEmails, setCurrentChildUserEmails] = useState<
-    Array<string>
-  >([]);
   const { currentUser, updateUser, getChildUsersIds } = useUser();
   const [isSubmitDisabled, setIsSubmitedDisabled] = useState<boolean>(true);
   const toast = useToast();
-
-  useEffect(() => {
-    const doAsync = async () => {
-      const res = await getChildUsersIds();
-      setCurrentChildUserEmails(res.users.map((u: any) => u.email));
-    };
-    doAsync();
-  }, []);
 
   useEffect(() => {
     if (!currentUser) {

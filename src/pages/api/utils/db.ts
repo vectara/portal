@@ -100,7 +100,7 @@ export const createUser = (
   role: string = "admin"
 ) => {
   return sendQuery(
-    `INSERT INTO users (email, auth_service_id, role) VALUES ('${email}', '${authServiceId}', '${role}') ON CONFLICT (auth_service_id) DO NOTHING RETURNING id;`,
+    `INSERT INTO users (email, auth_service_id, role) VALUES ('${email}', '${authServiceId}', '${role}') ON CONFLICT (auth_service_id) DO NOTHING RETURNING *;`,
     (resolved) => resolved.rows?.[0] ?? null
   );
 };

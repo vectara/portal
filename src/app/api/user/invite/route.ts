@@ -28,7 +28,6 @@ export const POST = withLoginVerification(async (loggedInUser, req, res) => {
   const { email, user_group_id } = await req.json();
   // Create the user if necessary
   let registeredUser = await getUserByEmail(email);
-  await requestPasswordChange(registeredUser.email);
 
   if (!registeredUser) {
     try {
@@ -38,6 +37,10 @@ export const POST = withLoginVerification(async (loggedInUser, req, res) => {
         email,
         loggedInUser.email
       );
+      if (!authServiceUser) {
+        return sendApiResponse({ error: "Could not create a new user" }, 500);
+      }
+
       registeredUser = await createUser(email, authServiceUser.user_id);
 
       if (!registeredUser) {
@@ -58,33 +61,39 @@ export const POST = withLoginVerification(async (loggedInUser, req, res) => {
 });
 
 const createAuthServiceUser = async (email: string, invitedByEmail: string) => {
-  const response = await management.users.create({
-    email,
-    email_verified: false,
-    connection: "Username-Password-Authentication",
-    verify_email: false,
-    user_metadata: {
-      invited_by_email: invitedByEmail,
-    },
-    password: generatePassword({
-      length: 8,
-      symbols: true,
-      lowercase: true,
-      uppercase: true,
-      numbers: true,
-    }),
-  });
-
-  return response.data;
+  try {
+    const response = await management.users.create({
+      email,
+      email_verified: false,
+      connection: "Username-Password-Authentication",
+      verify_email: false,
+      user_metadata: {
+        invited_by_email: invitedByEmail,
+      },
+      password: generatePassword({
+        length: 8,
+        symbols: true,
+        lowercase: true,
+        uppercase: true,
+        numbers: true,
+      }),
+    });
+    return response.data;
+  } catch (e) {
+    console.log("error creating auth service user: ", e);
+  }
 };
 
 const requestPasswordChange = async (userEmail: string) => {
-  const response = await auth.database.changePassword({
-    connection: "Username-Password-Authentication",
-    email: userEmail,
-  });
-
-  return response.data;
+  try {
+    const response = await auth.database.changePassword({
+      connection: "Username-Password-Authentication",
+      email: userEmail,
+    });
+    return response.data;
+  } catch (e) {
+    console.log("error request password change: ", e);
+  }
 };
 
 const createGroupMembership = async (
