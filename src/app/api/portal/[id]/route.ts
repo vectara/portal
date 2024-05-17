@@ -1,5 +1,6 @@
 import {
   deletePortal,
+  getAuthedUserIdsForPortal,
   getPortalByKey,
   getUserByAuthServiceId,
   updatePortal,
@@ -7,17 +8,43 @@ import {
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
+import { sendApiResponse } from "../../utils";
 
 export const GET = async (req: NextRequest) => {
   const urlParts = req.url.split("/");
   const portalKey = urlParts[urlParts.length - 1];
   const portal = await getPortalByKey(portalKey);
 
-  return NextResponse.json(
+  if (!portal.is_restricted) {
+    return sendApiResponse({ portal }, 200);
+  }
+
+  const session = await getSession();
+  if (!session) {
+    return sendApiResponse({ error: "Not authorized" }, 401);
+  }
+
+  const internalUserData = await getUserByAuthServiceId(session.user.sub);
+  if (!internalUserData) {
+    return sendApiResponse({ error: "Could not find logged in user" }, 500);
+  }
+
+  const authedUserIds = (await getAuthedUserIdsForPortal(portalKey)).map(
+    (authedUserId: any) => authedUserId.authorized_id
+  );
+  if (portal.owner_id === internalUserData.id) {
+    authedUserIds.push(internalUserData.id);
+  }
+
+  if (!authedUserIds.includes(internalUserData.id)) {
+    return sendApiResponse({ error: "Not authorized" }, 401);
+  }
+
+  return sendApiResponse(
     {
       portal,
     },
-    { status: 200 }
+    200
   );
 };
 

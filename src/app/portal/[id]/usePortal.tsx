@@ -1,32 +1,52 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { PortalData, PortalType } from "../../types";
 
+type PortalDataWithPrivilege = {
+  isAuthorized: boolean;
+  data: PortalData | null;
+};
+
 export const usePortal = () => {
-  const getPortal = async (key: string): Promise<PortalData | null> => {
+  const getPortal = async (key: string): Promise<PortalDataWithPrivilege> => {
     const config = {
       method: "get",
       maxBodyLength: Infinity,
       url: `/api/portal/${key}`,
     };
 
-    const response = await axios(config);
-    const { portal: portalData } = response.data;
+    try {
+      const response = await axios(config);
+      const { portal: portalData } = response.data;
 
-    if (!portalData) {
-      return null;
+      if (!portalData) {
+        return {
+          isAuthorized: true,
+          data: null,
+        };
+      }
+
+      return {
+        isAuthorized: response.status === 200,
+        data: {
+          name: portalData.name,
+          vectaraCorpusId: portalData.vectara_corpus_id,
+          type: portalData.type,
+          portalKey: portalData.key,
+          vectaraCustomerId: portalData.vectara_customer_id,
+          vectaraApiKey: portalData.vectara_api_key,
+          isRestricted: portalData.is_restricted,
+          description: portalData.description,
+          ownerId: portalData.owner_id,
+        },
+      };
+    } catch (e: any) {
+      return {
+        // We only consider explicit 401s as being unauthorized.
+        // Anything else is an error that doesn't reflect any authorization
+        isAuthorized: e.response.status !== 401,
+        data: null,
+      };
     }
-
-    return {
-      name: portalData.name,
-      vectaraCorpusId: portalData.vectara_corpus_id,
-      type: portalData.type,
-      portalKey: portalData.key,
-      vectaraCustomerId: portalData.vectara_customer_id,
-      vectaraApiKey: portalData.vectara_api_key,
-      isRestricted: portalData.is_restricted,
-      description: portalData.description,
-      ownerId: portalData.owner_id,
-    };
   };
 
   const updatePortal = async (

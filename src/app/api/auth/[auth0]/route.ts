@@ -1,13 +1,15 @@
-import { handleAuth, handleCallback } from "@auth0/nextjs-auth0";
+import { handleAuth, handleCallback, handleLogin } from "@auth0/nextjs-auth0";
 import { redirect } from "next/navigation";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import {
   createUser,
   getUserByAuthServiceId,
   updateUserAuthServiceId,
 } from "@/pages/api/utils/db";
+import { NextRequest } from "next/server";
+import url from "url";
 
-const afterCallback = async (req: NextApiRequest, session: any) => {
+const afterCallback = async (req: NextRequest, session: any, state: any) => {
   if (session.user) {
     const internalUser = await getUserByAuthServiceId(session.user.sub);
 
@@ -26,5 +28,16 @@ const afterCallback = async (req: NextApiRequest, session: any) => {
 };
 
 export const GET = handleAuth({
-  callback: handleCallback({ afterCallback }),
+  login: async (req: NextApiRequest, res: NextApiResponse) => {
+    const parsedUrl = url.parse(req.url!, true);
+    if (parsedUrl.query.returnTo) {
+      return await handleLogin(req, res, {
+        returnTo: parsedUrl.query.returnTo as string,
+      });
+    }
+    return await handleLogin(req, res);
+  },
+  callback: handleCallback({
+    afterCallback,
+  }),
 });

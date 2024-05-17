@@ -22,7 +22,7 @@ export const LoginForm = () => {
               href="/api/auth/login"
               variant="outline"
               color="#ddd"
-              fontWeight={300}
+              fontWeight={400}
               _hover={{
                 backgroundColor: "#555",
               }}

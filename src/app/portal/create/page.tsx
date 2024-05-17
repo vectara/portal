@@ -259,7 +259,7 @@ const CreateForm = () => {
                 style={{ ...formLabelStyles, marginBottom: "0" }}
                 flexGrow={1}
               >
-                Restrict to authorized users?
+                Restrict to user group?
               </FormLabel>
               <Switch
                 isChecked={formState.isRestricted}

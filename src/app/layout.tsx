@@ -148,9 +148,10 @@ const Header = () => {
         </ListItem>
         <ListItem display="flex">
           <Box style={logoutStyles}>
-            <LogoutIcon />
             <Box>
-              <a href="/api/auth/logout">Log Out</a>
+              <a aria-label="Log out" href="/api/auth/logout">
+                <LogoutIcon />
+              </a>
             </Box>
           </Box>
         </ListItem>

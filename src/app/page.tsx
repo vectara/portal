@@ -1,5 +1,5 @@
 "use client";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, Text } from "@chakra-ui/react";
 import { Page } from "./components/Page";
 import { VectaraLogoLarge } from "./icons/Logo";
 import { LoginForm } from "./LoginForm";
@@ -42,13 +42,22 @@ const Login = () => {
             <Flex alignItems="center" justifyContent="center" height="164px">
               <Logo />
             </Flex>
-            <Box>
+            <Flex direction="column" alignItems="center">
               <Text color="#ddd" fontWeight={300} fontSize="3rem">
                 PORTAL
               </Text>
-            </Box>
+              <Badge
+                fontSize=".6rem"
+                padding=".125rem .5rem"
+                colorScheme="purple"
+              >
+                alpha
+              </Badge>
+            </Flex>
           </Flex>
-          <LoginForm />
+          <Box paddingTop="1rem">
+            <LoginForm />
+          </Box>
         </Flex>
       )}
     </Page>

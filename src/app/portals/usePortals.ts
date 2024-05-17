@@ -33,8 +33,15 @@ export const usePortals = () => {
     const response = await axios(config);
 
     return response.data.portals.map((portal: any) => ({
-      ...portal,
+      name: portal.name,
+      vectaraCorpusId: portal.vectara_corpus_id,
+      type: portal.type,
       portalKey: portal.key,
+      vectaraCustomerId: portal.vectara_customer_id,
+      vectaraApiKey: portal.vectara_personal_api_key,
+      isRestricted: portal.is_restricted,
+      description: portal.description,
+      ownerId: portal.owner_id,
     }));
   }, [currentUser]);
 

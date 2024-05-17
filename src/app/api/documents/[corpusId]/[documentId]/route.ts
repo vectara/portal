@@ -83,6 +83,5 @@ const deleteDocumentForCorpus = async (
   };
 
   const resp = await axios(config);
-  console.log("### RESP: ", resp);
   return resp.data;
 };

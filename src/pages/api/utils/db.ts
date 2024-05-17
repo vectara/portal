@@ -75,8 +75,9 @@ export const updatePortal = (
   const setParts: Array<string> = [];
 
   Object.keys(params).forEach((key) => {
-    if (params[key]) {
-      setParts.push(`${key} = '${params[key]}'`);
+    if (params[key] !== undefined) {
+      let sanitizedKey = key === "isRestricted" ? "is_restricted" : key;
+      setParts.push(`${sanitizedKey} = '${params[key]}'`);
     }
   });
 
@@ -89,6 +90,18 @@ export const getPortalByKey = (key: string) => {
   return sendQuery(
     `select * from portals where key = '${key}' and is_deleted != 'true';`,
     (resolved) => resolved.rows?.[0] ?? null
+  );
+};
+
+export const getAuthedUserIdsForPortal = (portalKey: string) => {
+  return sendQuery(
+    `SELECT 
+     t2.user_id as authorized_id
+     FROM portals t1 
+     INNER JOIN user_group_memberships t2 on t1.owner_id = t2.inviter_id
+     WHERE t1.key='${portalKey}'AND t2.state='accepted';
+    `,
+    (resolved) => resolved.rows ?? null
   );
 };
 

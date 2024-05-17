@@ -99,7 +99,7 @@ export const ManagementPanel = ({
     updatePortal(
       portalData.portalKey,
       updatedPortalName,
-      false,
+      updatedIsRestricted,
       updatedPortalType,
       updatedPortalDescription
     );
@@ -108,7 +108,7 @@ export const ManagementPanel = ({
       ...portalData,
       portalKey: portalData.portalKey,
       name: updatedPortalName,
-      isRestricted: false,
+      isRestricted: updatedIsRestricted,
       type: updatedPortalType,
       description: updatedPortalDescription,
     });
@@ -312,7 +312,7 @@ export const ManagementPanel = ({
                   Restricted
                 </FormLabel>
                 <Switch
-                  checked={updatedIsRestricted}
+                  isChecked={updatedIsRestricted}
                   onChange={() => setUpdatedIsRestricted((prev) => !prev)}
                 />
               </Flex>
