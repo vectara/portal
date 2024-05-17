@@ -27,8 +27,8 @@ export const sendApiUserNotFoundError = () =>
   sendApiResponse({ error: "User not found" }, 500);
 
 export const withLoginVerification = (handler: LoggedInRouteHandler) => {
-  const apiRoute = async (req: any, res: any) => {
-    const session = await getSession(req, res);
+  const apiRoute = async (req: Request, res: any) => {
+    const session = await getSession(req as any, res);
 
     if (!session) {
       return sendApiUnauthorizedError();
@@ -40,7 +40,8 @@ export const withLoginVerification = (handler: LoggedInRouteHandler) => {
       return sendApiUserNotFoundError();
     }
 
-    return handler(internalUserData, req, res);
+    return handler(internalUserData, req as any, res);
   };
-  return withApiAuthRequired(apiRoute);
+
+  return withApiAuthRequired(apiRoute as any);
 };

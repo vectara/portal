@@ -42,7 +42,7 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 };
 
 const Profile = () => (
-  <Page pageId="signup">
+  <Page pageId="profile">
     <Centered>
       <SignUpForm />
     </Centered>

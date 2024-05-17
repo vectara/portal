@@ -10,12 +10,13 @@ import {
   Heading,
   Input,
   Select,
+  Spinner,
   Text,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import { LoadingMessage } from "../portal/[id]/page";
-import { ChangeEvent, useEffect, useState } from "react";
+import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import { LoadingMessage } from "../portal/[id]/LoadingMessage";
 
 const Portals = () => {
   return (
@@ -115,7 +116,7 @@ const Content = () => {
               padding="1rem"
               gap="1rem"
             >
-              <Text color="#ddd">You don't have any portals yet.</Text>
+              <Text color="#ddd">{"You don't have any portals yet."}</Text>
               <Link href="/portal/create">
                 <Text color="blue.500" fontWeight={500}>
                   Create your first one

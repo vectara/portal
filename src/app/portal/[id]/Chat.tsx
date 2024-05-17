@@ -158,11 +158,6 @@ const Turn = ({
           ) : (
             <Box>
               <Markdown
-                children={
-                  !isStreaming && !answer
-                    ? "I couldn't find anything related to that."
-                    : answer ?? ""
-                }
                 options={{
                   forceInline: true,
                   overrides: {
@@ -171,7 +166,11 @@ const Turn = ({
                     },
                   },
                 }}
-              />
+              >
+                {!isStreaming && !answer
+                  ? "I couldn't find anything related to that."
+                  : answer ?? ""}
+              </Markdown>
             </Box>
           )}
         </Flex>

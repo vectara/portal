@@ -2,14 +2,16 @@ import {
   getUserGroupMemberships,
   getUserGroup,
   getUsersById,
+  getPendingUserGroupMembershipsForUser,
 } from "@/pages/api/utils/db";
 import {
   sendApiResponse,
   sendApiUnauthorizedError,
   withLoginVerification,
 } from "../../utils";
+import { NextResponse } from "next/server";
 
-export const GET = withLoginVerification(async (loggedInUser, req) => {
+export const GET = withLoginVerification(async (loggedInUser, req, res) => {
   const urlParts = req.nextUrl.pathname.split("/");
   const groupId = urlParts[urlParts.length - 1];
   const groupIdInt = parseInt(groupId);

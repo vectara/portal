@@ -19,6 +19,7 @@ import { Button } from "@/app/components/Button";
 import { useUser } from "@/app/hooks/useUser";
 import { FaShareSquare } from "react-icons/fa";
 import { CopyToClipboard } from "react-copy-to-clipboard";
+import { LoadingMessage } from "./LoadingMessage";
 
 const Portal = ({ params }: any) => {
   const { getPortal } = usePortal();
@@ -29,6 +30,11 @@ const Portal = ({ params }: any) => {
   const { currentUser } = useUser();
   const userIsOwner = currentUser?.id === portalData?.ownerId;
   const toast = useToast();
+  const [url, setUrl] = useState<string>("");
+
+  useEffect(() => {
+    setUrl(window.location.href);
+  }, []);
 
   useEffect(() => {
     const doAsync = async () => {
@@ -52,7 +58,8 @@ const Portal = ({ params }: any) => {
 
   const headerButtons = [
     <CopyToClipboard
-      text={window.location.href}
+      key="copy-to-clipboard"
+      text={url}
       onCopy={() =>
         toast({
           title: "Portal URL copied to clipboard!",
@@ -75,6 +82,7 @@ const Portal = ({ params }: any) => {
   if (userIsOwner) {
     headerButtons.push(
       <Button
+        key="manage-button"
         hasBorder={false}
         icon={<GearIcon />}
         onClick={() => setIsManagementOpen(true)}
@@ -138,34 +146,3 @@ const PORTAL_TYPE_TO_COMPONENT: Record<
   summary: Summary,
   chat: Chat,
 };
-
-export const LoadingMessage = ({ show }: { show: boolean }) => (
-  <Fade in={show}>
-    <Flex direction="column" style={loadingMessageStyles}>
-      <Spinner />
-      <Flex
-        textAlign="center"
-        position="absolute"
-        h="100%"
-        w="100%"
-        alignItems="center"
-        justifyContent="center"
-      >
-        <Text
-          fontSize="1rem"
-          fontWeight="500"
-          color="#ddd"
-          letterSpacing=".1rem"
-        >
-          LOADING
-        </Text>
-      </Flex>
-    </Flex>
-  </Fade>
-);
-
-const loadingMessageStyles = {
-  position: "absolute",
-  left: "calc(50% - 100px)",
-  top: "calc(50% - 100px)",
-} as CSSProperties;

@@ -75,13 +75,15 @@ const Content = () => {
   }
 
   if (invitations.length === 0) {
-    return <Text>You haven't received any invitations.</Text>;
+    return <Text>{"You haven't received any invitations."}</Text>;
   }
 
   return (
     <>
       <Text>
-        Accept an invitation to gain access to the inviter's restricted portals.
+        {
+          "Accept an invitation to gain access to the inviter's restricted portals."
+        }
       </Text>
       <TableContainer
         border="1px solid #888"

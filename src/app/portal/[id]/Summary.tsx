@@ -94,7 +94,6 @@ export const Summary = (props: PortalData) => {
       viewedReferenceIndex={viewedReferenceIndex}
     >
       <Markdown
-        children={processedSummary}
         options={{
           forceInline: true,
           overrides: {
@@ -103,7 +102,9 @@ export const Summary = (props: PortalData) => {
             },
           },
         }}
-      />
+      >
+        {processedSummary}
+      </Markdown>
     </ChatSummaryBase>
   );
 };
