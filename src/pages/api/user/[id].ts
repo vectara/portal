@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { getPortalByKey, getUserById, updatePortal } from "../utils/db";
+import { getUserById } from "../utils/db";
 
 type ResponseData = {
   user: any;
