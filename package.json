@@ -20,7 +20,7 @@
     "formidable": "^3.5.1",
     "generate-password": "^1.7.1",
     "markdown-to-jsx": "^7.4.6",
-    "next": "14.1.0",
+    "next": "^14.1.1",
     "pg": "^8.11.5",
     "qs": "^6.12.1",
     "react": "^18",
