@@ -163,7 +163,7 @@ export const getUserById = (id: number) => {
 
 export const getUsersById = (ids: Array<number>) => {
   return sendQuery(
-    `SELECT * FROM users where id = ANY(ARRAY[${ids.join(",")}]);`,
+    `SELECT * FROM users where id = ANY(ARRAY[${ids.join(",")}]::integer[]);`,
     (resolved) => resolved.rows ?? null
   );
 };

@@ -26,12 +26,11 @@ export const GET = withLoginVerification(async (loggedInUser, req, res) => {
   }
 
   const memberships = await getUserGroupMemberships(parseInt(groupId));
-
   const membershipUsers = await getUsersById(
     memberships.map((membership: any) => membership.user_id)
   );
 
-  let groupMemberships: Array<any> = [];
+  const groupMemberships: Array<any> = [];
 
   memberships.forEach((membership: any) => {
     const membershipUser = membershipUsers.find(
