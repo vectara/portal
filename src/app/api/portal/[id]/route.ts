@@ -4,7 +4,7 @@ import {
   getPortalByKey,
   getUserByAuthServiceId,
   updatePortal,
-} from "@/pages/api/utils/db";
+} from "@/app/api/db";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";

@@ -82,7 +82,7 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 
 const Content = () => {
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
-  const { currentUser, updateUser, getChildUsersIds } = useUser();
+  const { currentUser, updateUser } = useUser();
   const [isSubmitDisabled, setIsSubmitedDisabled] = useState<boolean>(true);
   const toast = useToast();
 

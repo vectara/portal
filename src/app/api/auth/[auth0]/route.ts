@@ -5,7 +5,7 @@ import {
   createUser,
   getUserByAuthServiceId,
   updateUserAuthServiceId,
-} from "@/pages/api/utils/db";
+} from "@/app/api/db";
 import { NextRequest } from "next/server";
 import url from "url";
 

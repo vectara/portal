@@ -2,10 +2,7 @@ import axios from "axios";
 import qs from "qs";
 import ShortUniqueId from "short-unique-id";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
-import {
-  createPortalForUser,
-  getUserByAuthServiceId,
-} from "@/pages/api/utils/db";
+import { createPortalForUser, getUserByAuthServiceId } from "@/app/api/db";
 import { NextRequest, NextResponse } from "next/server";
 
 const { randomUUID } = new ShortUniqueId({ length: 10 });

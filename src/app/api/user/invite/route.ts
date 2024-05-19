@@ -1,10 +1,6 @@
 import axios from "axios";
 import { sendApiResponse, withLoginVerification } from "../../utils";
-import {
-  addUserToUserGroup,
-  createUser,
-  getUserByEmail,
-} from "@/pages/api/utils/db";
+import { addUserToUserGroup, createUser, getUserByEmail } from "@/app/api/db";
 
 import { ManagementClient, AuthenticationClient } from "auth0";
 

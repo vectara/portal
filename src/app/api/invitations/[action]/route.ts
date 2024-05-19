@@ -5,7 +5,7 @@ import {
   rejectUserGroupMembership,
   resendUserGroupMembership,
   revokeUserGroupMembership,
-} from "@/pages/api/utils/db";
+} from "@/app/api/db";
 
 export const POST = withLoginVerification(async (loggedInUser, req, res) => {
   const urlParts = req.nextUrl.pathname.split("/");

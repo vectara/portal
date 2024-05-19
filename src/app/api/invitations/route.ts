@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import {
   acceptUserGroupMembership,
   getPendingUserGroupMembershipsForUser,
-} from "@/pages/api/utils/db";
+} from "@/app/api/db";
 
 export const GET = withLoginVerification(async (loggedInUser, req, res) => {
   const invitations = await getPendingUserGroupMembershipsForUser(

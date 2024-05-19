@@ -1,4 +1,4 @@
-import { getUserGroupsForUser } from "@/pages/api/utils/db";
+import { getUserGroupsForUser } from "@/app/api/db";
 import { sendApiResponse, withLoginVerification } from "../../utils";
 
 // TODO: We don't need the dynamic param. Move directly /groups directory

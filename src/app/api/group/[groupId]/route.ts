@@ -3,7 +3,7 @@ import {
   getUserGroup,
   getUsersById,
   getPendingUserGroupMembershipsForUser,
-} from "@/pages/api/utils/db";
+} from "@/app/api/db";
 import {
   sendApiResponse,
   sendApiUnauthorizedError,

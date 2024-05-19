@@ -1,4 +1,4 @@
-import { getUserByAuthServiceId } from "@/pages/api/utils/db";
+import { getUserByAuthServiceId } from "@/app/api/db";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";

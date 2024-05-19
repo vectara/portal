@@ -31,48 +31,6 @@ export const useUser = () => {
     }
   };
 
-  const createUser = async (email: string, password: string) => {
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "/api/user",
-      data: {
-        email,
-        password,
-      },
-    };
-
-    const response = await axios(config);
-    const createdUser = response.data.user
-      ? {
-          id: response.data.user.id,
-          email: response.data.user.email,
-          role: response.data.user.role,
-          vectaraCustomerId: response.data.user.vectara_customer_id,
-          vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
-          vectaraOAuth2ClientId: response.data.user.oauth2_client_id,
-          vectaraOAuth2ClientSecret: response.data.user.oauth2_client_secret,
-          sessionToken: response.data.user.sessionToken,
-          users_ids: response.data.user.users_ids,
-        }
-      : null;
-
-    if (createdUser) {
-      setCurrentUser(createdUser);
-    }
-  };
-
-  const getChildUsersIds = async () => {
-    const config = {
-      maxBodyLength: Infinity,
-      url: "/api/user/users",
-    };
-
-    const response = await axios(config);
-
-    return response.data;
-  };
-
   const updateUser = async (
     vectaraCustomerId?: string,
     vectaraPersonalApiKey?: string,
@@ -103,9 +61,7 @@ export const useUser = () => {
 
   return {
     loadCurrentUser,
-    createUser,
     updateUser,
     currentUser,
-    getChildUsersIds,
   };
 };

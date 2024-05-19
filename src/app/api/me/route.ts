@@ -1,25 +1,23 @@
-import { getUserByAuthServiceId, updateUser } from "@/pages/api/utils/db";
+import { getUserByAuthServiceId, updateUser } from "@/app/api/db";
 import { withApiAuthRequired, getSession } from "@auth0/nextjs-auth0";
 import { NextRequest, NextResponse } from "next/server";
 import { withLoginVerification } from "../utils";
 
-export const GET = withLoginVerification(
-  async (loggedInUser, re: Request, res) => {
-    if (loggedInUser) {
-      return NextResponse.json(
-        {
-          user: {
-            ...loggedInUser,
-            auth_service_id: undefined,
-          },
+export const GET = withLoginVerification(async (loggedInUser) => {
+  if (loggedInUser) {
+    return NextResponse.json(
+      {
+        user: {
+          ...loggedInUser,
+          auth_service_id: undefined,
         },
-        { status: 200 }
-      );
-    }
-
-    return NextResponse.json({ user: null }, { status: 200 });
+      },
+      { status: 200 }
+    );
   }
-);
+
+  return NextResponse.json({ user: null }, { status: 200 });
+});
 
 export const PATCH = withApiAuthRequired(async function myApiRoute(req, res) {
   const session = await getSession(req as NextRequest, res as NextResponse);

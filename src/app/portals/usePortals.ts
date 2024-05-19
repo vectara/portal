@@ -1,5 +1,5 @@
 import axios from "axios";
-import { PortalData, PortalType } from "../types";
+import { PortalData } from "../types";
 import { useUser } from "../hooks/useUser";
 import { useCallback, useEffect, useState } from "react";
 
@@ -22,12 +22,9 @@ export const usePortals = () => {
   const getPortals = useCallback(async (): Promise<PortalData[]> => {
     if (!currentUser?.id) return [];
     const config = {
-      method: "post",
+      method: "get",
       maxBodyLength: Infinity,
       url: `/api/portals`,
-      data: {
-        ownerId: currentUser?.id,
-      },
     };
 
     const response = await axios(config);

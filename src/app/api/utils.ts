@@ -1,4 +1,4 @@
-import { getUserByAuthServiceId } from "@/pages/api/utils/db";
+import { getUserByAuthServiceId } from "@/app/api/db";
 import {
   AppRouteHandlerFn,
   getSession,
