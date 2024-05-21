@@ -203,6 +203,13 @@ export const addUserToUserGroup = (
 
 /* USER GROUP */
 
+export const createDefaultUserGroupForUser = (ownerId: number) => {
+  return sendQuery(
+    `INSERT INTO user_groups (name, owner_id) VALUES ('default', '${ownerId}');`,
+    (resolved) => resolved.rows?.[0] ?? null
+  );
+};
+
 export const getUserGroup = (groupId: number) => {
   const q = `SELECT *
   FROM user_groups

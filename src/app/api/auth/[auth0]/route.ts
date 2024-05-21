@@ -2,6 +2,7 @@ import { handleAuth, handleCallback, handleLogin } from "@auth0/nextjs-auth0";
 import { redirect } from "next/navigation";
 import { NextApiRequest, NextApiResponse } from "next";
 import {
+  createDefaultUserGroupForUser,
   createUser,
   getUserByAuthServiceId,
   updateUserAuthServiceId,
@@ -15,7 +16,9 @@ const afterCallback = async (req: NextRequest, session: any, state: any) => {
 
     // If we don't have a corresponding internal user for yet, create one.
     if (!internalUser) {
-      await createUser(session.user.email, session.user.sub);
+      const created = await createUser(session.user.email, session.user.sub);
+
+      await createDefaultUserGroupForUser(created.id);
     } else if (!internalUser.auth_service_id) {
       // If the user was pre-created and logging in for the first time, update their auth service id
       updateUserAuthServiceId(internalUser.id, session.user.sub);
@@ -35,6 +38,9 @@ export const GET = handleAuth({
         returnTo: parsedUrl.query.returnTo as string,
       });
     }
+    return await handleLogin(req, res);
+  },
+  signup: async (req: NextApiRequest, res: NextApiResponse) => {
     return await handleLogin(req, res);
   },
   callback: handleCallback({
