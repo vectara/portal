@@ -17,6 +17,7 @@ import {
   Switch,
   Text,
   Textarea,
+  Tooltip,
   useToast,
 } from "@chakra-ui/react";
 import { FileUploader } from "react-drag-drop-files";
@@ -173,6 +174,26 @@ export const ManagementPanel = ({
           />
         </FormControl>
         <FormControl>
+          <FormLabel style={formLabelStyles}>Slug</FormLabel>
+          <Tooltip
+            label={
+              <UpgradeTooltip description="Upgrade to choose your own Portal Path." />
+            }
+            backgroundColor="#444"
+            borderRadius=".25rem"
+            padding=".5rem"
+            hasArrow
+          >
+            <Input
+              type="text"
+              value={portalData.portalKey}
+              onChange={() => {}}
+              isDisabled={true}
+              border="1px solid #888"
+            />
+          </Tooltip>
+        </FormControl>
+        <FormControl>
           <FormLabel style={formLabelStyles}>Description</FormLabel>
           <Textarea
             value={updatedPortalDescription}
@@ -219,7 +240,7 @@ export const ManagementPanel = ({
                       border="none"
                       onClick={() => getDocuments()}
                     />
-                    <Flex className="file-uploader-wrapper">
+                    <Flex className="file-uploader-wrapper" overflow="hidden">
                       <FileUploader
                         handleChange={(files: FileList) => {
                           queueFilesForUpload(files);
@@ -455,4 +476,22 @@ const formLabelStyles = {
   fontSize: ".8rem",
   margin: 0,
   marginBottom: "0.75rem",
+};
+
+const UpgradeTooltip = ({ description }: { description: string }) => {
+  return (
+    <Box>
+      <Flex
+        borderRadius=".25rem"
+        padding=".5rem"
+        direction="column"
+        gap=".5rem"
+        fontSize=".8rem"
+      >
+        <Box>
+          <Text>{description}</Text>
+        </Box>
+      </Flex>
+    </Box>
+  );
 };
