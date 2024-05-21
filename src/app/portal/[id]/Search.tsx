@@ -66,10 +66,9 @@ export const Search = (props: PortalData) => {
   return (
     <>
       <Flex as="form" direction="column" gap=".5rem" width="100%">
-        <Flex alignItems="center" gap=".5rem">
+        <Flex alignItems="center" gap=".5rem" position="relative">
           <Input
             border="1px solid #aaa"
-            maxWidth="500px"
             placeholder="Search..."
             onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
               if (e.key === "Enter") {
@@ -77,9 +76,18 @@ export const Search = (props: PortalData) => {
                 e.preventDefault();
               }
             }}
+            width={{ base: "100%", md: "500px" }}
+            paddingRight={{ base: "2.25rem", md: "1rem" }}
             onChange={onChange}
           />
-          {isLoading && <Spinner color="#888" size="sm" />}
+          {isLoading && (
+            <Spinner
+              color="#888"
+              size="sm"
+              position={{ base: "absolute", md: "initial" }}
+              right={{ base: "1rem" }}
+            />
+          )}
         </Flex>
       </Flex>
       <Box

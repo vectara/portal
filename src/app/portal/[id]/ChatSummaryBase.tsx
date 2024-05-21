@@ -29,8 +29,8 @@ export const ChatSummaryBase = ({
   onQuery,
   children,
   references,
-  buttonLabel = "Send Query",
-  placeholder = "Type anything",
+  buttonLabel = "Send",
+  placeholder = "Ask anything",
   viewedReferenceIndex,
 }: Props) => {
   const [query, setQuery] = useState<string>("");
