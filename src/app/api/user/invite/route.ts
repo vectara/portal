@@ -1,6 +1,11 @@
 import axios from "axios";
 import { sendApiResponse, withLoginVerification } from "../../utils";
-import { addUserToUserGroup, createUser, getUserByEmail } from "@/app/api/db";
+import {
+  addUserToUserGroup,
+  createDefaultUserGroupForUser,
+  createUser,
+  getUserByEmail,
+} from "@/app/api/db";
 
 import { ManagementClient, AuthenticationClient } from "auth0";
 
@@ -38,6 +43,7 @@ export const POST = withLoginVerification(async (loggedInUser, req, res) => {
       }
 
       registeredUser = await createUser(email, authServiceUser.user_id);
+      await createDefaultUserGroupForUser(registeredUser.id);
 
       if (!registeredUser) {
         return sendApiResponse({ error: "error sending invitation" }, 500);
