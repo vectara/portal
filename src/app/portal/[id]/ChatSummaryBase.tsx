@@ -276,12 +276,17 @@ const References = ({
                         elRefs.current[index] = ref;
                       }}
                     >
-                      <Reference
-                        title={reference.title}
-                        snippet={reference.snippet}
-                        url={reference.url}
-                        index={index}
-                      />
+                      {" "}
+                      {reference ? (
+                        <Reference
+                          title={reference?.title}
+                          snippet={reference.snippet}
+                          url={reference.url}
+                          index={index}
+                        />
+                      ) : (
+                        <EmptyReference index={index} />
+                      )}
                     </Box>
                   ))}
                 </AccordionPanel>
@@ -294,8 +299,26 @@ const References = ({
   );
 };
 
+const EmptyReference = ({ index }: { index: number }) => (
+  <Flex
+    padding=".5rem 0"
+    borderBottom="1px solid #888"
+    gap=".5rem"
+    direction="column"
+  >
+    <Box>
+      <Text as="span" fontWeight={700} fontSize=".75rem">
+        [{index + 1}]
+      </Text>{" "}
+      <Text as="span" fontWeight={700} fontSize=".75rem" color="red">
+        Error: This reference could not be parsed.
+      </Text>
+    </Box>
+  </Flex>
+);
+
 const Reference = ({
-  title,
+  title = "untitled",
   snippet,
   url,
   index,
