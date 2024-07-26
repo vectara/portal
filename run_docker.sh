@@ -21,6 +21,37 @@ run_postgres() {
 }
 
 
+# Check if Docker is installed
+if ! [ -x "$(command -v docker)" ]; then
+  echo "Docker is not installed. Installing Docker..."
+
+  # Install Docker based on the operating system
+  if [ "$(uname -s)" = "Linux" ]; then
+    # Install Docker on Linux
+    curl -fsSL https://get.docker.com -o get-docker.sh
+    sh get-docker.sh
+    sudo usermod -aG docker $USER
+    newgrp docker
+  elif [ "$(uname -s)" = "Darwin" ]; then
+    # Install Docker on macOS
+    brew install --cask docker
+    open /Applications/Docker.app
+    while ! docker system info > /dev/null 2>&1; do
+      echo "Waiting for Docker to start..."
+      sleep 1
+    done
+  else
+    echo "Unsupported operating system. Please install Docker manually."
+    exit 1
+  fi
+
+  echo "Docker installed successfully."
+else
+  echo "Docker is already installed."
+fi
+
+
+
 # Check if the ENV_FILE variable is set
 if [ -z "$ENV_FILE" ]; then
   echo "ENV_FILE is not set. Please set ENV_FILE to the appropriate environment file."
