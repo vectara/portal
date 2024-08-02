@@ -6,7 +6,8 @@
     "dev": "next dev -p 8080",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create-schema": "node src/app/api/initializeDBSchema.js"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^3.5.0",
