@@ -9,8 +9,11 @@ RUN npm run build
 FROM node:18-alpine
 WORKDIR /app
 COPY --from=builder /app ./
-RUN npm install --production
-RUN npm run create-schema  # Run the create-schema command during build
+RUN apk add --no-cache postgresql-client
+
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
 EXPOSE 3000
 
-CMD ["npm", "start"]
+ENTRYPOINT ["/app/start.sh"]

@@ -1,7 +1,9 @@
 const pg = require("pg");
 
+console.log(`postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=${process.env.PG_SSL_MODE}`)
+
 const pool = new pg.Pool({
-    connectionString: `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=disable`
+    connectionString: `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=${process.env.PG_SSL_MODE}`
     // user: process.env.PG_USER,
     // host: process.env.PG_HOST,
     // database: process.env.PG_NAME,
@@ -89,6 +91,3 @@ async function initializeDatabase() {
 initializeDatabase().catch((err) => {
     console.error('Failed to initialize database:', err);
 });
-
-
-// export default initializeDatabase;
