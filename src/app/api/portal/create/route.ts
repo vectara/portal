@@ -212,7 +212,7 @@ const getJwt = async (
       client_id: oAuth2ClientId,
       client_secret: oAuth2ClientSecret,
     }),
-    url: `https://vectara-prod-${customerId}.auth.us-west-2.amazoncognito.com/oauth2/token`,
+    url: `https://auth.vectara.io/oauth2/token`,
   };
 
   const {
