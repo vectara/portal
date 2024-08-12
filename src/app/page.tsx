@@ -51,7 +51,7 @@ const Login = () => {
                 padding=".125rem .5rem"
                 colorScheme="purple"
               >
-                alpha
+                beta
               </Badge>
             </Flex>
           </Flex>
