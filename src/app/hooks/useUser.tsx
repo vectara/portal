@@ -23,6 +23,7 @@ export const useUser = () => {
           vectaraPersonalApiKey: user.vectara_personal_api_key,
           vectaraOAuth2ClientId: user.oauth2_client_id,
           vectaraOAuth2ClientSecret: user.oauth2_client_secret,
+          isVectaraScaleUser: user.is_vectara_scale_user,
           role: user.role,
         });
       }
@@ -36,6 +37,7 @@ export const useUser = () => {
     vectaraPersonalApiKey?: string,
     vectaraOAuth2ClientId?: string,
     vectaraOAuth2ClientSecret?: string,
+    isVectaraScaleUser?: boolean,
     addEmails?: Array<string>
   ) => {
     const response = await axios.patch("/api/me", {
@@ -43,6 +45,7 @@ export const useUser = () => {
       vectaraPersonalApiKey,
       vectaraOAuth2ClientId,
       vectaraOAuth2ClientSecret,
+      isVectaraScaleUser,
       addEmails,
     });
 
@@ -53,6 +56,7 @@ export const useUser = () => {
         vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
         vectaraOAuth2ClientId: response.data.user.oauth2_client_id,
         vectaraOAuth2ClientSecret: response.data.user.oauth2_client_secret,
+        isVectaraScaleUser: response.data.user.isVectaraScaleUser
       });
     }
 

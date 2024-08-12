@@ -2,7 +2,45 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) and [npm](https://www.npmjs.com/)
+- [Auth0](https://auth0.com/)
+
+### Auth0 Configuration
+
+To run this project, you need to set up an [Auth0](https://auth0.com/docs) application and obtain the following variables:
+
+- `AUTH0_SECRET`
+- `AUTH0_BASE_URL`
+- `AUTH0_ISSUER_BASE_URL`
+- `AUTH0_CLIENT_ID`
+- `AUTH0_CLIENT_SECRET`
+- `AUTH0_MACHINE_TO_MACHINE_DOMAIN`
+- `AUTH0_MACHINE_TO_MACHINE_CLIENT_ID`
+- `AUTH0_MACHINE_TO_MACHINE_CLIENT_SECRET`
+
+### Create `.env.local` or `.env.production` File
+
+```env
+PG_USER=your_username
+PG_PASSWORD=your_password
+PG_NAME=your_database
+PG_PORT=5432
+PG_HOST=postgres
+RUN_POSTGRES=true # set to true if you want to run the postgres locally with docker
+
+AUTH0_SECRET
+AUTH0_BASE_URL
+AUTH0_ISSUER_BASE_URL
+AUTH0_CLIENT_ID
+AUTH0_CLIENT_SECRET
+AUTH0_MACHINE_TO_MACHINE_DOMAIN
+AUTH0_MACHINE_TO_MACHINE_CLIENT_ID
+AUTH0_MACHINE_TO_MACHINE_CLIENT_SECRET
+```
+
+First, make sure your postgres database is running, then run the development server:
 
 ```bash
 npm run dev
@@ -14,23 +52,26 @@ pnpm dev
 bun dev
 ```
 
+**Create Database Schema**
+
+Run the following command to create the database schema:
+
+```
+npm run create-schema
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Running the development setup with docker
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If you want start the postgres container with the application add the following to `.env` file.
+```RUN_POSTGRES=true```
 
-## Learn More
+Run the following command
+```bash
+bash run_docker.sh .env.local
 
-To learn more about Next.js, take a look at the following resources:
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

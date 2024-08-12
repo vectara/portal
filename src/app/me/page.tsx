@@ -8,8 +8,9 @@ import {
   FormLabel,
   Heading,
   Input,
-  Select,
-  useToast,
+  Switch,
+  Link,
+  useToast, SimpleGrid,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
@@ -53,6 +54,7 @@ interface FormState {
   vectaraOAuth2ClientSecret?: string;
   pendingUserEmailsToAdd?: Array<string>;
   userEmailToAdd?: string;
+  isVectaraScaleUser: boolean
 }
 
 interface FormErrors {
@@ -61,6 +63,7 @@ interface FormErrors {
   vectaraOAuth2ClientId: boolean;
   vectaraOAuth2ClientSecret: boolean;
   userEmailToAdd: boolean;
+  isVectaraScaleUser: boolean
 }
 
 const INITIAL_FORM_STATE: FormState = {
@@ -70,6 +73,7 @@ const INITIAL_FORM_STATE: FormState = {
   vectaraOAuth2ClientId: undefined,
   vectaraOAuth2ClientSecret: undefined,
   userEmailToAdd: undefined,
+  isVectaraScaleUser: false
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
@@ -78,6 +82,7 @@ const INITIAL_FORM_ERRORS: FormErrors = {
   vectaraOAuth2ClientId: false,
   vectaraOAuth2ClientSecret: false,
   userEmailToAdd: false,
+  isVectaraScaleUser: false
 };
 
 const Content = () => {
@@ -98,6 +103,7 @@ const Content = () => {
       vectaraOAuth2ClientId: currentUser.vectaraOAuth2ClientId ?? undefined,
       vectaraOAuth2ClientSecret:
         currentUser.vectaraOAuth2ClientSecret ?? undefined,
+      isVectaraScaleUser: currentUser.isVectaraScaleUser ?? false
     });
   }, [currentUser]);
 
@@ -111,6 +117,7 @@ const Content = () => {
       formState.vectaraPersonalApiKey,
       formState.vectaraOAuth2ClientId,
       formState.vectaraOAuth2ClientSecret,
+      formState.isVectaraScaleUser,
       formState.pendingUserEmailsToAdd
     );
 
@@ -226,6 +233,30 @@ const Content = () => {
             />
           </FormControl>
         </Box>
+      </Flex>
+      <Flex gap="1rem">
+        <Box>
+          <FormControl as={SimpleGrid} columns={{ base: 2, lg: 2 }}>
+            <FormLabel htmlFor='advanceConfig' style={formLabelStyles}>
+              Are you <Link href="https://vectara.com/pricing/" isExternal textDecoration="underline">
+              scale customer
+            </Link>?
+            </FormLabel>
+            <Switch
+              marginLeft="50px"
+              id='advanceConfig'
+              isChecked={formState.isVectaraScaleUser}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                setFormState({
+                  ...formState,
+                  isVectaraScaleUser: e.target.checked ?? false,
+                });
+                setIsSubmitedDisabled(false);
+              }}
+              size="md"/>
+          </FormControl>
+        </Box>
+
       </Flex>
       <UserGroups userId={currentUser.id} />
       <Flex>

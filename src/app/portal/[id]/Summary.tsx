@@ -14,6 +14,7 @@ import {
 } from "./ChatSummaryBase";
 import Markdown from "markdown-to-jsx";
 import { Text } from "@chakra-ui/react";
+import {useUser} from "@/app/hooks/useUser";
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
@@ -23,6 +24,8 @@ export const Summary = (props: PortalData) => {
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
     number | undefined
   >();
+
+  const { currentUser } = useUser();
 
   const onReceiveSummary = (update: StreamUpdate) => {
     setIsStreaming(true);
@@ -42,24 +45,39 @@ export const Summary = (props: PortalData) => {
 
   const onSummarize = (query: string) => {
     if (!query) return;
+    let summaryPromptName = "vectara-summary-ext-24-05-sml"
+    let reranker = 272725718
+    let summaryNumResults = 5
+
+    if (currentUser?.isVectaraScaleUser) {
+      summaryPromptName = "vectara-summary-ext-24-05-med-omni"
+      reranker = 272725719
+      summaryNumResults = 10
+    }
+    else {
+    }
 
     const requestConfig = {
       filter: "",
       queryValue: query,
       rerank: true,
-      rerankNumResults: 10,
-      rerankerId: 272725718,
-      rerankDiversityBias: 0.3,
+      rerankNumResults: 100,
+      rerankerId: reranker,
+      rerankDiversityBias: 0.1,
       customerId: props.vectaraCustomerId,
       corpusIds: [props.vectaraCorpusId],
       endpoint: "api.vectara.io",
       apiKey: props.vectaraApiKey,
-      summaryNumResults: 3,
-      summaryNumSentences: 3,
+      summaryNumResults: summaryNumResults,
+      summaryNumSentences: 2,
       language: "eng" as SummaryLanguage,
-      summaryPromptName: "vectara-summary-ext-v1.2.0",
+      summaryPromptName: summaryPromptName,
+      hybridNumWords: 2,
+      hybridLambdaLong: 0.005,
+      hybridLambdaShort: 0.1,
       chat: { store: false },
     };
+
 
     streamQuery(requestConfig, onReceiveSummary);
   };

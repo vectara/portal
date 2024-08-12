@@ -115,8 +115,16 @@ export const updateUser = (
   vectaraCustomerId?: string,
   vectaraPersonalApiKey?: string,
   vectaraOAuth2ClientId?: string,
-  vectaraOAuth2ClientSecret?: string
+  vectaraOAuth2ClientSecret?: string,
+  isVectaraScaleUser?: boolean
 ) => {
+  console.log(
+    vectaraCustomerId,
+    vectaraPersonalApiKey,
+    vectaraOAuth2ClientId,
+    vectaraOAuth2ClientSecret,
+    isVectaraScaleUser
+  )
   return sendQuery(
     `UPDATE users SET vectara_customer_id = ${
       vectaraCustomerId ? `'${vectaraCustomerId}'` : "NULL"
@@ -126,7 +134,8 @@ export const updateUser = (
       vectaraOAuth2ClientId ?? "NULL"
     }', oauth2_client_secret='${
       vectaraOAuth2ClientSecret ?? "NULL"
-    }' WHERE id='${userId}' RETURNING *;`
+    }', is_vectara_scale_user='${isVectaraScaleUser ?? false}'
+    WHERE id='${userId}' RETURNING *;`
   );
 };
 

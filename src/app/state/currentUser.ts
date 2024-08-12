@@ -8,6 +8,7 @@ type CurrentUserState =
       vectaraPersonalApiKey: string | null;
       vectaraOAuth2ClientId: string | null;
       vectaraOAuth2ClientSecret: string | null;
+      isVectaraScaleUser: boolean
       role: string;
     }
   | null
