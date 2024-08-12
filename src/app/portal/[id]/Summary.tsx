@@ -72,9 +72,7 @@ export const Summary = (props: PortalData) => {
       summaryNumSentences: 2,
       language: "eng" as SummaryLanguage,
       summaryPromptName: summaryPromptName,
-      hybridNumWords: 2,
-      hybridLambdaLong: 0.005,
-      hybridLambdaShort: 0.1,
+      lambda: 0.005,
       chat: { store: false },
     };
 
