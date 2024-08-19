@@ -185,7 +185,6 @@ const References = ({
   references: Array<DeserializedSearchResult>;
   showIndex?: number;
 }) => {
-  console.log("### REFERENCES: ", references);
   const elRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [toggleState, setToggleState] =
     useState<ReferencesToggleState>(undefined);
