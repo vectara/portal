@@ -56,7 +56,7 @@ export const useUser = () => {
         vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
         vectaraOAuth2ClientId: response.data.user.oauth2_client_id,
         vectaraOAuth2ClientSecret: response.data.user.oauth2_client_secret,
-        isVectaraScaleUser: response.data.user.isVectaraScaleUser
+        isVectaraScaleUser: response.data.user.is_vectara_scale_user,
       });
     }
 
