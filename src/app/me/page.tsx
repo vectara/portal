@@ -10,6 +10,7 @@ import {
   Input,
   Switch,
   Link,
+  Text,
   useToast, SimpleGrid,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
@@ -238,7 +239,7 @@ const Content = () => {
         <Box>
           <FormControl as={SimpleGrid} columns={{ base: 2, lg: 2 }}>
             <FormLabel htmlFor='advanceConfig' style={formLabelStyles}>
-              Are you <Link href="https://vectara.com/pricing/" isExternal textDecoration="underline">
+              Are you a <Link href="https://vectara.com/pricing/" isExternal textDecoration="underline">
               scale customer
             </Link>?
             </FormLabel>
@@ -256,8 +257,13 @@ const Content = () => {
               size="md"/>
           </FormControl>
         </Box>
-
       </Flex>
+      {
+        formState.isVectaraScaleUser && (
+          <Text fontSize='sm' color='#FEFCBF'>You have enabled the option indicating that you are a Scale customer.
+            Please note that your portals will not function if you are not a Scale customer.</Text>
+        )
+      }
       <UserGroups userId={currentUser.id} />
       <Flex>
         <FormControl style={formControlStyles} w="initial">
