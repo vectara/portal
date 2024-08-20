@@ -32,6 +32,7 @@ export const PATCH = withApiAuthRequired(async function myApiRoute(req, res) {
     vectaraPersonalApiKey,
     vectaraOAuth2ClientId,
     vectaraOAuth2ClientSecret,
+    isVectaraScaleUser
   } = await req.json();
 
   try {
@@ -40,7 +41,8 @@ export const PATCH = withApiAuthRequired(async function myApiRoute(req, res) {
       vectaraCustomerId,
       vectaraPersonalApiKey,
       vectaraOAuth2ClientId,
-      vectaraOAuth2ClientSecret
+      vectaraOAuth2ClientSecret,
+      isVectaraScaleUser
     );
 
     return updated.length === 0

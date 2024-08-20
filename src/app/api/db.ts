@@ -1,19 +1,11 @@
 // TODO: Split these so we don't have one giant bucket of db functions.
 import { PortalType } from "@/app/types";
-
 const pg = require("pg");
 
 const pool = new pg.Pool({
-  user: process.env.PG_USER,
-  host: process.env.PG_HOST,
-  database: process.env.PG_NAME,
-  password: process.env.PG_PASSWORD,
-  port: process.env.PG_PORT,
-  ssl: {
-    rejectUnauthorized: true,
-    ca: process.env.PG_PEM,
-  },
+  connectionString: `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=${process.env.PG_SSL_MODE}`
 });
+
 
 /* PORTALS */
 
@@ -123,8 +115,16 @@ export const updateUser = (
   vectaraCustomerId?: string,
   vectaraPersonalApiKey?: string,
   vectaraOAuth2ClientId?: string,
-  vectaraOAuth2ClientSecret?: string
+  vectaraOAuth2ClientSecret?: string,
+  isVectaraScaleUser?: boolean
 ) => {
+  console.log(
+    vectaraCustomerId,
+    vectaraPersonalApiKey,
+    vectaraOAuth2ClientId,
+    vectaraOAuth2ClientSecret,
+    isVectaraScaleUser
+  )
   return sendQuery(
     `UPDATE users SET vectara_customer_id = ${
       vectaraCustomerId ? `'${vectaraCustomerId}'` : "NULL"
@@ -134,7 +134,8 @@ export const updateUser = (
       vectaraOAuth2ClientId ?? "NULL"
     }', oauth2_client_secret='${
       vectaraOAuth2ClientSecret ?? "NULL"
-    }' WHERE id='${userId}' RETURNING *;`
+    }', is_vectara_scale_user='${isVectaraScaleUser ?? false}'
+    WHERE id='${userId}' RETURNING *;`
   );
 };
 

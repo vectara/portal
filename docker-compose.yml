@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - PG_USER=${PG_USER}
+      - PG_PASSWORD=${PG_PASSWORD}
+      - PG_NAME=${PG_NAME}
+      - PG_PORT=${PG_PORT}
+      - PG_HOST=${PG_HOST}
+      - PG_SSL_MODE=${PG_SSL_MODE}
+      - RUN_POSTGRES=${RUN_POSTGRES:-false}
+    ports:
+      - "8080:3000"
+
+  postgres:
+    image: postgres:latest
+    container_name: ${PG_HOST}
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_NAME}
+    ports:
+      - "${PG_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    profiles:
+      - postgres
+
+volumes:
+  postgres_data:
