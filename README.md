@@ -40,6 +40,8 @@ AUTH0_MACHINE_TO_MACHINE_CLIENT_ID
 AUTH0_MACHINE_TO_MACHINE_CLIENT_SECRET
 ```
 
+### Running the development setup with npm
+
 First, make sure your postgres database is running, then run the development server:
 
 ```bash
