@@ -11,7 +11,8 @@ import {
   Switch,
   Link,
   Text,
-  useToast, SimpleGrid,
+  useToast,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
@@ -55,7 +56,7 @@ interface FormState {
   vectaraOAuth2ClientSecret?: string;
   pendingUserEmailsToAdd?: Array<string>;
   userEmailToAdd?: string;
-  isVectaraScaleUser: boolean
+  isVectaraScaleUser: boolean;
 }
 
 interface FormErrors {
@@ -64,7 +65,7 @@ interface FormErrors {
   vectaraOAuth2ClientId: boolean;
   vectaraOAuth2ClientSecret: boolean;
   userEmailToAdd: boolean;
-  isVectaraScaleUser: boolean
+  isVectaraScaleUser: boolean;
 }
 
 const INITIAL_FORM_STATE: FormState = {
@@ -74,7 +75,7 @@ const INITIAL_FORM_STATE: FormState = {
   vectaraOAuth2ClientId: undefined,
   vectaraOAuth2ClientSecret: undefined,
   userEmailToAdd: undefined,
-  isVectaraScaleUser: false
+  isVectaraScaleUser: false,
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
@@ -83,7 +84,7 @@ const INITIAL_FORM_ERRORS: FormErrors = {
   vectaraOAuth2ClientId: false,
   vectaraOAuth2ClientSecret: false,
   userEmailToAdd: false,
-  isVectaraScaleUser: false
+  isVectaraScaleUser: false,
 };
 
 const Content = () => {
@@ -104,7 +105,7 @@ const Content = () => {
       vectaraOAuth2ClientId: currentUser.vectaraOAuth2ClientId ?? undefined,
       vectaraOAuth2ClientSecret:
         currentUser.vectaraOAuth2ClientSecret ?? undefined,
-      isVectaraScaleUser: currentUser.isVectaraScaleUser ?? false
+      isVectaraScaleUser: currentUser.isVectaraScaleUser ?? false,
     });
   }, [currentUser]);
 
@@ -236,34 +237,52 @@ const Content = () => {
         </Box>
       </Flex>
       <Flex gap="1rem">
-        <Box>
-          <FormControl as={SimpleGrid} columns={{ base: 2, lg: 2 }}>
-            <FormLabel htmlFor='advanceConfig' style={formLabelStyles}>
-              Are you a <Link href="https://vectara.com/pricing/" isExternal textDecoration="underline">
-              scale customer
-            </Link>?
-            </FormLabel>
-            <Switch
-              marginLeft="50px"
-              id='advanceConfig'
-              isChecked={formState.isVectaraScaleUser}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormState({
-                  ...formState,
-                  isVectaraScaleUser: e.target.checked ?? false,
-                });
-                setIsSubmitedDisabled(false);
-              }}
-              size="md"/>
+        <Box maxWidth="600px">
+          <FormControl as={Flex} direction="column">
+            <Flex>
+              <FormLabel htmlFor="advanceConfig" style={formLabelStyles}>
+                Are you a{" "}
+                <Link
+                  href="https://vectara.com/pricing/"
+                  isExternal
+                  textDecoration="underline"
+                >
+                  scale customer
+                </Link>
+                ?
+              </FormLabel>
+              <Switch
+                marginLeft="50px"
+                id="advanceConfig"
+                isChecked={formState.isVectaraScaleUser}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormState({
+                    ...formState,
+                    isVectaraScaleUser: e.target.checked ?? false,
+                  });
+                  setIsSubmitedDisabled(false);
+                }}
+                size="md"
+              />
+            </Flex>
+            <Box fontWeight={600}>
+              {formState.isVectaraScaleUser && (
+                <>
+                  <Text fontSize="xs" color="#FEFCBF">
+                    You have indicated that you are a Scale customer.
+                  </Text>
+                  <Text fontSize="xs" color="#FEFCBF">
+                    {" "}
+                    If you have enabled this and are not a Scale customer, your
+                    portals will not work.
+                  </Text>
+                </>
+              )}
+            </Box>
           </FormControl>
         </Box>
       </Flex>
-      {
-        formState.isVectaraScaleUser && (
-          <Text fontSize='sm' color='#FEFCBF'>You have enabled the option indicating that you are a Scale customer.
-            Please note that your portals will not function if you are not a Scale customer.</Text>
-        )
-      }
+
       <UserGroups userId={currentUser.id} />
       <Flex>
         <FormControl style={formControlStyles} w="initial">
