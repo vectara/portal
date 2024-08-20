@@ -190,7 +190,7 @@ const Content = () => {
           <FormControl style={formControlStyles}>
             <FormLabel style={formLabelStyles}>OAuth 2.0 Client ID</FormLabel>
             <Input
-              type="text"
+              type="password"
               value={formState.vectaraOAuth2ClientId ?? ""}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 setFormState({
