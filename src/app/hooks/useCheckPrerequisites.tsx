@@ -37,8 +37,11 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
     // Check the logged in user.
     if (shouldVerifyLoggedInUser) {
       accessCheck = !!currentUser;
-    } else {
-      router.push("/");
+
+      if (!accessCheck) {
+        router.push("/");
+        return;
+      }
     }
 
     // Check Vectara credentials.
@@ -63,7 +66,7 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
       }
     }
     setCanAccess(accessCheck);
-  }, [currentUser?.id]);
+  }, [currentUser]);
 
   return { canAccess };
 };
