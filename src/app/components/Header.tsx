@@ -16,12 +16,15 @@ import { VectaraLogo } from "../icons/Logo";
 import Link from "next/link";
 import { EmailIcon } from "@chakra-ui/icons";
 import { LogoutIcon } from "../icons/Logout";
+import { ACTION_LOG_OUT } from "../analytics";
+import { useAmplitude } from "amplitude-react";
 
 export const Header = () => {
   const pathName = usePathname();
   const { currentUser } = useUser();
   const isPortalPath = pathName?.match(/^\/portal\/(?!.*create)/);
   const { getInvitations } = useUserGroupInvitations();
+  const { logEvent, resetIdentity } = useAmplitude();
   const invitations = suspend(() => getInvitations(), ["invitations"]);
   const pendingInvitationsCount = invitations.length;
 
@@ -84,7 +87,14 @@ export const Header = () => {
         <ListItem display="flex">
           <Box style={logoutStyles}>
             <Box>
-              <a aria-label="Log out" href="/api/auth/logout">
+              <a
+                aria-label="Log out"
+                href="/api/auth/logout"
+                onClick={() => {
+                  logEvent(ACTION_LOG_OUT);
+                  resetIdentity();
+                }}
+              >
                 <LogoutIcon />
               </a>
             </Box>

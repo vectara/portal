@@ -15,6 +15,8 @@ import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import Link from "next/link";
+import { useAmplitude } from "amplitude-react";
+import { ACTION_QUERY_PORTAL } from "@/app/analytics";
 
 interface Props {
   onQuery: (query: string) => void;

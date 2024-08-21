@@ -14,7 +14,9 @@ import {
 } from "./ChatSummaryBase";
 import Markdown from "markdown-to-jsx";
 import { Text } from "@chakra-ui/react";
-import {useUser} from "@/app/hooks/useUser";
+import { useUser } from "@/app/hooks/useUser";
+import { useAmplitude } from "amplitude-react";
+import { ACTION_QUERY_PORTAL } from "@/app/analytics";
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
@@ -24,6 +26,7 @@ export const Summary = (props: PortalData) => {
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
     number | undefined
   >();
+  const { logEvent } = useAmplitude();
 
   const { currentUser } = useUser();
 
@@ -45,17 +48,20 @@ export const Summary = (props: PortalData) => {
 
   const onSummarize = (query: string) => {
     if (!query) return;
-    let summaryPromptName = "vectara-summary-ext-24-05-sml"
-    let reranker = 272725718
-    let summaryNumResults = 5
+    let summaryPromptName = "vectara-summary-ext-24-05-sml";
+    let reranker = 272725718;
+    let summaryNumResults = 5;
 
     if (currentUser?.isVectaraScaleUser) {
-      summaryPromptName = "vectara-summary-ext-24-05-med-omni"
-      reranker = 272725719
-      summaryNumResults = 10
+      summaryPromptName = "vectara-summary-ext-24-05-med-omni";
+      reranker = 272725719;
+      summaryNumResults = 10;
     }
-    else {
-    }
+
+    logEvent(ACTION_QUERY_PORTAL, {
+      type: "summary",
+      portalKey: props.portalKey,
+    });
 
     const requestConfig = {
       filter: "",
@@ -75,7 +81,6 @@ export const Summary = (props: PortalData) => {
       lambda: 0.005,
       chat: { store: false },
     };
-
 
     streamQuery(requestConfig, onReceiveSummary);
   };

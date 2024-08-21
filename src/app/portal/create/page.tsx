@@ -19,6 +19,8 @@ import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useCreatePortal } from "./useCreatePortal";
 import { PortalType } from "../../types";
 import { redirect, useRouter } from "next/navigation";
+import { NAVIGATE_CREATE_PORTAL } from "@/app/analytics";
+import { useAmplitude } from "amplitude-react";
 
 interface FormState {
   name?: string;
@@ -45,6 +47,12 @@ const INITIAL_FORM_ERRORS: FormErrors = {
 };
 
 const Create = () => {
+  const { logEvent } = useAmplitude();
+
+  useEffect(() => {
+    logEvent(NAVIGATE_CREATE_PORTAL);
+  }, []);
+
   return (
     <Page
       pageId="create"

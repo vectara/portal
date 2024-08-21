@@ -1,12 +1,13 @@
 "use client";
 
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ChakraProvider, Flex } from "@chakra-ui/react";
 import { RecoilRoot } from "recoil";
 import { useUser } from "./hooks/useUser";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { Header } from "./components/Header";
+import { AmplitudeReactProvider, useAmplitude } from "amplitude-react";
+import { NAVIGATE_HOME_PAGE } from "./analytics";
 
 export default function RootLayout({
   children,
@@ -22,7 +23,11 @@ export default function RootLayout({
       <body>
         <ChakraProvider>
           <RecoilRoot>
-            <App>{children}</App>
+            <AmplitudeReactProvider
+              apiKey={process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY}
+            >
+              <App>{children}</App>
+            </AmplitudeReactProvider>
           </RecoilRoot>
         </ChakraProvider>
       </body>
@@ -32,9 +37,15 @@ export default function RootLayout({
 
 const App = ({ children }: { children: React.ReactNode }) => {
   const { loadCurrentUser, currentUser } = useUser();
+  const { logEvent } = useAmplitude();
+
   if (!currentUser) {
     loadCurrentUser();
   }
+
+  useEffect(() => {
+    logEvent(NAVIGATE_HOME_PAGE);
+  }, []);
 
   return (
     <Flex

@@ -32,6 +32,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useDocuments } from "../hooks/useDocuments";
 import { IoMdRefresh } from "react-icons/io";
+import { ACTION_DELETE_PORTAL, ACTION_UPLOAD_DOCUMENTS } from "../analytics";
+import { useAmplitude } from "amplitude-react";
 
 interface ManagementPanelProps {
   portalData: PortalData;
@@ -95,6 +97,8 @@ export const ManagementPanel = ({
     portalData.vectaraCorpusId
   );
 
+  const { logEvent } = useAmplitude();
+
   const saveUpdates = () => {
     updatePortal(
       portalData.portalKey,
@@ -128,6 +132,10 @@ export const ManagementPanel = ({
     setIsDeleting(true);
     try {
       await deletePortal(portalData.portalKey);
+      logEvent(ACTION_DELETE_PORTAL, {
+        portalKey: portalData.portalKey,
+        type: portalData.type,
+      });
       toast({
         title: "Portal deleted!",
         description: "Taking you to your Portals page...",
@@ -233,6 +241,9 @@ export const ManagementPanel = ({
                     <Flex className="file-uploader-wrapper" overflow="hidden">
                       <FileUploader
                         handleChange={(files: FileList) => {
+                          logEvent(ACTION_UPLOAD_DOCUMENTS, {
+                            fileCount: files.length,
+                          });
                           queueFilesForUpload(files);
                         }}
                         name="files"

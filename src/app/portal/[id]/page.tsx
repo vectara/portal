@@ -21,6 +21,8 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingMessage } from "./LoadingMessage";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAmplitude } from "amplitude-react";
+import { ACTION_SHARE_PORTAL, NAVIGATE_PORTAL } from "@/app/analytics";
 
 const Portal = ({ params }: any) => {
   const { getPortal } = usePortal();
@@ -39,6 +41,11 @@ const Portal = ({ params }: any) => {
   );
 
   const pathname = usePathname();
+  const { logEvent } = useAmplitude();
+
+  useEffect(() => {
+    logEvent(NAVIGATE_PORTAL, { portalId });
+  }, []);
 
   useEffect(() => {
     setUrl(window.location.href);
@@ -69,13 +76,17 @@ const Portal = ({ params }: any) => {
     <CopyToClipboard
       key="copy-to-clipboard"
       text={url}
-      onCopy={() =>
+      onCopy={() => {
+        logEvent(ACTION_SHARE_PORTAL, {
+          portalKey: portalData?.portalKey,
+          type: portalData?.type,
+        });
         toast({
           title: "Portal URL copied to clipboard!",
           status: "success",
           duration: 5000,
-        })
-      }
+        });
+      }}
     >
       <Button
         hasBorder={false}
