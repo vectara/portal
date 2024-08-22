@@ -20,8 +20,16 @@ import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useUserGroupInvitations } from "../hooks/useUserGroupInvitations";
 import { useEffect, useState } from "react";
 import { UserGroupMembershipState } from "../types";
+import { useAmplitude } from "amplitude-react";
+import { NAVIGATE_INVITATIONS } from "../analytics";
 
 const Invitations = () => {
+  const { logEvent } = useAmplitude();
+
+  useEffect(() => {
+    logEvent(NAVIGATE_INVITATIONS);
+  }, []);
+
   return (
     <Page pageId="profile" accessPrerequisites={{ loggedInUser: true }}>
       <Flex padding="2rem" w="100%">

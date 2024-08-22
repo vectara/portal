@@ -18,6 +18,8 @@ import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
 import { UserGroups } from "./UserGroups";
+import { useAmplitude } from "amplitude-react";
+import { ACTION_SAVE_PROFILE, NAVIGATE_PROFILE } from "../analytics";
 
 const Profile = () => {
   return (
@@ -92,6 +94,11 @@ const Content = () => {
   const { currentUser, updateUser } = useUser();
   const [isSubmitDisabled, setIsSubmitedDisabled] = useState<boolean>(true);
   const toast = useToast();
+  const { logEvent } = useAmplitude();
+
+  useEffect(() => {
+    logEvent(NAVIGATE_PROFILE);
+  }, []);
 
   useEffect(() => {
     if (!currentUser) {
@@ -122,6 +129,8 @@ const Content = () => {
       formState.isVectaraScaleUser,
       formState.pendingUserEmailsToAdd
     );
+
+    logEvent(ACTION_SAVE_PROFILE);
 
     toast({
       status: "success",

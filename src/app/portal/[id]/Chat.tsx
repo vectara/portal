@@ -10,6 +10,8 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import Markdown from "markdown-to-jsx";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import { useState } from "react";
+import { ACTION_QUERY_PORTAL } from "@/app/analytics";
+import { useAmplitude } from "amplitude-react";
 
 export const Chat = (props: PortalData) => {
   const {
@@ -23,6 +25,8 @@ export const Chat = (props: PortalData) => {
     [props.vectaraCorpusId],
     props.vectaraApiKey
   );
+
+  const { logEvent } = useAmplitude();
 
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
     number | undefined
@@ -77,7 +81,13 @@ export const Chat = (props: PortalData) => {
 
   return (
     <ChatSummaryBase
-      onQuery={(query) => sendMessage({ query })}
+      onQuery={(query) => {
+        logEvent(ACTION_QUERY_PORTAL, {
+          type: "chat",
+          portalKey: props.portalKey,
+        });
+        sendMessage({ query });
+      }}
       references={latestReferences}
       viewedReferenceIndex={viewedReferenceIndex}
     >

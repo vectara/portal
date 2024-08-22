@@ -1,7 +1,11 @@
 import axios from "axios";
 import { PortalType } from "../../types";
+import { ACTION_CREATE_PORTAL } from "@/app/analytics";
+import { useAmplitude } from "amplitude-react";
 
 export const useCreatePortal = () => {
+  const { logEvent } = useAmplitude();
+
   const createPortal = async (
     name: string,
     description: string,
@@ -21,6 +25,8 @@ export const useCreatePortal = () => {
     };
 
     const response = await axios(config);
+
+    logEvent(ACTION_CREATE_PORTAL, { type, isRestricted });
 
     return {
       name: response.data.portal.name,
