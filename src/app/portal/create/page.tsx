@@ -90,12 +90,26 @@ const CreateForm = () => {
 
     setIsCreating(true);
 
-    const createdPortal = await createPortal(
+    const result = await createPortal(
       formState.name,
       formState.description,
       formState.type,
       formState.isRestricted
     );
+
+    if (!result.success) {
+      setIsCreating(false);
+      toast({
+        status: "error",
+        title: "Could not create portal",
+        description: result.error,
+        duration: 10000,
+      });
+
+      return;
+    }
+
+    const createdPortal = result.data;
 
     if (createdPortal) {
       toast({

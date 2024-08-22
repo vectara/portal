@@ -4,6 +4,7 @@ import ShortUniqueId from "short-unique-id";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { createPortalForUser, getUserByAuthServiceId } from "@/app/api/db";
 import { NextRequest, NextResponse } from "next/server";
+import { CreatePortalResponse, PortalType, SubTaskResponse } from "./types";
 
 const { randomUUID } = new ShortUniqueId({ length: 10 });
 
@@ -41,7 +42,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const portal = await createPortal(
+  const response = await createPortal(
     name,
     type,
     description,
@@ -53,10 +54,10 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     isRestricted
   );
 
-  if (!portal) {
+  if (!response.success) {
     return NextResponse.json(
       {
-        error: "Error creating portal.",
+        error: response.error ?? "There was an error creating your portal.",
       },
       { status: 500 }
     );
@@ -64,7 +65,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
 
   return NextResponse.json(
     {
-      portal,
+      portal: response.data,
     },
     { status: 200 }
   );
@@ -80,22 +81,36 @@ const createPortal = async (
   vectaraOAuth2ClientId: string,
   vectaraOAuth2ClientSecret: string,
   isRestricted: boolean = false
-) => {
+): Promise<CreatePortalResponse> => {
+  const genericError = {
+    success: false,
+    data: null,
+    error: "Sorry! We couldn't create your portal.",
+  };
+
   // Step 1. Create the corpus in Vectara.
-  const corpus = await createCorpus(
+  let response = await createCorpus(
     name,
     vectaraCustomerId,
     vectaraPersonalApiKey
   );
 
-  if (!corpus) {
-    return null;
+  if (response.error) {
+    return {
+      success: false,
+      data: null,
+      error: response.error,
+    };
   }
 
-  const corpusId = corpus.corpusId;
+  if (!response.corpus) {
+    return genericError;
+  }
+
+  const corpusId = response.corpus.corpusId;
 
   // Step 2. Create the query API key for the corpus.
-  const apiKey = await createApiKey(
+  response = await createApiKey(
     name,
     corpusId,
     vectaraCustomerId,
@@ -103,9 +118,11 @@ const createPortal = async (
     vectaraOAuth2ClientSecret
   );
 
-  if (!apiKey) {
-    return null;
+  if (!response.apiKey) {
+    return genericError;
   }
+
+  const apiKey = response.apiKey;
 
   // Step 3. Create the portal using corpus/customer details.
 
@@ -124,9 +141,13 @@ const createPortal = async (
   );
 
   return {
-    name,
-    id: portalKey,
-    type,
+    success: true,
+    data: {
+      name,
+      id: portalKey,
+      type: type as PortalType,
+    },
+    error: null,
   };
 };
 
@@ -134,7 +155,7 @@ const createCorpus = async (
   name: string,
   customerId: string,
   apiKey: string
-) => {
+): Promise<SubTaskResponse> => {
   const data = JSON.stringify({
     corpus: {
       id: 0,
@@ -159,7 +180,20 @@ const createCorpus = async (
   };
 
   const resp = await axios(config);
-  return resp.data;
+
+  const didReachCorpusLimit =
+    resp.data?.status?.code === "ADM__CORPUS_LIMIT_REACHED";
+
+  if (didReachCorpusLimit) {
+    return {
+      error:
+        "You may have reached the maximum allowed corpora for your Vectara account.",
+    };
+  }
+
+  return {
+    corpus: resp.data,
+  };
 };
 
 const createApiKey = async (
@@ -168,7 +202,7 @@ const createApiKey = async (
   customerId: string,
   oAuth2ClientId: string,
   oAuth2ClientSecret: string
-) => {
+): Promise<SubTaskResponse> => {
   const jwt = await getJwt(customerId, oAuth2ClientId, oAuth2ClientSecret);
 
   const data = JSON.stringify({
@@ -196,7 +230,9 @@ const createApiKey = async (
 
   const response = await axios(config);
 
-  return response.data.response[0].keyId;
+  return {
+    apiKey: response.data.response[0].keyId,
+  };
 };
 
 const getJwt = async (
