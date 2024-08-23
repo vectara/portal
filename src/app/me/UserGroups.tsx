@@ -62,8 +62,8 @@ export const UserGroups = ({ userId }: Props) => {
   }, []);
 
   return (
-    <Flex gap="1rem" direction="column" mt="1rem" width="33%" minWidth="500px">
-      <Heading size="md">Your Users</Heading>
+    <Flex gap="1rem" direction="column" width="33%" minWidth="500px">
+      <Heading size="md">Users</Heading>
 
       {currentUserGroupId && (
         <>
