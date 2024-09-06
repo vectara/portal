@@ -15,6 +15,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@vectara/react-chatbot": "^1.0.0",
     "@vectara/react-search": "^0.0.15",
+    "@vectara/stream-query-client": "^4.1.0",
     "amplitude-react": "^0.0.4",
     "argon2": "^0.40.1",
     "auth0": "^4.3.1",

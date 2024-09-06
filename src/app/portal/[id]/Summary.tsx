@@ -1,11 +1,7 @@
 import { PortalData } from "../../types";
 import { useState } from "react";
+import {ApiV2, streamQueryV2} from "@vectara/stream-query-client";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
-import {
-  StreamUpdate,
-  SummaryLanguage,
-  streamQuery,
-} from "@vectara/stream-query-client";
 import {
   ChatSummaryBase,
   applyCitationOrder,
@@ -17,6 +13,8 @@ import { Text } from "@chakra-ui/react";
 import { useUser } from "@/app/hooks/useUser";
 import { useAmplitude } from "amplitude-react";
 import { ACTION_QUERY_PORTAL } from "@/app/analytics";
+import {SummaryLanguage} from "@vectara/react-chatbot/lib/types";
+import {parseSnippet} from "@/app/portal/[id]/utils";
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
@@ -29,21 +27,46 @@ export const Summary = (props: PortalData) => {
   const { logEvent } = useAmplitude();
 
   const { currentUser } = useUser();
+  const onStreamEvent = (event: ApiV2.StreamEvent) => {
+    switch (event.type) {
+      case "requestError":
+      case "genericError":
+      case "error":
+        setIsStreaming(false);
+        break;
 
-  const onReceiveSummary = (update: StreamUpdate) => {
-    setIsStreaming(true);
+      case "searchResults":
+        const results: Array<DeserializedSearchResult> = [];
+        event.searchResults.forEach((document) => {
+          const { pre, post, text } = parseSnippet(document.text);
 
-    if (update.references) {
-      setReferences(update.references);
+          results.push({
+            id: document.document_id,
+            snippet: {
+              pre,
+              text,
+              post
+            },
+            source: document.document_metadata.source,
+            url: document.document_metadata.url,
+            title: document.document_metadata.title || text.split(' ').slice(0, 10).join(' '),
+            metadata: document.document_metadata
+          } as DeserializedSearchResult);
+        });
+        setReferences(results)
+
+        break;
+
+      case "generationChunk":
+        setSummary(event.updatedText ?? undefined);
+        break;
+
+
+      case "end":
+        setIsStreaming(false);
+        break;
     }
 
-    if (update.updatedText) {
-      setSummary(update.updatedText);
-    }
-
-    if (update.isDone) {
-      setIsStreaming(false);
-    }
   };
 
   const onSummarize = (query: string) => {
@@ -63,28 +86,40 @@ export const Summary = (props: PortalData) => {
       portalKey: props.portalKey,
     });
 
-    const requestConfig = {
-      filter: "",
-      queryValue: query,
-      rerank: true,
-      rerankNumResults: 100,
-      rerankerId: reranker,
-      rerankDiversityBias: 0.1,
-      customerId: props.vectaraCustomerId,
-      corpusIds: [props.vectaraCorpusId],
-      endpoint: "api.vectara.io",
-      apiKey: props.vectaraApiKey,
-      summaryNumResults: summaryNumResults,
-      summaryNumSentences: 2,
-      language: "eng" as SummaryLanguage,
-      summaryPromptName: summaryPromptName,
-      lambda: 0.005,
-      chat: { store: false },
+    const streamQueryConfig: ApiV2.StreamQueryConfig = {
+      apiKey: props.vectaraApiKey!,
+      customerId: props.vectaraCustomerId!,
+      query: query,
+      corpusKey: `${props.name}_${props.vectaraCorpusId}`,
+      search: {
+        limit: 100,
+        offset: 0,
+        metadataFilter: "",
+        lexicalInterpolation: 0.005,
+        reranker: reranker === 272725718
+          ? {
+            type: "mmr",
+            diversityBias: 0.1
+          }
+          : {
+            type: "customer_reranker",
+            // rnk_ prefix needed for conversion from API v1 to v2.
+            rerankerId: `rnk_${reranker}`
+          },
+        contextConfiguration: {
+          sentencesBefore: 2,
+          sentencesAfter: 2,
+        }
+      },
+      generation: {
+        generationPresetName: summaryPromptName,
+        maxUsedSearchResults: summaryNumResults,
+        responseLanguage: "eng" as SummaryLanguage
+
+      }
     };
-
-    streamQuery(requestConfig, onReceiveSummary);
-  };
-
+    streamQueryV2({streamQueryConfig, onStreamEvent})
+  }
   const SummaryCitation = ({ reference }: { reference: string }) => {
     const referenceIndex = parseInt(reference);
     return (
@@ -106,7 +141,7 @@ export const Summary = (props: PortalData) => {
 
   const reorderedAnswer = summary ? reorderCitations(summary) : summary ?? "";
   const processedSummary = markDownCitations(reorderedAnswer);
-
+  console.log(references)
   return (
     <ChatSummaryBase
       onQuery={(query) => onSummarize(query)}
