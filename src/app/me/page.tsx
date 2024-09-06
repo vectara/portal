@@ -13,6 +13,7 @@ import {
   Text,
   useToast,
   SimpleGrid,
+  IconButton,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
@@ -20,6 +21,7 @@ import { useUser } from "../hooks/useUser";
 import { UserGroups } from "./UserGroups";
 import { useAmplitude } from "amplitude-react";
 import { ACTION_SAVE_PROFILE, NAVIGATE_PROFILE } from "../analytics";
+import { QuestionIcon } from "@chakra-ui/icons";
 
 const Profile = () => {
   return (
@@ -146,7 +148,8 @@ const Content = () => {
 
   return (
     <Flex as="form" direction="column" gap="1.5rem">
-      <Flex gap="1rem">
+      <Flex direction="column" gap="1rem" mt={1}>
+        <Heading size="md">Personal Details</Heading>
         <Box>
           <FormControl style={formControlStyles}>
             <FormLabel style={formLabelStyles}>Email</FormLabel>
@@ -155,101 +158,140 @@ const Content = () => {
               value={currentUser?.email ?? ""}
               onChange={() => {}}
               border="1px solid #888"
-              minWidth="320px"
+              width="320px"
               isDisabled={true}
             />
           </FormControl>
         </Box>
       </Flex>
-      <Flex gap="1rem">
+      <Flex direction="column" gap="1rem" mt={3}>
+        <Heading size="md">Vectara Credentials</Heading>
         <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>Vectara Customer ID</FormLabel>
-            <Input
-              type="text"
-              value={formState.vectaraCustomerId ?? ""}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormState({
-                  ...formState,
-                  vectaraCustomerId: e.target.value ?? undefined,
-                });
-
-                setIsSubmitedDisabled(false);
-              }}
-              border="1px solid #888"
-              minWidth="320px"
-            />
-          </FormControl>
+          <Text fontSize="xs" color="#FEFCBF" fontWeight={600}>
+            Don't have a Vectara account?{" "}
+            <Link color="blue.500" href="https://console.vectara.com/signup/?utm_source=App&utm_medium=Portal&utm_term=sign-up&utm_content=sign-up-in-portal&utm_campaign=App-Portal-sign-up-sign-up-in-portal">
+              Sign up here.
+            </Link>
+          </Text>
         </Box>
-        <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>
-              Vectara Personal API Key
-            </FormLabel>
-            <Input
-              type="password"
-              value={formState.vectaraPersonalApiKey ?? ""}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormState({
-                  ...formState,
-                  vectaraPersonalApiKey: e.target.value ?? undefined,
-                });
+        <Flex gap="1rem">
+          <Box>
+            <FormControl style={formControlStyles}>
+              <FormLabel style={formLabelStyles}>Vectara Customer ID</FormLabel>
+              <Input
+                type="text"
+                value={formState.vectaraCustomerId ?? ""}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormState({
+                    ...formState,
+                    vectaraCustomerId: e.target.value ?? undefined,
+                  });
 
-                setIsSubmitedDisabled(false);
-              }}
-              border="1px solid #888"
-              minWidth="320px"
-            />
-          </FormControl>
-        </Box>
-      </Flex>
-      <Flex gap="1rem">
-        <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>OAuth 2.0 Client ID</FormLabel>
-            <Input
-              type="password"
-              value={formState.vectaraOAuth2ClientId ?? ""}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormState({
-                  ...formState,
-                  vectaraOAuth2ClientId: e.target.value ?? undefined,
-                });
+                  setIsSubmitedDisabled(false);
+                }}
+                border="1px solid #888"
+                minWidth="320px"
+              />
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl style={formControlStyles}>
+              <Flex gap={2} alignItems={"center"}>
+                <FormLabel style={formLabelStyles}>
+                  Vectara Personal API Key
+                </FormLabel>
+                <Link
+                  href="https://docs.vectara.com/docs/console-ui/personal-api-key"
+                  target="_blank"
+                >
+                  <QuestionIcon marginBottom="0.75rem" />
+                </Link>
+              </Flex>
+              <Input
+                type="password"
+                value={formState.vectaraPersonalApiKey ?? ""}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormState({
+                    ...formState,
+                    vectaraPersonalApiKey: e.target.value ?? undefined,
+                  });
 
-                setIsSubmitedDisabled(false);
-              }}
-              border="1px solid #888"
-              minWidth="320px"
-            />
-          </FormControl>
-        </Box>
-        <Box>
-          <FormControl style={formControlStyles}>
-            <FormLabel style={formLabelStyles}>
-              OAuth 2.0 Client Secret
-            </FormLabel>
-            <Input
-              type="password"
-              value={formState.vectaraOAuth2ClientSecret ?? ""}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                setFormState({
-                  ...formState,
-                  vectaraOAuth2ClientSecret: e.target.value ?? undefined,
-                });
+                  setIsSubmitedDisabled(false);
+                }}
+                border="1px solid #888"
+                minWidth="320px"
+              />
+            </FormControl>
+          </Box>
+        </Flex>
+        <Flex gap="1rem">
+          <Box>
+            <FormControl style={formControlStyles}>
+              <Flex gap={2} alignItems="center">
+                <FormLabel style={formLabelStyles}>
+                  OAuth 2.0 Client ID
+                </FormLabel>
+                <Link
+                  href="https://docs.vectara.com/docs/console-ui/app-clients"
+                  target="_blank"
+                >
+                  <QuestionIcon marginBottom="0.75rem" />
+                </Link>
+              </Flex>
 
-                setIsSubmitedDisabled(false);
-              }}
-              border="1px solid #888"
-              minWidth="320px"
-            />
-          </FormControl>
-        </Box>
+              <Input
+                type="password"
+                value={formState.vectaraOAuth2ClientId ?? ""}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormState({
+                    ...formState,
+                    vectaraOAuth2ClientId: e.target.value ?? undefined,
+                  });
+
+                  setIsSubmitedDisabled(false);
+                }}
+                border="1px solid #888"
+                minWidth="320px"
+              />
+            </FormControl>
+          </Box>
+          <Box>
+            <FormControl style={formControlStyles}>
+              <Flex gap={2} alignItems="center">
+                <FormLabel style={formLabelStyles}>
+                  OAuth 2.0 Client Secret
+                </FormLabel>
+                <Link
+                  href="https://docs.vectara.com/docs/console-ui/app-clients"
+                  target="_blank"
+                >
+                  <QuestionIcon marginBottom="0.75rem" />
+                </Link>
+              </Flex>
+
+              <Input
+                type="password"
+                value={formState.vectaraOAuth2ClientSecret ?? ""}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setFormState({
+                    ...formState,
+                    vectaraOAuth2ClientSecret: e.target.value ?? undefined,
+                  });
+
+                  setIsSubmitedDisabled(false);
+                }}
+                border="1px solid #888"
+                minWidth="320px"
+              />
+            </FormControl>
+          </Box>
+        </Flex>
       </Flex>
       <Flex gap="1rem">
         <Box maxWidth="600px">
           <FormControl as={Flex} direction="column">
             <Flex>
-              <FormLabel htmlFor="advanceConfig" style={formLabelStyles}>
+              <FormLabel htmlFor="advanceConfig" fontWeight={400}>
                 Are you a{" "}
                 <Link
                   href="https://vectara.com/pricing/"
@@ -291,7 +333,6 @@ const Content = () => {
           </FormControl>
         </Box>
       </Flex>
-
       <UserGroups userId={currentUser.id} />
       <Flex>
         <FormControl style={formControlStyles} w="initial">
