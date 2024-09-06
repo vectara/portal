@@ -169,7 +169,7 @@ const Content = () => {
         <Box>
           <Text fontSize="xs" color="#FEFCBF" fontWeight={600}>
             Don't have a Vectara account?{" "}
-            <Link color="blue.500" href="https://console.vectara.com/signup">
+            <Link color="blue.500" href="https://console.vectara.com/signup/?utm_source=App&utm_medium=Portal&utm_term=sign-up&utm_content=sign-up-in-portal&utm_campaign=App-Portal-sign-up-sign-up-in-portal">
               Sign up here.
             </Link>
           </Text>
