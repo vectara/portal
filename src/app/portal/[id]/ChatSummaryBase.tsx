@@ -9,7 +9,6 @@ import {
   AccordionItem,
   AccordionButton,
 } from "@chakra-ui/react";
-import { PortalData } from "../../types";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";

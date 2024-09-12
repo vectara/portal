@@ -12,14 +12,12 @@ import {
   Link,
   Text,
   useToast,
-  SimpleGrid,
-  IconButton,
 } from "@chakra-ui/react";
 import { Page } from "../components/Page";
 import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import { useUser } from "../hooks/useUser";
 import { UserGroups } from "./UserGroups";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 import { ACTION_SAVE_PROFILE, NAVIGATE_PROFILE } from "../analytics";
 import { QuestionIcon } from "@chakra-ui/icons";
 
@@ -96,10 +94,9 @@ const Content = () => {
   const { currentUser, updateUser } = useUser();
   const [isSubmitDisabled, setIsSubmitedDisabled] = useState<boolean>(true);
   const toast = useToast();
-  const { logEvent } = useAmplitude();
 
   useEffect(() => {
-    logEvent(NAVIGATE_PROFILE);
+    amplitude.track(NAVIGATE_PROFILE);
   }, []);
 
   useEffect(() => {
@@ -132,7 +129,7 @@ const Content = () => {
       formState.pendingUserEmailsToAdd
     );
 
-    logEvent(ACTION_SAVE_PROFILE);
+    amplitude.track(ACTION_SAVE_PROFILE);
 
     toast({
       status: "success",

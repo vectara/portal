@@ -6,7 +6,8 @@ import { RecoilRoot } from "recoil";
 import { useUser } from "./hooks/useUser";
 import { Suspense, useEffect } from "react";
 import { Header } from "./components/Header";
-import { AmplitudeReactProvider, useAmplitude } from "amplitude-react";
+import TrackingPreference from "./components/TrackingToastMessage";
+import * as amplitude from '@amplitude/analytics-browser';
 import { NAVIGATE_HOME_PAGE } from "./analytics";
 
 export default function RootLayout({
@@ -23,11 +24,7 @@ export default function RootLayout({
       <body>
         <ChakraProvider>
           <RecoilRoot>
-            <AmplitudeReactProvider
-              apiKey={process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY}
-            >
-              <App>{children}</App>
-            </AmplitudeReactProvider>
+            <App>{children}</App>
           </RecoilRoot>
         </ChakraProvider>
       </body>
@@ -37,14 +34,15 @@ export default function RootLayout({
 
 const App = ({ children }: { children: React.ReactNode }) => {
   const { loadCurrentUser, currentUser } = useUser();
-  const { logEvent } = useAmplitude();
+  // @ts-ignore
+  amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY);
 
   if (!currentUser) {
     loadCurrentUser();
   }
 
   useEffect(() => {
-    logEvent(NAVIGATE_HOME_PAGE);
+    amplitude.track(NAVIGATE_HOME_PAGE);
   }, []);
 
   return (
@@ -66,6 +64,9 @@ const App = ({ children }: { children: React.ReactNode }) => {
       )}
 
       {children}
+
+      <TrackingPreference />
+
     </Flex>
   );
 };

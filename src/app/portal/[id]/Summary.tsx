@@ -11,10 +11,10 @@ import {
 import Markdown from "markdown-to-jsx";
 import { Text } from "@chakra-ui/react";
 import { useUser } from "@/app/hooks/useUser";
-import { useAmplitude } from "amplitude-react";
 import { ACTION_QUERY_PORTAL } from "@/app/analytics";
 import {SummaryLanguage} from "@vectara/react-chatbot/lib/types";
 import {parseSnippet} from "@/app/portal/[id]/utils";
+import * as amplitude from '@amplitude/analytics-browser';
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
@@ -24,7 +24,6 @@ export const Summary = (props: PortalData) => {
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
     number | undefined
   >();
-  const { logEvent } = useAmplitude();
 
   const { currentUser } = useUser();
   const onStreamEvent = (event: ApiV2.StreamEvent) => {
@@ -81,7 +80,7 @@ export const Summary = (props: PortalData) => {
       summaryNumResults = 10;
     }
 
-    logEvent(ACTION_QUERY_PORTAL, {
+    amplitude.track(ACTION_QUERY_PORTAL, {
       type: "summary",
       portalKey: props.portalKey,
     });

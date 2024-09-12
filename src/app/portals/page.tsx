@@ -18,7 +18,7 @@ import { CSSProperties, ChangeEvent, useEffect, useState } from "react";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { LoadingMessage } from "../portal/[id]/LoadingMessage";
 import { NAVIGATE_PORTALS } from "../analytics";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 
 const Portals = () => {
   return (
@@ -34,10 +34,9 @@ const Portals = () => {
 const Content = () => {
   const { portals, isLoading } = usePortals();
   const [filters, setFilters] = useState<FilterData | null>(null);
-  const { logEvent } = useAmplitude();
 
   useEffect(() => {
-    logEvent(NAVIGATE_PORTALS);
+    amplitude.track(NAVIGATE_PORTALS);
   }, []);
 
   const onFilter = (filterData: FilterData) => {

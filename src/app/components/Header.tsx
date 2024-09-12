@@ -17,14 +17,13 @@ import Link from "next/link";
 import { EmailIcon } from "@chakra-ui/icons";
 import { LogoutIcon } from "../icons/Logout";
 import { ACTION_LOG_OUT } from "../analytics";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 
 export const Header = () => {
   const pathName = usePathname();
   const { currentUser } = useUser();
   const isPortalPath = pathName?.match(/^\/portal\/(?!.*create)/);
   const { getInvitations } = useUserGroupInvitations();
-  const { logEvent, resetIdentity } = useAmplitude();
   const invitations = suspend(() => getInvitations(), ["invitations"]);
   const pendingInvitationsCount = invitations.length;
 
@@ -91,8 +90,8 @@ export const Header = () => {
                 aria-label="Log out"
                 href="/api/auth/logout"
                 onClick={() => {
-                  logEvent(ACTION_LOG_OUT);
-                  resetIdentity();
+                  amplitude.track(ACTION_LOG_OUT);
+                  amplitude.reset();
                 }}
               >
                 <LogoutIcon />

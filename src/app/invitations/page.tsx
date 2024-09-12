@@ -19,15 +19,13 @@ import { Page } from "../components/Page";
 import { CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useUserGroupInvitations } from "../hooks/useUserGroupInvitations";
 import { useEffect, useState } from "react";
-import { UserGroupMembershipState } from "../types";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 import { NAVIGATE_INVITATIONS } from "../analytics";
 
 const Invitations = () => {
-  const { logEvent } = useAmplitude();
 
   useEffect(() => {
-    logEvent(NAVIGATE_INVITATIONS);
+    amplitude.track(NAVIGATE_INVITATIONS);
   }, []);
 
   return (

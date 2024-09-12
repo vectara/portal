@@ -10,6 +10,7 @@
     "create-schema": "node src/app/api/initializeDBSchema.js"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.3",
     "@auth0/nextjs-auth0": "^3.5.0",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",

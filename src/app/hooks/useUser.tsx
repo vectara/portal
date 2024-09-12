@@ -1,12 +1,11 @@
 import axios from "axios";
 import { useRecoilState } from "recoil";
 import { currentUserState } from "../state/currentUser";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 import { ACTION_START_SESSION } from "../analytics";
 
 export const useUser = () => {
   const [currentUser, setCurrentUser] = useRecoilState(currentUserState);
-  const { logEvent, setUserId } = useAmplitude();
 
   const loadCurrentUser = async () => {
     const config = {
@@ -19,8 +18,8 @@ export const useUser = () => {
       const user = response.data.user;
 
       if (user) {
-        logEvent(ACTION_START_SESSION, { id: user.id, email: user.email });
-        setUserId(user.id);
+        amplitude.track(ACTION_START_SESSION, { id: user.id, email: user.email });
+        amplitude.setUserId(user.id);
         setCurrentUser({
           id: user.id,
           email: user.email,
