@@ -35,7 +35,9 @@ export default function RootLayout({
 const App = ({ children }: { children: React.ReactNode }) => {
   const { loadCurrentUser, currentUser } = useUser();
   // @ts-ignore
-  amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY);
+  amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY, {
+    autocapture: false,
+  });
 
   if (!currentUser) {
     loadCurrentUser();
