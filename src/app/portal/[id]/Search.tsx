@@ -15,7 +15,7 @@ import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import debounce from "debounce";
 import Link from "next/link";
 import { ACTION_QUERY_PORTAL } from "@/app/analytics";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 
 interface ParsedSearchResult extends Pick<DeserializedSearchResult, "snippet"> {
   title: string;
@@ -46,11 +46,9 @@ export const Search = (props: PortalData) => {
     props.vectaraApiKey
   );
 
-  const { logEvent } = useAmplitude();
-
   const onSearch = useCallback(
     debounce(async (value: string) => {
-      logEvent(ACTION_QUERY_PORTAL, {
+      amplitude.track(ACTION_QUERY_PORTAL, {
         type: "search",
         portalKey: props.portalKey,
       });

@@ -21,7 +21,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingMessage } from "./LoadingMessage";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 import { ACTION_SHARE_PORTAL, NAVIGATE_PORTAL } from "@/app/analytics";
 
 const Portal = ({ params }: any) => {
@@ -41,10 +41,9 @@ const Portal = ({ params }: any) => {
   );
 
   const pathname = usePathname();
-  const { logEvent } = useAmplitude();
 
   useEffect(() => {
-    logEvent(NAVIGATE_PORTAL, { portalId });
+    amplitude.track(NAVIGATE_PORTAL, { portalId });
   }, []);
 
   useEffect(() => {
@@ -77,7 +76,7 @@ const Portal = ({ params }: any) => {
       key="copy-to-clipboard"
       text={url}
       onCopy={() => {
-        logEvent(ACTION_SHARE_PORTAL, {
+        amplitude.track(ACTION_SHARE_PORTAL, {
           portalKey: portalData?.portalKey,
           type: portalData?.type,
         });

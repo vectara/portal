@@ -33,7 +33,7 @@ import { useRouter } from "next/navigation";
 import { useDocuments } from "../hooks/useDocuments";
 import { IoMdRefresh } from "react-icons/io";
 import { ACTION_DELETE_PORTAL, ACTION_UPLOAD_DOCUMENTS } from "../analytics";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 
 interface ManagementPanelProps {
   portalData: PortalData;
@@ -97,8 +97,6 @@ export const ManagementPanel = ({
     portalData.vectaraCorpusId
   );
 
-  const { logEvent } = useAmplitude();
-
   const saveUpdates = () => {
     updatePortal(
       portalData.portalKey,
@@ -132,7 +130,7 @@ export const ManagementPanel = ({
     setIsDeleting(true);
     try {
       await deletePortal(portalData.portalKey);
-      logEvent(ACTION_DELETE_PORTAL, {
+      amplitude.track(ACTION_DELETE_PORTAL, {
         portalKey: portalData.portalKey,
         type: portalData.type,
       });
@@ -241,7 +239,7 @@ export const ManagementPanel = ({
                     <Flex className="file-uploader-wrapper" overflow="hidden">
                       <FileUploader
                         handleChange={(files: FileList) => {
-                          logEvent(ACTION_UPLOAD_DOCUMENTS, {
+                          amplitude.track(ACTION_UPLOAD_DOCUMENTS, {
                             fileCount: files.length,
                           });
                           queueFilesForUpload(files);

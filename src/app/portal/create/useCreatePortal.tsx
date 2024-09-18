@@ -1,10 +1,9 @@
 import axios from "axios";
 import { PortalType } from "../../types";
 import { ACTION_CREATE_PORTAL } from "@/app/analytics";
-import { useAmplitude } from "amplitude-react";
+import * as amplitude from '@amplitude/analytics-browser';
 
 export const useCreatePortal = () => {
-  const { logEvent } = useAmplitude();
 
   const createPortal = async (
     name: string,
@@ -27,7 +26,7 @@ export const useCreatePortal = () => {
     try {
       const response = await axios(config);
 
-      logEvent(ACTION_CREATE_PORTAL, { type, isRestricted });
+      amplitude.track(ACTION_CREATE_PORTAL, { type, isRestricted });
 
       return {
         success: true,
