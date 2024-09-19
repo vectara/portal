@@ -21,7 +21,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { LoadingMessage } from "./LoadingMessage";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import * as amplitude from '@amplitude/analytics-browser';
+import * as amplitude from "@amplitude/analytics-browser";
 import { ACTION_SHARE_PORTAL, NAVIGATE_PORTAL } from "@/app/analytics";
 
 const Portal = ({ params }: any) => {

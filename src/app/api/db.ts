@@ -3,9 +3,8 @@ import { PortalType } from "@/app/types";
 const pg = require("pg");
 
 const pool = new pg.Pool({
-  connectionString: `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=${process.env.PG_SSL_MODE}`
+  connectionString: `postgresql://${process.env.PG_USER}:${process.env.PG_PASSWORD}@${process.env.PG_HOST}:${process.env.PG_PORT}/${process.env.PG_NAME}?sslmode=${process.env.PG_SSL_MODE}`,
 });
-
 
 /* PORTALS */
 
@@ -30,6 +29,7 @@ export const getPortalsForUser = (userId: string) => {
 export const createPortalForUser = (
   name: string,
   corpusId: string,
+  corpusKey: string,
   type: string,
   description: string,
   key: string,
@@ -41,9 +41,10 @@ export const createPortalForUser = (
   const sanitizedName = name.replace(/'/g, "''");
   const sanitizedDescription = description.replace(/'/g, "''");
 
-  return sendQuery(
-    `INSERT INTO portals (name, vectara_corpus_id, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key) VALUES ('${sanitizedName}', '${corpusId}', '${type}', '${sanitizedDescription}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`
-  );
+  return sendQuery(`
+    INSERT INTO 
+      portals (name, vectara_corpus_id, vectara_corpus_key, type, description, key, is_restricted, owner_id, vectara_customer_id, vectara_api_key)
+      VALUES ('${sanitizedName}', '${corpusId}', '${corpusKey}', '${type}', '${sanitizedDescription}', '${key}', ${isRestricted}, ${ownerId}, '${vectaraCustomerId}', '${vectaraApiKey}');`);
 };
 
 export const deletePortal = (key: string) => {
@@ -124,7 +125,7 @@ export const updateUser = (
     vectaraOAuth2ClientId,
     vectaraOAuth2ClientSecret,
     isVectaraScaleUser
-  )
+  );
   return sendQuery(
     `UPDATE users SET vectara_customer_id = ${
       vectaraCustomerId ? `'${vectaraCustomerId}'` : "NULL"

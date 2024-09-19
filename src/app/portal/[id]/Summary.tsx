@@ -1,6 +1,6 @@
 import { PortalData } from "../../types";
 import { useState } from "react";
-import {ApiV2, streamQueryV2} from "@vectara/stream-query-client";
+import { ApiV2, streamQueryV2 } from "@vectara/stream-query-client";
 import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import {
   ChatSummaryBase,
@@ -12,9 +12,9 @@ import Markdown from "markdown-to-jsx";
 import { Text } from "@chakra-ui/react";
 import { useUser } from "@/app/hooks/useUser";
 import { ACTION_QUERY_PORTAL } from "@/app/analytics";
-import {SummaryLanguage} from "@vectara/react-chatbot/lib/types";
-import {parseSnippet} from "@/app/portal/[id]/utils";
-import * as amplitude from '@amplitude/analytics-browser';
+import { SummaryLanguage } from "@vectara/react-chatbot/lib/types";
+import { parseSnippet } from "@/app/portal/[id]/utils";
+import * as amplitude from "@amplitude/analytics-browser";
 
 export const Summary = (props: PortalData) => {
   const [summary, setSummary] = useState<string | null>();
@@ -44,15 +44,17 @@ export const Summary = (props: PortalData) => {
             snippet: {
               pre,
               text,
-              post
+              post,
             },
             source: document.document_metadata.source,
             url: document.document_metadata.url,
-            title: document.document_metadata.title || text.split(' ').slice(0, 10).join(' '),
-            metadata: document.document_metadata
+            title:
+              document.document_metadata.title ||
+              text.split(" ").slice(0, 10).join(" "),
+            metadata: document.document_metadata,
           } as DeserializedSearchResult);
         });
-        setReferences(results)
+        setReferences(results);
 
         break;
 
@@ -60,12 +62,10 @@ export const Summary = (props: PortalData) => {
         setSummary(event.updatedText ?? undefined);
         break;
 
-
       case "end":
         setIsStreaming(false);
         break;
     }
-
   };
 
   const onSummarize = (query: string) => {
@@ -89,36 +89,38 @@ export const Summary = (props: PortalData) => {
       apiKey: props.vectaraApiKey!,
       customerId: props.vectaraCustomerId!,
       query: query,
-      corpusKey: `${props.name}_${props.vectaraCorpusId}`,
+      corpusKey:
+        props.vectaraCorpusKey ??
+        getBackupCorpusKey(props.name, props.vectaraCorpusId),
       search: {
         limit: 100,
         offset: 0,
         metadataFilter: "",
         lexicalInterpolation: 0.005,
-        reranker: reranker === 272725718
-          ? {
-            type: "mmr",
-            diversityBias: 0.1
-          }
-          : {
-            type: "customer_reranker",
-            // rnk_ prefix needed for conversion from API v1 to v2.
-            rerankerId: `rnk_${reranker}`
-          },
+        reranker:
+          reranker === 272725718
+            ? {
+                type: "mmr",
+                diversityBias: 0.1,
+              }
+            : {
+                type: "customer_reranker",
+                // rnk_ prefix needed for conversion from API v1 to v2.
+                rerankerId: `rnk_${reranker}`,
+              },
         contextConfiguration: {
           sentencesBefore: 2,
           sentencesAfter: 2,
-        }
+        },
       },
       generation: {
         generationPresetName: summaryPromptName,
         maxUsedSearchResults: summaryNumResults,
-        responseLanguage: "eng" as SummaryLanguage
-
-      }
+        responseLanguage: "eng" as SummaryLanguage,
+      },
     };
-    streamQueryV2({streamQueryConfig, onStreamEvent})
-  }
+    streamQueryV2({ streamQueryConfig, onStreamEvent });
+  };
   const SummaryCitation = ({ reference }: { reference: string }) => {
     const referenceIndex = parseInt(reference);
     return (
@@ -140,7 +142,7 @@ export const Summary = (props: PortalData) => {
 
   const reorderedAnswer = summary ? reorderCitations(summary) : summary ?? "";
   const processedSummary = markDownCitations(reorderedAnswer);
-  console.log(references)
+
   return (
     <ChatSummaryBase
       onQuery={(query) => onSummarize(query)}
@@ -162,4 +164,12 @@ export const Summary = (props: PortalData) => {
       </Markdown>
     </ChatSummaryBase>
   );
+};
+
+// In the event we don't have the corpus key (we will do a future backfill),
+// try to derive it. This may not always work.
+const getBackupCorpusKey = (portalName: string, corpusId: string) => {
+  return `${portalName
+    .toLowerCase()
+    .replace(/\s/g, "-")}-portal-corpus_${corpusId}`;
 };

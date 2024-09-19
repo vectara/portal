@@ -108,6 +108,7 @@ const createPortal = async (
   }
 
   const corpusId = response.corpus.corpusId;
+  const corpusKey = response.corpus.corpusKey;
 
   // Step 2. Create the query API key for the corpus.
   response = await createApiKey(
@@ -131,6 +132,7 @@ const createPortal = async (
   await createPortalForUser(
     name,
     corpusId,
+    corpusKey,
     type,
     description,
     portalKey,
