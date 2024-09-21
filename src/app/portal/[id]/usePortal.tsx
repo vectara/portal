@@ -30,6 +30,7 @@ export const usePortal = () => {
         data: {
           name: portalData.name,
           vectaraCorpusId: portalData.vectara_corpus_id,
+          vectaraCorpusKey: portalData.vectara_corpus_key,
           type: portalData.type,
           portalKey: portalData.key,
           vectaraCustomerId: portalData.vectara_customer_id,
