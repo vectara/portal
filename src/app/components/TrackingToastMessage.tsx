@@ -47,7 +47,7 @@ const TrackingPreference = () => {
           <Box width="450px" bg="white" p={3} borderRadius="md">
             <VStack>
             <Text>This website uses analytics to enhance your experience and improve our product. For more information, please see
-              our <Link href="https://vectara.com/legal/privacy-policy/" isExternal>Privacy Policy</Link>.
+              our <Link href="https://vectara.com/legal/privacy-policy/"  color='blue' isExternal>privacy policy</Link>.
               <Text mt="5px" mb="5px">If you choose to opt out, your preference will be saved, and no data will be collected during your visit.</Text>
               Your preference will be saved in a single cookie.
             </Text>
