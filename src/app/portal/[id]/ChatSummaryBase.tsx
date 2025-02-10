@@ -38,6 +38,9 @@ export const ChatSummaryBase = ({
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
 
   const onQueryInternal = () => {
+    if (query.trim() === "") {
+      return;
+    }
     onQuery(query);
     setQuery("");
   };
@@ -276,7 +279,6 @@ const References = ({
                         elRefs.current[index] = ref;
                       }}
                     >
-                      {" "}
                       {reference ? (
                         <Reference
                           title={reference?.title}
@@ -384,6 +386,8 @@ export const applyCitationOrder = (
   searchResults: any[],
   unorderedSummary: string
 ) => {
+  console.log("searchResults", searchResults)
+  console.log("unorderedSummary", unorderedSummary)
   const orderedSearchResults: any[] = [];
   const allCitations = unorderedSummary.match(/\[\d+\]/g) || [];
 
