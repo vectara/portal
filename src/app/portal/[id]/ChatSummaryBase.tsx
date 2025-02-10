@@ -386,8 +386,6 @@ export const applyCitationOrder = (
   searchResults: any[],
   unorderedSummary: string
 ) => {
-  console.log("searchResults", searchResults)
-  console.log("unorderedSummary", unorderedSummary)
   const orderedSearchResults: any[] = [];
   const allCitations = unorderedSummary.match(/\[\d+\]/g) || [];
 
