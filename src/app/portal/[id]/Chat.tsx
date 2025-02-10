@@ -20,10 +20,11 @@ export const Chat = (props: PortalData) => {
     activeMessage,
     isLoading,
     isStreamingResponse,
-  } = useChat(
-    props.vectaraCustomerId,
-    [props.vectaraCorpusId],
-    props.vectaraApiKey
+  } = useChat({
+    customerId: props.vectaraCustomerId,
+    corpusKeys: props.vectaraCorpusKey,
+    apiKey: props.vectaraApiKey
+    }
   );
 
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<

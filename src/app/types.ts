@@ -10,7 +10,7 @@ export type PortalData = {
   isRestricted: boolean;
   description: string | null;
   ownerId: string | null;
-  vectaraCorpusKey: string | null;
+  vectaraCorpusKey: string;
 };
 
 export type UserGroupMembership = {

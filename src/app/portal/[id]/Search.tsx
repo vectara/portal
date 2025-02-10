@@ -54,7 +54,7 @@ export const Search = (props: PortalData) => {
       });
       const results = await fetchSearchResults(value);
 
-      setSearchResults(parseSearchResults(results));
+      setSearchResults(parseSearchResults(results.searchResults));
     }, 500),
     []
   );
@@ -71,7 +71,7 @@ export const Search = (props: PortalData) => {
 
   return (
     <>
-      <Flex as="form" direction="column" gap=".5rem" width="100%">
+      <Flex as="form" direction="column" width="100%">
         <Flex alignItems="center" gap=".5rem" position="relative">
           <Input
             border="1px solid #aaa"
@@ -97,7 +97,6 @@ export const Search = (props: PortalData) => {
         </Flex>
       </Flex>
       <Box
-        overflow="scroll"
         width="100%"
         borderTop={searchResults ? "1px solid #888" : undefined}
       >
