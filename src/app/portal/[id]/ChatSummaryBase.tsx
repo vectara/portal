@@ -284,7 +284,7 @@ const References = ({
                     >
                       {reference ? (
                         <Reference
-                          title={(reference?.document_metadata?.title || 
+                          title={(reference?.title || reference?.document_metadata?.title || 
                                   'Untitled') as string}
                           snippet={reference.snippet}
                           url={reference.url}
