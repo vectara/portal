@@ -3,7 +3,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { atom, useRecoilState } from "recoil";
 
-export const useFileUpload = (corpusId: string) => {
+export const useFileUpload = (corpusKey: string) => {
   const toast = useToast();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const queueFilesForUpload = (files: FileList) => {
@@ -21,7 +21,7 @@ export const useFileUpload = (corpusId: string) => {
     });
     setIsUploading(true);
     files.forEach(async (file, index) => {
-      const resp = await uploadFileToCorpus(corpusId, file);
+      const resp = await uploadFileToCorpus(corpusKey, file);
 
       if (resp.data.success) {
         if (index === files.length - 1) {
@@ -39,9 +39,9 @@ export const useFileUpload = (corpusId: string) => {
     });
   };
 
-  const uploadFileToCorpus = async (corpusId: string, file: File) => {
+  const uploadFileToCorpus = async (corpusKey: string, file: File) => {
     const data = {
-      corpusId,
+      corpusKey,
       file,
     };
 

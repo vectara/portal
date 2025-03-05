@@ -16,7 +16,7 @@ export const useUser = () => {
     try {
       const response = await axios(config);
       const user = response.data.user;
-
+      
       if (user) {
         amplitude.track(ACTION_START_SESSION, { id: user.id, email: user.email });
         amplitude.setUserId(user.id);
@@ -25,9 +25,6 @@ export const useUser = () => {
           email: user.email,
           vectaraCustomerId: user.vectara_customer_id,
           vectaraPersonalApiKey: user.vectara_personal_api_key,
-          vectaraOAuth2ClientId: user.oauth2_client_id,
-          vectaraOAuth2ClientSecret: user.oauth2_client_secret,
-          isVectaraScaleUser: user.is_vectara_scale_user,
           role: user.role,
         });
       }
@@ -39,17 +36,11 @@ export const useUser = () => {
   const updateUser = async (
     vectaraCustomerId?: string,
     vectaraPersonalApiKey?: string,
-    vectaraOAuth2ClientId?: string,
-    vectaraOAuth2ClientSecret?: string,
-    isVectaraScaleUser?: boolean,
     addEmails?: Array<string>
   ) => {
     const response = await axios.patch("/api/me", {
       vectaraCustomerId,
       vectaraPersonalApiKey,
-      vectaraOAuth2ClientId,
-      vectaraOAuth2ClientSecret,
-      isVectaraScaleUser,
       addEmails,
     });
 
@@ -57,10 +48,7 @@ export const useUser = () => {
       setCurrentUser({
         ...currentUser,
         vectaraCustomerId: response.data.user.vectara_customer_id,
-        vectaraPersonalApiKey: response.data.user.vectara_personal_api_key,
-        vectaraOAuth2ClientId: response.data.user.oauth2_client_id,
-        vectaraOAuth2ClientSecret: response.data.user.oauth2_client_secret,
-        isVectaraScaleUser: response.data.user.is_vectara_scale_user,
+        vectaraPersonalApiKey: response.data.user.vectara_personal_api_key
       });
     }
 

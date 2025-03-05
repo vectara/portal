@@ -56,7 +56,7 @@ export const ManagementPanel = ({
     getNextPage,
     getPrevPage,
     reloadCurrentPage,
-  } = useDocuments(portalData.vectaraCorpusId);
+  } = useDocuments(portalData.vectaraCorpusKey, portalData.vectaraApiKey);
 
   const [documents, setDocuments] = useState<Array<{ id: string }>>([]);
   const [isLoadingDocuments, setIsLoadingDocuments] = useState<boolean>(false);
@@ -70,7 +70,7 @@ export const ManagementPanel = ({
 
   useEffect(() => {
     getDocuments();
-  }, [portalData.vectaraCorpusId]);
+  }, [portalData.vectaraCorpusKey]);
 
   const [updatedPortalName, setUpdatedPortalName] = useState<string>(
     portalData.name
@@ -94,7 +94,7 @@ export const ManagementPanel = ({
   const deleteConfirmationRef = useRef<HTMLDivElement>(null);
 
   const { queueFilesForUpload, isUploading } = useFileUpload(
-    portalData.vectaraCorpusId
+    portalData.vectaraCorpusKey
   );
 
   const saveUpdates = () => {
@@ -287,7 +287,7 @@ export const ManagementPanel = ({
               ) : (
                 documents.map((document) => (
                   <Document
-                    key={`document-${portalData.vectaraCorpusId}-${document.id}`}
+                    key={`document-${portalData.vectaraCorpusKey}-${document.id}`}
                     documentId={document.id}
                     onDelete={deleteDocument}
                   />

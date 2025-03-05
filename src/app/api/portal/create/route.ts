@@ -1,5 +1,4 @@
 import axios from "axios";
-import qs from "qs";
 import ShortUniqueId from "short-unique-id";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import { createPortalForUser, getUserByAuthServiceId } from "@/app/api/db";
@@ -49,8 +48,6 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     internalUserData.id,
     internalUserData.vectara_customer_id,
     internalUserData.vectara_personal_api_key,
-    internalUserData.oauth2_client_id,
-    internalUserData.oauth2_client_secret,
     isRestricted
   );
 
@@ -78,8 +75,6 @@ const createPortal = async (
   ownerId: number,
   vectaraCustomerId: string,
   vectaraPersonalApiKey: string,
-  vectaraOAuth2ClientId: string,
-  vectaraOAuth2ClientSecret: string,
   isRestricted: boolean = false
 ): Promise<CreatePortalResponse> => {
   const genericError = {
@@ -91,7 +86,6 @@ const createPortal = async (
   // Step 1. Create the corpus in Vectara.
   let response = await createCorpus(
     name,
-    vectaraCustomerId,
     vectaraPersonalApiKey
   );
 
@@ -107,25 +101,9 @@ const createPortal = async (
     return genericError;
   }
 
-  const corpusId = response.corpus.corpusId;
-  const corpusKey = response.corpus.corpusKey;
+  const corpusId = response.corpus.id;
+  const corpusKey = response.corpus.key;
 
-  // Step 2. Create the query API key for the corpus.
-  response = await createApiKey(
-    name,
-    corpusId,
-    vectaraCustomerId,
-    vectaraOAuth2ClientId,
-    vectaraOAuth2ClientSecret
-  );
-
-  if (!response.apiKey) {
-    return genericError;
-  }
-
-  const apiKey = response.apiKey;
-
-  // Step 3. Create the portal using corpus/customer details.
 
   const portalKey = randomUUID();
 
@@ -139,7 +117,7 @@ const createPortal = async (
     ownerId,
     isRestricted,
     vectaraCustomerId,
-    apiKey
+    vectaraPersonalApiKey
   );
 
   return {
@@ -155,107 +133,55 @@ const createPortal = async (
 
 const createCorpus = async (
   name: string,
-  customerId: string,
   apiKey: string
 ): Promise<SubTaskResponse> => {
+
+  const corpusName = `${name.replace(/ +/g, "-").toLowerCase()}-portal-corpus`;
+  const corpusKey = corpusName.length > 50 ? corpusName.slice(-50) : corpusName;
+
   const data = JSON.stringify({
-    corpus: {
-      id: 0,
-      name: `${name.replace(/ +/g, "-").toLowerCase()}-portal-corpus`,
-      enabled: true,
-      encrypted: true,
-      metadataMaxBytes: 0,
-    },
+    key: corpusKey,
+    name: corpusName,
+  
   });
 
   const config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: "https://api.vectara.io/v1/create-corpus",
+    url: "https://api.vectara.io/v2/corpora",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "x-api-key": apiKey,
-      "customer-id": customerId,
+      "x-api-key": apiKey
     },
     data: data,
   };
 
   const resp = await axios(config);
 
-  const didReachCorpusLimit =
-    resp.data?.status?.code === "ADM__CORPUS_LIMIT_REACHED";
+  if (resp.status !== 201) {
+    let errorMessage = "Unknown error occurred.";
 
-  if (didReachCorpusLimit) {
+    if (resp.data?.messages && resp.data.messages.length > 0) {
+      errorMessage = resp.data.messages.join(", ");
+    } 
+
+    else if (resp.data?.field_errors) {
+      // Convert the field_errors object into a readable string
+      const fieldErrorStrings = Object.entries(resp.data.field_errors)
+        .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(", ") : errors}`)
+        .join("; ");
+
+      errorMessage = `Field errors: ${fieldErrorStrings}`;
+    }
+    console.log(errorMessage);
     return {
-      error:
-        "You may have reached the maximum allowed corpora for your Vectara account.",
+      error: `Unable to create corpus. Reason: ${errorMessage}`,
     };
   }
+
 
   return {
     corpus: resp.data,
   };
-};
-
-const createApiKey = async (
-  name: string,
-  corpusId: string,
-  customerId: string,
-  oAuth2ClientId: string,
-  oAuth2ClientSecret: string
-): Promise<SubTaskResponse> => {
-  const jwt = await getJwt(customerId, oAuth2ClientId, oAuth2ClientSecret);
-
-  const data = JSON.stringify({
-    apiKeyData: [
-      {
-        description: `${name.replace(/ +/g, "-").toLowerCase()}-query-api-key`,
-        apiKeyType: "API_KEY_TYPE__SERVING",
-        corpusId: [corpusId],
-      },
-    ],
-  });
-
-  const config = {
-    method: "post",
-    maxBodyLength: Infinity,
-    url: "https://api.vectara.io/v1/create-api-key",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      Authorization: `Bearer ${jwt}`,
-      "customer-id": customerId,
-    },
-    data: data,
-  };
-
-  const response = await axios(config);
-
-  return {
-    apiKey: response.data.response[0].keyId,
-  };
-};
-
-const getJwt = async (
-  customerId: string,
-  oAuth2ClientId: string,
-  oAuth2ClientSecret: string
-) => {
-  const config = {
-    method: "post",
-    headers: { "content-type": "application/x-www-form-urlencoded" },
-    data: qs.stringify({
-      grant_type: "client_credentials",
-      client_id: oAuth2ClientId,
-      client_secret: oAuth2ClientSecret,
-    }),
-    url: `https://auth.vectara.io/oauth2/token`,
-  };
-
-  const {
-    data: { access_token: jwt },
-  } = await axios(config);
-
-  return jwt;
 };

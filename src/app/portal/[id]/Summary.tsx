@@ -25,7 +25,6 @@ export const Summary = (props: PortalData) => {
     number | undefined
   >();
 
-  const { currentUser } = useUser();
   const onStreamEvent = (event: ApiV2.StreamEvent) => {
     switch (event.type) {
       case "requestError":
@@ -70,15 +69,6 @@ export const Summary = (props: PortalData) => {
 
   const onSummarize = (query: string) => {
     if (!query) return;
-    let summaryPromptName = "vectara-summary-ext-24-05-sml";
-    let reranker = 272725718;
-    let summaryNumResults = 5;
-
-    if (currentUser?.isVectaraScaleUser) {
-      summaryPromptName = "vectara-summary-ext-24-05-med-omni";
-      reranker = 272725719;
-      summaryNumResults = 10;
-    }
 
     amplitude.track(ACTION_QUERY_PORTAL, {
       type: "summary",
@@ -87,7 +77,7 @@ export const Summary = (props: PortalData) => {
 
     const streamQueryConfig: ApiV2.StreamQueryConfig = {
       apiKey: props.vectaraApiKey!,
-      customerId: props.vectaraCustomerId!,
+      customerId: props.vectaraCustomerId,
       query: query,
       corpusKey:
         props.vectaraCorpusKey ??
@@ -97,16 +87,10 @@ export const Summary = (props: PortalData) => {
         offset: 0,
         metadataFilter: "",
         lexicalInterpolation: 0.005,
-        reranker:
-          reranker === 272725718
-            ? {
-                type: "mmr",
-                diversityBias: 0.1,
-              }
-            : {
+        reranker: {
                 type: "customer_reranker",
                 // rnk_ prefix needed for conversion from API v1 to v2.
-                rerankerId: `rnk_${reranker}`,
+                rerankerId: `rnk_${272725719}`,
               },
         contextConfiguration: {
           sentencesBefore: 2,
@@ -114,8 +98,8 @@ export const Summary = (props: PortalData) => {
         },
       },
       generation: {
-        generationPresetName: summaryPromptName,
-        maxUsedSearchResults: summaryNumResults,
+        generationPresetName: "vectara-summary-ext-24-05-med-omni",
+        maxUsedSearchResults: 10,
         responseLanguage: "eng" as SummaryLanguage,
       },
     };
@@ -149,6 +133,7 @@ export const Summary = (props: PortalData) => {
       // TODO: Figure out why references are occasionally undefined
       references={processedReferences.filter((ref) => ref !== undefined)}
       viewedReferenceIndex={viewedReferenceIndex}
+      requestFrom="Summary"
     >
       <Markdown
         options={{

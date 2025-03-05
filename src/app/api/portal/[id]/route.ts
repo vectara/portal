@@ -140,7 +140,7 @@ export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
 
   await deletePortal(portalKey);
   await deleteCorpus(
-    portal.vectara_corpus_id,
+    portal.vectara_corpus_key,
     internalUserData.vectara_personal_api_key
   );
 
@@ -152,15 +152,15 @@ export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
   );
 });
 
-const deleteCorpus = async (corpusId: string, apiKey: string) => {
+const deleteCorpus = async (corpusKey: string, apiKey: string) => {
   const data = JSON.stringify({
-    corpusId,
+    corpusKey,
   });
 
   const config = {
-    method: "post",
+    method: "delete",
     maxBodyLength: Infinity,
-    url: "https://api.vectara.io/v1/delete-corpus",
+    url: `https://api.vectara.io/v2/corpora/${corpusKey}`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",

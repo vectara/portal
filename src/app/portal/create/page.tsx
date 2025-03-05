@@ -27,6 +27,8 @@ interface FormState {
   description?: string;
   type: PortalType;
   isRestricted: boolean;
+  vectaraCustomerId?: string;
+  vectaraApiKey?: string;
 }
 
 interface FormErrors {
@@ -39,6 +41,8 @@ const INITIAL_FORM_STATE: FormState = {
   description: "",
   type: "search",
   isRestricted: false,
+  vectaraCustomerId: "",
+  vectaraApiKey: "",
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
@@ -93,7 +97,9 @@ const CreateForm = () => {
       formState.name,
       formState.description,
       formState.type,
-      formState.isRestricted
+      formState.isRestricted,
+      formState.vectaraCustomerId ?? "",
+      formState.vectaraApiKey ?? "",
     );
 
     if (!result.success) {

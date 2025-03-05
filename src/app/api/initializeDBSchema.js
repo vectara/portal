@@ -11,9 +11,6 @@ const schema = `CREATE TABLE IF NOT EXISTS users (
   role VARCHAR NOT NULL,
   auth_service_id VARCHAR UNIQUE NOT NULL,
   email VARCHAR UNIQUE NOT NULL,
-  oauth2_client_id VARCHAR,
-  oauth2_client_secret VARCHAR,
-  is_vectara_scale_user BOOLEAN DEFAULT false
 );
 
 CREATE TABLE IF NOT EXISTS portals (

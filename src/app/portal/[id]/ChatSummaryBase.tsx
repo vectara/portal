@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
-import { DeserializedSearchResult } from "@vectara/react-search/lib/types";
 import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import Link from "next/link";
 import { useAmplitude } from "amplitude-react";
@@ -21,9 +20,10 @@ interface Props {
   onQuery: (query: string) => void;
   placeholder?: string;
   buttonLabel?: string;
-  references?: Array<DeserializedSearchResult>;
+  references?: Array<any>;
   viewedReferenceIndex?: number;
   children: React.ReactNode;
+  requestFrom?: string;
 }
 
 export const ChatSummaryBase = ({
@@ -33,6 +33,7 @@ export const ChatSummaryBase = ({
   buttonLabel = "Send",
   placeholder = "Ask anything",
   viewedReferenceIndex,
+  requestFrom = "Chat",
 }: Props) => {
   const [query, setQuery] = useState<string>("");
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
@@ -42,7 +43,9 @@ export const ChatSummaryBase = ({
       return;
     }
     onQuery(query);
-    setQuery("");
+    if (requestFrom === "Chat") {
+        setQuery("");
+    }
   };
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -186,7 +189,7 @@ const References = ({
   references,
   showIndex,
 }: {
-  references: Array<DeserializedSearchResult>;
+  references: Array<any>;
   showIndex?: number;
 }) => {
   const elRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -281,7 +284,8 @@ const References = ({
                     >
                       {reference ? (
                         <Reference
-                          title={reference?.title}
+                          title={(reference?.title || reference?.document_metadata?.title || 
+                                  'Untitled') as string}
                           snippet={reference.snippet}
                           url={reference.url}
                           index={index}
