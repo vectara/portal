@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = withApiAuthRequired(async function myApiRoute(req, res) {
   const urlParts = req.nextUrl.pathname.split("/");
-  const corpusId = urlParts[urlParts.length - 1];
+  const corpusKey = urlParts[urlParts.length - 1];
   const pageKey = req.nextUrl.searchParams.get("pageKey");
 
   const session = await getSession(req as NextRequest, res as NextResponse);
@@ -30,10 +30,9 @@ export const GET = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { vectara_customer_id: customerId, vectara_personal_api_key: apiKey } =
-    internalUserData;
+  const { vectara_personal_api_key: apiKey } = internalUserData;
 
-  if (!apiKey || !customerId) {
+  if (!apiKey) {
     return NextResponse.json(
       {
         error: "Insufficient credentials to get documents.",
@@ -43,8 +42,7 @@ export const GET = withApiAuthRequired(async function myApiRoute(req, res) {
   }
 
   const success = await getDocumentsForCorpus(
-    customerId,
-    corpusId,
+    corpusKey,
     apiKey,
     pageKey
   );
@@ -58,26 +56,23 @@ export const GET = withApiAuthRequired(async function myApiRoute(req, res) {
 });
 
 const getDocumentsForCorpus = async (
-  customerId: string,
-  corpusId: string,
+  corpusKey: string,
   apiKey: string,
   pageKey: string | null
 ) => {
   const data = JSON.stringify({
-    corpusId,
-    numResults: 10,
+    limit: 10,
     pageKey: pageKey ?? null,
   });
 
   const config = {
-    method: "post",
+    method: "get",
     maxBodyLength: Infinity,
-    url: "https://api.vectara.io/v1/list-documents",
+    url: `https://api.vectara.io/v2/corpora/${corpusKey}/documents`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
       "x-api-key": apiKey,
-      "customer-id": customerId,
     },
     data: data,
   };

@@ -28,21 +28,15 @@ export const PATCH = withApiAuthRequired(async function myApiRoute(req, res) {
 
   const user = await getUserByAuthServiceId(session.user.sub);
   const {
-    vectaraCustomerId,
     vectaraPersonalApiKey,
-    vectaraOAuth2ClientId,
-    vectaraOAuth2ClientSecret,
-    isVectaraScaleUser
+    vectaraCustomerId,
   } = await req.json();
 
   try {
     const updated = await updateUser(
       user.id,
-      vectaraCustomerId,
       vectaraPersonalApiKey,
-      vectaraOAuth2ClientId,
-      vectaraOAuth2ClientSecret,
-      isVectaraScaleUser
+      vectaraCustomerId,
     );
 
     return updated.length === 0

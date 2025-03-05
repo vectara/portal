@@ -1,29 +1,34 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 
-export const useDocuments = (corpusId: string) => {
+export const useDocuments = (corpusKey: string, apiKey: string) => {
   const [currPageKey, setCurrPageKey] = useState<string | null>(null);
   const [nextPageKey, setNextPageKey] = useState<string | null>(null);
 
   // TODO: Optimize. This is absolutely not memory-efficient :)
   const [prevPageKeys, setPrevPageKeys] = useState<(string | null)[]>([]);
 
-  const baseUrl = `/api/documents/${corpusId}`;
+  const baseUrl = `https://api.vectara.io/v2/corpora/${corpusKey}/documents`;
 
   const getDocumentsForCorpus = async () => {
-    return sendGetDocumentsRequest(baseUrl);
+
+    return sendGetDocumentsRequest(baseUrl, null);
   };
 
   const reloadCurrentPage = async () => {
-    const url = currPageKey ? `${baseUrl}/pageKey=${currPageKey}` : baseUrl;
-    return sendGetDocumentsRequest(url);
+    return sendGetDocumentsRequest(baseUrl, currPageKey);
   };
 
   const deleteDocument = async (documentId: string) => {
     try {
       const response = await axios({
         method: "delete",
-        url: `/api/documents/${corpusId}/${documentId}`,
+        url: `https://api.vectara.io/v2/corpora/${corpusKey}/documents/${documentId}`,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "x-api-key": apiKey,
+        },
       });
 
       const {
@@ -47,9 +52,7 @@ export const useDocuments = (corpusId: string) => {
   const getNextPage = nextPageKey
     ? async () => {
         setPrevPageKeys((prev) => [...prev, currPageKey]);
-        return sendGetDocumentsRequest(
-          `${baseUrl}?pageKey=${encodeURIComponent(nextPageKey)}`
-        );
+        return sendGetDocumentsRequest(baseUrl, nextPageKey);
       }
     : null;
 
@@ -59,9 +62,7 @@ export const useDocuments = (corpusId: string) => {
           setNextPageKey(currPageKey);
           const pageKey = prevPageKeys[prevPageKeys.length - 1];
           const docs = await sendGetDocumentsRequest(
-            pageKey
-              ? `${baseUrl}?pageKey=${encodeURIComponent(pageKey)}`
-              : baseUrl
+            baseUrl, pageKey
           );
           setPrevPageKeys((prev) => prev.slice(0, -1));
           setCurrPageKey(pageKey);
@@ -69,16 +70,23 @@ export const useDocuments = (corpusId: string) => {
         }
       : null;
 
-  const sendGetDocumentsRequest = async (url: string) => {
+  const sendGetDocumentsRequest = async (url: string, pageKey: string | null) => {
     try {
       const response = await axios({
         method: "get",
         url,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "x-api-key": apiKey,
+        },
+        data: {
+          pageKey: pageKey ?? null,
+        },
       });
-
-      const {
-        success: { document: documents, nextPageKey: responseNextPageKey },
-      } = response.data;
+   
+      const { documents, metadata } = response.data;
+      const responseNextPageKey = metadata?.page_key;
 
       setCurrPageKey(nextPageKey);
 

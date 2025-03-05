@@ -2,9 +2,7 @@ import { getUserByAuthServiceId } from "@/app/api/db";
 import { getSession, withApiAuthRequired } from "@auth0/nextjs-auth0";
 import formidable from "formidable";
 import { NextRequest, NextResponse } from "next/server";
-import { Blob as BlobConstructor } from "buffer";
 
-import fs from "fs";
 import axios from "axios";
 
 export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
@@ -30,10 +28,9 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { vectara_customer_id: customerId, vectara_personal_api_key: apiKey } =
-    internalUserData;
+  const { vectara_personal_api_key: apiKey } = internalUserData;
 
-  if (!apiKey || !customerId) {
+  if (!apiKey) {
     return NextResponse.json(
       {
         error: "Insufficient credentials to upload file",
@@ -42,7 +39,7 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const success = await uploadFile(req, customerId, apiKey);
+  const success = await uploadFile(req, apiKey);
 
   return NextResponse.json(
     {
@@ -54,16 +51,15 @@ export const POST = withApiAuthRequired(async function myApiRoute(req, res) {
 
 const uploadFile = async (
   req: NextRequest,
-  customerId: string,
   apiKey: string
 ) => {
   const form = formidable({});
   try {
     const inboundFormData = await req.formData();
-    const corpusId = inboundFormData.get("corpusId");
+    const corpusKey = inboundFormData.get("corpusKey");
     const file = inboundFormData.get("file");
 
-    if (!customerId || !corpusId || !file) {
+    if (!corpusKey || !file) {
       return false;
     }
 
@@ -73,7 +69,7 @@ const uploadFile = async (
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `https://api.vectara.io/v1/upload?c=${customerId}&o=${corpusId}`,
+      url: `https://api.vectara.io/v2/corpora/${corpusKey}/upload_file`,
       headers: {
         "Content-Type": "multipart/form-data",
         Accept: "application/json",

@@ -52,41 +52,28 @@ const panelStyles = {
 };
 
 interface FormState {
-  vectaraCustomerId?: string;
   vectaraPersonalApiKey?: string;
-  vectaraOAuth2ClientId?: string;
-  vectaraOAuth2ClientSecret?: string;
   pendingUserEmailsToAdd?: Array<string>;
   userEmailToAdd?: string;
-  isVectaraScaleUser: boolean;
+  vectaraCustomerId?: string;
 }
 
 interface FormErrors {
-  vectaraCustomerId: boolean;
   vectaraPersonalApiKey: boolean;
-  vectaraOAuth2ClientId: boolean;
-  vectaraOAuth2ClientSecret: boolean;
   userEmailToAdd: boolean;
-  isVectaraScaleUser: boolean;
+
 }
 
 const INITIAL_FORM_STATE: FormState = {
-  vectaraCustomerId: undefined,
   vectaraPersonalApiKey: undefined,
   pendingUserEmailsToAdd: undefined,
-  vectaraOAuth2ClientId: undefined,
-  vectaraOAuth2ClientSecret: undefined,
   userEmailToAdd: undefined,
-  isVectaraScaleUser: false,
+  vectaraCustomerId: undefined
 };
 
 const INITIAL_FORM_ERRORS: FormErrors = {
-  vectaraCustomerId: false,
   vectaraPersonalApiKey: false,
-  vectaraOAuth2ClientId: false,
-  vectaraOAuth2ClientSecret: false,
   userEmailToAdd: false,
-  isVectaraScaleUser: false,
 };
 
 const Content = () => {
@@ -106,12 +93,8 @@ const Content = () => {
 
     setFormState({
       ...INITIAL_FORM_STATE,
-      vectaraCustomerId: currentUser.vectaraCustomerId ?? undefined,
       vectaraPersonalApiKey: currentUser.vectaraPersonalApiKey ?? undefined,
-      vectaraOAuth2ClientId: currentUser.vectaraOAuth2ClientId ?? undefined,
-      vectaraOAuth2ClientSecret:
-        currentUser.vectaraOAuth2ClientSecret ?? undefined,
-      isVectaraScaleUser: currentUser.isVectaraScaleUser ?? false,
+      vectaraCustomerId: currentUser.vectaraCustomerId ?? undefined
     });
   }, [currentUser]);
 
@@ -123,9 +106,6 @@ const Content = () => {
     await updateUser(
       formState.vectaraCustomerId,
       formState.vectaraPersonalApiKey,
-      formState.vectaraOAuth2ClientId,
-      formState.vectaraOAuth2ClientSecret,
-      formState.isVectaraScaleUser,
       formState.pendingUserEmailsToAdd
     );
 
@@ -221,114 +201,6 @@ const Content = () => {
             </FormControl>
           </Box>
         </Flex>
-        <Flex gap="1rem">
-          <Box>
-            <FormControl style={formControlStyles}>
-              <Flex gap={2} alignItems="center">
-                <FormLabel style={formLabelStyles}>
-                  OAuth 2.0 Client ID
-                </FormLabel>
-                <Link
-                  href="https://docs.vectara.com/docs/console-ui/app-clients"
-                  target="_blank"
-                >
-                  <QuestionIcon marginBottom="0.75rem" />
-                </Link>
-              </Flex>
-
-              <Input
-                type="password"
-                value={formState.vectaraOAuth2ClientId ?? ""}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormState({
-                    ...formState,
-                    vectaraOAuth2ClientId: e.target.value ?? undefined,
-                  });
-
-                  setIsSubmitedDisabled(false);
-                }}
-                border="1px solid #888"
-                minWidth="320px"
-              />
-            </FormControl>
-          </Box>
-          <Box>
-            <FormControl style={formControlStyles}>
-              <Flex gap={2} alignItems="center">
-                <FormLabel style={formLabelStyles}>
-                  OAuth 2.0 Client Secret
-                </FormLabel>
-                <Link
-                  href="https://docs.vectara.com/docs/console-ui/app-clients"
-                  target="_blank"
-                >
-                  <QuestionIcon marginBottom="0.75rem" />
-                </Link>
-              </Flex>
-
-              <Input
-                type="password"
-                value={formState.vectaraOAuth2ClientSecret ?? ""}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormState({
-                    ...formState,
-                    vectaraOAuth2ClientSecret: e.target.value ?? undefined,
-                  });
-
-                  setIsSubmitedDisabled(false);
-                }}
-                border="1px solid #888"
-                minWidth="320px"
-              />
-            </FormControl>
-          </Box>
-        </Flex>
-      </Flex>
-      <Flex gap="1rem">
-        <Box maxWidth="600px">
-          <FormControl as={Flex} direction="column">
-            <Flex>
-              <FormLabel htmlFor="advanceConfig" fontWeight={400}>
-                Are you a{" "}
-                <Link
-                  href="https://vectara.com/pricing/"
-                  isExternal
-                  textDecoration="underline"
-                >
-                  scale customer
-                </Link>
-                ?
-              </FormLabel>
-              <Switch
-                marginLeft="50px"
-                id="advanceConfig"
-                isChecked={formState.isVectaraScaleUser}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setFormState({
-                    ...formState,
-                    isVectaraScaleUser: e.target.checked ?? false,
-                  });
-                  setIsSubmitedDisabled(false);
-                }}
-                size="md"
-              />
-            </Flex>
-            <Box fontWeight={600}>
-              {formState.isVectaraScaleUser && (
-                <>
-                  <Text fontSize="xs" color="#FEFCBF">
-                    You have indicated that you are a Scale customer.
-                  </Text>
-                  <Text fontSize="xs" color="#FEFCBF">
-                    {" "}
-                    If you have enabled this and are not a Scale customer, your
-                    portals will not work.
-                  </Text>
-                </>
-              )}
-            </Box>
-          </FormControl>
-        </Box>
       </Flex>
       <UserGroups userId={currentUser.id} />
       <Flex>

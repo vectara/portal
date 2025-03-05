@@ -23,9 +23,9 @@ export const Chat = (props: PortalData) => {
   } = useChat({
     customerId: props.vectaraCustomerId,
     corpusKeys: props.vectaraCorpusKey,
-    apiKey: props.vectaraApiKey
-    }
-  );
+    apiKey: props.vectaraApiKey,
+  });
+
 
   const [viewedReferenceIndex, setViewedReferenceIndex] = useState<
     number | undefined

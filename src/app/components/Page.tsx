@@ -24,7 +24,7 @@ interface PageProps {
   accessPrerequisites?: PagePrerequisites;
   children?: ReactNode;
 }
-
+ 
 const HEADERLESS_PAGE_IDS = ["login", "portal", "signup"];
 
 export const Page = ({ pageId, children, accessPrerequisites }: PageProps) => {

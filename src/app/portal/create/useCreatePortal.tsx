@@ -9,7 +9,9 @@ export const useCreatePortal = () => {
     name: string,
     description: string,
     type: PortalType,
-    isRestricted: boolean
+    isRestricted: boolean,
+    vectaraCustomerId: string,
+    vectaraApiKey: string
   ) => {
     const config = {
       method: "post",
@@ -20,6 +22,8 @@ export const useCreatePortal = () => {
         description,
         type,
         isRestricted,
+        vectaraCustomerId,
+        vectaraApiKey,
       },
     };
 

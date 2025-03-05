@@ -20,7 +20,11 @@ export const usePortals = () => {
   }, [currentUser]);
 
   const getPortals = useCallback(async (): Promise<PortalData[]> => {
-    if (!currentUser?.id) return [];
+    if (!currentUser?.id) {
+      console.log("No current user ID available");
+      return [];
+    }
+
     const config = {
       method: "get",
       maxBodyLength: Infinity,
@@ -28,18 +32,23 @@ export const usePortals = () => {
     };
 
     const response = await axios(config);
-
-    return response.data.portals.map((portal: any) => ({
-      name: portal.name,
-      vectaraCorpusId: portal.vectara_corpus_id,
-      type: portal.type,
-      portalKey: portal.key,
-      vectaraCustomerId: portal.vectara_customer_id,
-      vectaraApiKey: portal.vectara_personal_api_key,
-      isRestricted: portal.is_restricted,
-      description: portal.description,
-      ownerId: portal.owner_id,
-    }));
+    console.log("API response:", response.data);
+    
+    return response.data.portals.map((portal: any) => {
+      const portalData = {
+        name: portal.name,
+        vectaraCorpusId: portal.vectara_corpus_id,
+        vectaraCorpusKey: portal.vectara_corpus_key,
+        type: portal.type,
+        portalKey: portal.key,
+        vectaraApiKey: currentUser.vectaraPersonalApiKey,
+        vectaraCustomerId: currentUser.vectaraCustomerId,
+        isRestricted: portal.is_restricted,
+        description: portal.description,
+        ownerId: portal.owner_id,
+      };
+      return portalData;
+    });
   }, [currentUser]);
 
   return { portals, isLoading };

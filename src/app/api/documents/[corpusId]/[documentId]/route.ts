@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
   const urlParts = req.nextUrl.pathname.split("/");
-  const corpusId = urlParts[urlParts.length - 2];
+  const corpusKey = urlParts[urlParts.length - 2];
   const documentId = urlParts[urlParts.length - 1];
 
   const session = await getSession(req as NextRequest, res as NextResponse);
@@ -30,10 +30,10 @@ export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
     );
   }
 
-  const { vectara_customer_id: customerId, vectara_personal_api_key: apiKey } =
+  const { vectara_personal_api_key: apiKey } =
     internalUserData;
 
-  if (!apiKey || !customerId) {
+  if (!apiKey) {
     return NextResponse.json(
       {
         error: "Insufficient credentials to get documents.",
@@ -43,8 +43,7 @@ export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
   }
 
   const success = await deleteDocumentForCorpus(
-    customerId,
-    corpusId,
+    corpusKey,
     documentId,
     apiKey
   );
@@ -58,28 +57,20 @@ export const DELETE = withApiAuthRequired(async function myApiRoute(req, res) {
 });
 
 const deleteDocumentForCorpus = async (
-  customerId: string,
-  corpusId: string,
+  corpusKey: string,
   documentId: string,
   apiKey: string
 ) => {
-  const data = JSON.stringify({
-    customerId,
-    corpusId,
-    documentId,
-  });
 
   const config = {
-    method: "post",
+    method: "delete",
     maxBodyLength: Infinity,
-    url: "https://api.vectara.io/v1/delete-doc",
+    url: `https://api.vectara.io/v2/corpora/${corpusKey}/documents/${documentId}`,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
       "x-api-key": apiKey,
-      "customer-id": customerId,
-    },
-    data: data,
+    }
   };
 
   const resp = await axios(config);

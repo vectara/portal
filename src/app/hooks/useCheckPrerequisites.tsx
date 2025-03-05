@@ -48,9 +48,7 @@ export const useCheckPrequisites = (prereqs?: PagePrerequisites) => {
     if (shouldVerifyVectaraCredentials) {
       accessCheck =
         !!currentUser?.vectaraCustomerId &&
-        !!currentUser?.vectaraPersonalApiKey &&
-        !!currentUser?.vectaraOAuth2ClientId &&
-        !!currentUser?.vectaraOAuth2ClientSecret;
+        !!currentUser?.vectaraPersonalApiKey
 
       if (!accessCheck) {
         router.push("/me");
